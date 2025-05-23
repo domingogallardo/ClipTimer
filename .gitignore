@@ -1,0 +1,38 @@
+//
+//  .gitignore
+//  ClipTimer
+//
+//  Created by Domingo Gallardo on 23/5/25.
+//
+
+# Archivos generados por Xcode
+DerivedData/
+build/
+*.xcworkspace
+xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# Archivos de sistema
+.DS_Store
+
+# Archivos de playground
+timeline.xctimeline
+playground.xcworkspace
+
+# Swift Package Manager
+.swiftpm
+.build/
+Package.resolved
+
+# Archivos de resultado de testing
+*.xcresult
+
+# Archivos de logs
+*.log
+
+# Archivos de distribución
+*.ipa
+
+# Ignorar carpeta Misc
+Misc/
