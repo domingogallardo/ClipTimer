@@ -20,11 +20,16 @@ struct ClipTimerApp: App {
                        minHeight: 300, idealHeight: 420)
         }
         .commands {
-            CommandGroup(before: .pasteboard) {
-                Button("Undo") {
-                    store.undo()
+            CommandGroup(replacing: .undoRedo) {
+                Button("Deshacer") {
+                    NSApp.keyWindow?.undoManager?.undo()
                 }
                 .keyboardShortcut("z")
+                
+                Button("Rehacer") {
+                    NSApp.keyWindow?.undoManager?.redo()
+                }
+                .keyboardShortcut("Z", modifiers: [.command, .shift])
             }
             CommandGroup(replacing: .pasteboard) {
                 Button("Copiar resumen de tareas") {

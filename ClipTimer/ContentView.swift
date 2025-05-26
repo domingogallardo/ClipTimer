@@ -22,18 +22,19 @@ struct Task: Identifiable {
 @MainActor
 final class TaskStore: ObservableObject {
     @Published var tasks: [Task] = []
-    private var undoStack: [[Task]] = []
+    weak var undoManager: UndoManager?
 
     private var timer: Timer?
 
-    private func pushUndo() {
-        undoStack.append(tasks)
-        if undoStack.count > 50 { undoStack.removeFirst() }
-    }
-    
-    func undo() {
-        guard let previous = undoStack.popLast() else { return }
-        tasks = previous
+    private func registerUndo(previousTasks: [Task], actionName: String) {
+        undoManager?.registerUndo(withTarget: self) { target in
+            DispatchQueue.main.async {
+                let current = target.tasks
+                target.tasks = previousTasks
+                target.registerUndo(previousTasks: current, actionName: actionName)
+            }
+        }
+        undoManager?.setActionName(actionName)
     }
     
     init() {
@@ -66,24 +67,26 @@ final class TaskStore: ObservableObject {
     }
     
     func replaceTasksFromClipboard() {
-        pushUndo()
+        let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let newTasks = tasksString
                 .split(separator: "\n")
                 .map { String($0) }
-                .compactMap { parseTaskLine($0) }  // ahora usaremos un parser
+                .compactMap { parseTaskLine($0) }
             tasks = newTasks
+            registerUndo(previousTasks: before, actionName: "Reemplazar tareas")
         }
     }
 
     func addTasksFromClipboard() {
-        pushUndo()
+        let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let addedTasks = tasksString
                 .split(separator: "\n")
                 .map { String($0) }
                 .compactMap { parseTaskLine($0) }
             tasks.append(contentsOf: addedTasks)
+            registerUndo(previousTasks: before, actionName: "Añadir tareas")
         }
     }
 
@@ -118,9 +121,11 @@ final class TaskStore: ObservableObject {
                                      repeats: true)
     }
     
+
     func delete(_ task: Task) {
-        pushUndo()
+        let before = tasks
         tasks.removeAll { $0.id == task.id }
+        registerUndo(previousTasks: before, actionName: "Eliminar tarea")
     }
 
     @objc private func timerDidFire(_ timer: Timer) {
@@ -148,6 +153,7 @@ final class TaskStore: ObservableObject {
 
 struct ContentView: View {
     @EnvironmentObject private var store: TaskStore
+    @Environment(\.undoManager) private var undoManager
     
     var instruction: String {
         if store.tasks.isEmpty {
@@ -159,15 +165,15 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-
+            
             // Cabecera (título + botón “+” en toolbar)
             Text("Tasks")
                 .font(.system(size: 24, weight: .bold))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
-
+            
             Divider()
-
+            
             // Lista de tareas
             List {
                 ForEach(store.tasks) { task in
@@ -184,7 +190,7 @@ struct ContentView: View {
             .listStyle(.inset(alternatesRowBackgrounds: true))
             .frame(minHeight: 300) // Mínimo espacio para la lista
             .padding(.horizontal)
-
+            
             // Instrucciones para copiar resumen
             Text(instruction)
                 .font(.footnote)
@@ -194,9 +200,9 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .transition(.opacity)
                 .animation(.easeInOut, value: instruction)
-
+            
             Divider()
-
+            
             // Total
             HStack {
                 Text("Working time")
@@ -207,6 +213,9 @@ struct ContentView: View {
                     .monospacedDigit()
             }
             .padding()
+        }
+        .onAppear {
+            store.undoManager = undoManager
         }
     }
 }
