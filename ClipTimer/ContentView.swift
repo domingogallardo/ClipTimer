@@ -10,7 +10,6 @@ import AppKit
 
 // MARK: - Modelo + Store
 
-
 struct Task: Identifiable {
     let id = UUID()
     let rawName: String
@@ -46,7 +45,7 @@ final class TaskStore: ObservableObject {
     }
     
     var summaryText: String {
-        if tasks.isEmpty { return "Sin tareas." }
+        if tasks.isEmpty { return "No tasks." }
         return tasks
             .map { "- \($0.name): \($0.elapsed.hms)" }
             .joined(separator: "\n") +
@@ -74,7 +73,7 @@ final class TaskStore: ObservableObject {
                 .map { String($0) }
                 .compactMap { parseTaskLine($0) }
             tasks = newTasks
-            registerUndo(previousTasks: before, actionName: "Reemplazar tareas")
+            registerUndo(previousTasks: before, actionName: "Replace tasks")
         }
     }
 
@@ -86,7 +85,7 @@ final class TaskStore: ObservableObject {
                 .map { String($0) }
                 .compactMap { parseTaskLine($0) }
             tasks.append(contentsOf: addedTasks)
-            registerUndo(previousTasks: before, actionName: "Añadir tareas")
+            registerUndo(previousTasks: before, actionName: "Add tasks")
         }
     }
 
@@ -125,7 +124,7 @@ final class TaskStore: ObservableObject {
     func delete(_ task: Task) {
         let before = tasks
         tasks.removeAll { $0.id == task.id }
-        registerUndo(previousTasks: before, actionName: "Eliminar tarea")
+        registerUndo(previousTasks: before, actionName: "Delete task")
     }
 
     @objc private func timerDidFire(_ timer: Timer) {
@@ -154,6 +153,7 @@ final class TaskStore: ObservableObject {
 struct ContentView: View {
     @EnvironmentObject private var store: TaskStore
     @Environment(\.undoManager) private var undoManager
+    @State private var showHelp = false
     
     var instruction: String {
         if store.tasks.isEmpty {
@@ -165,12 +165,22 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            
-            // Cabecera (título + botón “+” en toolbar)
-            Text("Tasks")
-                .font(.system(size: 24, weight: .bold))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
+            HStack {
+                Text("Tasks")
+                    .font(.system(size: 24, weight: .bold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                Spacer()
+                Button {
+                    withAnimation { showHelp.toggle() }
+                } label: {
+                    Image(systemName: "keyboard")
+                        .font(.title2)
+                }
+                .buttonStyle(.borderless)
+                .help("Show help (⌥⇧⌘?")
+                .padding(.horizontal, 16)
+            }
             
             Divider()
             
@@ -191,15 +201,6 @@ struct ContentView: View {
             .frame(minHeight: 300) // Mínimo espacio para la lista
             .padding(.horizontal)
             
-            // Instrucciones para copiar resumen
-            Text(instruction)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .padding(.vertical, 8)
-                .padding(.horizontal)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .transition(.opacity)
-                .animation(.easeInOut, value: instruction)
             
             Divider()
             
@@ -216,6 +217,21 @@ struct ContentView: View {
         }
         .onAppear {
             store.undoManager = undoManager
+        }.overlay {
+            ZStack(alignment: .trailing) {
+                if showHelp {
+                    Color.black.opacity(0.05)        // o .clear si no quieres sombreado
+                        .ignoresSafeArea()
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            withAnimation(.easeInOut) { showHelp = false }
+                        }
+                        .transition(.opacity)        // fundido de la capa (opcional)
+                    HelpOverlay()
+                        .transition(.move(edge: .trailing))
+                }
+            }
+            .animation(.easeInOut(duration: 0.35), value: showHelp)
         }
     }
 }

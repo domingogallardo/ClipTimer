@@ -10,7 +10,7 @@ import SwiftUI
 @main
 struct ClipTimerApp: App {
     @StateObject private var store = TaskStore()
-
+    
     var body: some Scene {
         // ── Ventana principal ─────────────────────────────────────────────
         WindowGroup {
@@ -21,32 +21,32 @@ struct ClipTimerApp: App {
         }
         .commands {
             CommandGroup(replacing: .undoRedo) {
-                Button("Deshacer") {
+                Button("Undo") {
                     NSApp.keyWindow?.undoManager?.undo()
                 }
                 .keyboardShortcut("z")
                 
-                Button("Rehacer") {
+                Button("Redo") {
                     NSApp.keyWindow?.undoManager?.redo()
                 }
                 .keyboardShortcut("Z", modifiers: [.command, .shift])
             }
             CommandGroup(replacing: .pasteboard) {
-                Button("Copiar resumen de tareas") {
+                Button("Copy task summary") {
                     store.copySummaryToClipboard()
                 }
                 .keyboardShortcut("c")       // ⌘C = resumen
                 Divider()
-                Button("Cortar") {           // ⌘X
+                Button("Cut") {           // ⌘X
                     NSApp.sendAction(#selector(NSText.cut(_:)), to: nil, from: nil)
                 }
                 .keyboardShortcut("x")
-                Button("Pegar tareas (reemplazar)") {
+                Button("Paste tasks (replace)") {
                     store.replaceTasksFromClipboard()
                 }
                 .keyboardShortcut("v") // ⌘V
 
-                Button("Pegar tareas (añadir)") {
+                Button("Paste tasks (append)") {
                     store.addTasksFromClipboard()
                 }
                 .keyboardShortcut("V", modifiers: [.command, .shift]) // ⇧⌘V
@@ -54,11 +54,11 @@ struct ClipTimerApp: App {
         }
 
         MenuBarExtra {
-            Button("Copiar resumen de tareas") {
+            Button("Copy task summary") {
                 store.copySummaryToClipboard()
             }
             Divider()
-            Button("Abrir ventana principal") {
+            Button("Open main window") {
                 NSApp.activate(ignoringOtherApps: true)
             }
         } label: {
