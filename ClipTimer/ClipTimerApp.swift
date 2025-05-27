@@ -51,6 +51,17 @@ struct ClipTimerApp: App {
                 }
                 .keyboardShortcut("V", modifiers: [.command, .shift]) // ⇧⌘V
             }
+            CommandMenu("Tasks") {
+                Button("Pause Active Task") {
+                    store.pauseActiveTask()
+                }
+                .keyboardShortcut("p", modifiers: .command)
+
+                Button("Restart Last Paused Task") {
+                    store.restartLastPausedTask()
+                }
+                .keyboardShortcut("r", modifiers: .command)
+            }
         }
 
         MenuBarExtra {

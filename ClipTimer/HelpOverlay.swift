@@ -24,7 +24,9 @@ struct HelpOverlay: View {
         .init(key: "⇧⌘V", description: "Paste tasks (append)"),
         .init(key: "⌘X", description: "Cut"),
         .init(key: "⌘Z", description: "Undo"),
-        .init(key: "⇧⌘Z", description: "Redo")
+        .init(key: "⇧⌘Z", description: "Redo"),
+        .init(key: "⌘P", description: "Pause active task"),
+        .init(key: "⌘R", description: "Restart last paused task")
     ]
 
     var body: some View {

@@ -22,7 +22,7 @@ struct Task: Identifiable {
 final class TaskStore: ObservableObject {
     @Published var tasks: [Task] = []
     weak var undoManager: UndoManager?
-
+    private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
 
     private func registerUndo(previousTasks: [Task], actionName: String) {
@@ -145,6 +145,30 @@ final class TaskStore: ObservableObject {
         let pb = NSPasteboard.general
         pb.clearContents()
         return pb.setString(summaryWithTotal, forType: .string)
+    }
+    
+    var activeTask: Task? {
+        tasks.first(where: { $0.isActive })
+    }
+
+    // Pausa la tarea activa (si hay)
+    func pauseActiveTask() {
+        if let idx = tasks.firstIndex(where: { $0.isActive }) {
+            tasks[idx].isActive = false
+            lastPausedTaskID = tasks[idx].id
+        }
+    }
+
+    // Reinicia (reanuda) la última tarea pausada
+    func restartLastPausedTask() {
+        guard let id = lastPausedTaskID,
+              let idx = tasks.firstIndex(where: { $0.id == id }) else { return }
+        // Desactiva todas
+        for i in tasks.indices {
+            tasks[i].isActive = false
+        }
+        // Activa la tarea pausada
+        tasks[idx].isActive = true
     }
 }
 
