@@ -202,7 +202,7 @@ struct ContentView: View {
                         .font(.title2)
                 }
                 .buttonStyle(.borderless)
-                .help("Show help (⌥⇧⌘?")
+                .help("Show keyboard shortcuts")
                 .padding(.horizontal, 16)
             }
             
@@ -244,11 +244,14 @@ struct ContentView: View {
         }.overlay {
             ZStack(alignment: .trailing) {
                 if showHelp {
-                    Color.black.opacity(0.05)        // o .clear si no quieres sombreado
+                    Color.clear        // o .clear si no quieres sombreado
                         .ignoresSafeArea()
                         .contentShape(Rectangle())
                         .transition(.opacity)        // fundido de la capa (opcional)
                     HelpOverlay()
+                        .background(Color(NSColor.windowBackgroundColor))
+                        .compositingGroup()
+                        .shadow(color: Color.black.opacity(0.3), radius: 14, x: -8, y: 0)
                         .transition(.move(edge: .trailing))
                 }
             }.onTapGesture {

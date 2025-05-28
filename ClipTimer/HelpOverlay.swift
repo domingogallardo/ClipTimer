@@ -54,26 +54,9 @@ struct HelpOverlay: View {
         .padding()
         .frame(maxWidth: 280, maxHeight: .infinity)
         .background(.ultraThinMaterial)
-
         .transition(.move(edge: .trailing))
     }
 }
-
-// MARK: - Integration guide
-/*
-
-4️⃣  (Optional) Define a global key equivalent using a menu command,
-    so ⌥⇧⌘? toggles the panel from anywhere:
-
-    .commands {
-        CommandMenu("Help") {
-            Button(action: { showHelp.toggle() }) {
-                Text("Show Help Panel")
-            }
-            .keyboardShortcut("?", modifiers: [.option, .shift, .command])
-        }
-    }
-*/
 
 // MARK: - Preview
 #if DEBUG
