@@ -247,13 +247,12 @@ struct ContentView: View {
                     Color.black.opacity(0.05)        // o .clear si no quieres sombreado
                         .ignoresSafeArea()
                         .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation(.easeInOut) { showHelp = false }
-                        }
                         .transition(.opacity)        // fundido de la capa (opcional)
                     HelpOverlay()
                         .transition(.move(edge: .trailing))
                 }
+            }.onTapGesture {
+                withAnimation(.easeInOut) { showHelp = false }
             }
             .animation(.easeInOut(duration: 0.35), value: showHelp)
         }
