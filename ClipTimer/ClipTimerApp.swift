@@ -13,11 +13,16 @@ struct ClipTimerApp: App {
     
     var body: some Scene {
         // ── Ventana principal ─────────────────────────────────────────────
-        WindowGroup {
+        Window("CipTimer", id: "main") {
             ContentView()
                 .environmentObject(store)
-                .frame(minWidth: 380, idealWidth: 480,
-                       minHeight: 300, idealHeight: 420)
+                .frame(
+                    minWidth: 380, idealWidth: 380,
+                    minHeight: 540, idealHeight: 540
+                ).onAppear {
+                    // Centrar la ventana en pantalla al arrancar
+                    NSApp.windows.first?.center()
+                }
         }
         .commands {
             CommandGroup(replacing: .undoRedo) {
