@@ -278,24 +278,23 @@ struct TaskRow: View {
             Button {
                 toggle()
             } label: {
-                Image(systemName: task.isActive ? "power.circle.fill"
-                                                : "power.circle")
-                    .symbolRenderingMode(.palette)
-                    .foregroundStyle(task.isActive ? .green : .secondary)
-                    .padding(4)
-                    .scaleEffect(isAnimating ? 1.15 : 1.0)
-                    .animation(task.isActive
+                Image(systemName: task.isActive ? "power.circle.fill" : "power.circle")
+                    .resizable()
+                    .frame(width: 22, height: 22)
+                    .foregroundColor(task.isActive ? .green : .secondary)
+                    .scaleEffect(isAnimating ? 1.25 : 1.0)                    .animation(task.isActive
                                ? .easeInOut(duration: 1).repeatForever(autoreverses: true)
                                : .default,
                                value: isAnimating)
+                    .padding(4)
             }
             .buttonStyle(.plain)
-        }
-        .onAppear {                      // start/stop animation on first display
-            isAnimating = task.isActive
-        }
-        .onChange(of: task.isActive) { _, newValue in
-            isAnimating = newValue
+            .onAppear {
+                isAnimating = task.isActive
+            }
+            .onChange(of: task.isActive) { _, newValue in
+                isAnimating = newValue
+            }
         }
         .padding(.vertical, 4)
     }
@@ -318,5 +317,17 @@ extension TimeInterval {
 #Preview {
     ContentView()
         .environmentObject(TaskStore())
+        .frame(width: 380, height: 600)
+}
+
+#Preview {
+    let store = TaskStore()
+    store.tasks = [
+        Task(rawName: "Write Report", name: "Write Report", elapsed: 432, isActive: true),
+        Task(rawName: "Email Review", name: "Email Review", elapsed: 1230, isActive: false)
+    ]
+    
+    return ContentView()
+        .environmentObject(store)
         .frame(width: 380, height: 600)
 }
