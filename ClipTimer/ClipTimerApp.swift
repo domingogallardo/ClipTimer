@@ -25,6 +25,7 @@ struct ClipTimerApp: App {
                 }
         }
         .commands {
+            // Undo / Redo (Edit menu, estándar)
             CommandGroup(replacing: .undoRedo) {
                 Button("Undo") {
                     NSApp.keyWindow?.undoManager?.undo()
@@ -36,36 +37,39 @@ struct ClipTimerApp: App {
                 }
                 .keyboardShortcut("Z", modifiers: [.command, .shift])
             }
-            CommandGroup(replacing: .pasteboard) {
-                Button("Copy task summary") {
-                    store.copySummaryToClipboard()
-                }
-                .keyboardShortcut("c")       // ⌘C = resumen
-                Divider()
-                Button("Cut") {           // ⌘X
-                    NSApp.sendAction(#selector(NSText.cut(_:)), to: nil, from: nil)
-                }
-                .keyboardShortcut("x")
+
+            // Paste tasks (Tasks menu)
+            CommandMenu("Tasks") {
                 Button("Paste tasks (replace)") {
                     store.replaceTasksFromClipboard()
                 }
-                .keyboardShortcut("v") // ⌘V
+                .keyboardShortcut("v")
 
                 Button("Paste tasks (append)") {
                     store.addTasksFromClipboard()
                 }
-                .keyboardShortcut("V", modifiers: [.command, .shift]) // ⇧⌘V
+                .keyboardShortcut("V", modifiers: [.command, .shift])
             }
-            CommandMenu("Tasks") {
-                Button("Pause Active Task") {
+
+            // Timer controls
+            CommandMenu("Timer") {
+                Button("Pause active task") {
                     store.pauseActiveTask()
                 }
-                .keyboardShortcut("p", modifiers: .command)
+                .keyboardShortcut("p")
 
-                Button("Restart Last Paused Task") {
+                Button("Restart last paused task") {
                     store.restartLastPausedTask()
                 }
-                .keyboardShortcut("r", modifiers: .command)
+                .keyboardShortcut("r")
+            }
+
+            // Export tasks with times
+            CommandMenu("Export") {
+                Button("Copy tasks with times") {
+                    store.copySummaryToClipboard()
+                }
+                .keyboardShortcut("c")
             }
         }
 

@@ -1,9 +1,5 @@
 //  HelpOverlay.swift
 //  ClipTimer
-//
-//  Slide-in panel that lists keyboard shortcuts.
-//  Place this file alongside your other SwiftUI views and
-//  follow the integration notes at the end of this file.
 
 import SwiftUI
 
@@ -15,19 +11,56 @@ struct Shortcut: Identifiable, Hashable {
     let description: String
 }
 
+// MARK: - Reusable row
+
+private struct ShortcutRow: View {
+    var shortcut: Shortcut
+
+    var body: some View {
+        HStack {
+            Text(shortcut.key)
+                .font(.system(.body, design: .monospaced).weight(.semibold))
+            Spacer(minLength: 16)
+            Text(shortcut.description)
+        }
+    }
+}
+
 // MARK: - Help overlay view
 
 struct HelpOverlay: View {
-    private let shortcuts: [Shortcut] = [
-        .init(key: "⌘C", description: "Copy task summary"),
-        .init(key: "⌘V", description: "Paste tasks (replace)"),
-        .init(key: "⇧⌘V", description: "Paste tasks (append)"),
-        .init(key: "⌘X", description: "Cut"),
-        .init(key: "⌘Z", description: "Undo"),
-        .init(key: "⇧⌘Z", description: "Redo"),
+    // Shortcut groups ------------------------------------------------------
+    private let taskShortcuts: [Shortcut] = [
+        .init(key: "⌘V",    description: "Paste tasks (replace)"),
+        .init(key: "⇧⌘V",   description: "Paste tasks (append)"),
+        .init(key: "Right-click", description: "Delete task")
+    ]
+
+    private let timerShortcuts: [Shortcut] = [
         .init(key: "⌘P", description: "Pause active task"),
         .init(key: "⌘R", description: "Restart last paused task")
     ]
+
+    private let exportShortcuts: [Shortcut] = [
+        .init(key: "⌘C", description: "Copy tasks with times")
+    ]
+
+    private let undoShortcuts: [Shortcut] = [
+        .init(key: "⌘Z",  description: "Undo"),
+        .init(key: "⇧⌘Z", description: "Redo")
+    ]
+
+    // Helper to render a titled section
+    @ViewBuilder
+    private func section(title: String, _ shortcuts: [Shortcut]) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.headline)
+                .padding(.top, 8)
+                .padding(.bottom, 4)
+            ForEach(shortcuts) { ShortcutRow(shortcut: $0) }
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -40,19 +73,15 @@ struct HelpOverlay: View {
             }
             .padding(.bottom, 4)
 
-            // Shortcuts list
-            ForEach(shortcuts) { pair in
-                HStack {
-                    Text(pair.key)
-                        .font(.system(.body, design: .monospaced).weight(.semibold))
-                    Spacer(minLength: 16)
-                    Text(pair.description)
-                }
-            }
+            section(title: "Tasks Management", taskShortcuts)
+            section(title: "Timer Controls", timerShortcuts)
+            section(title: "Export Tasks", exportShortcuts)
+            section(title: "Undo / Redo", undoShortcuts)
+
             Spacer()
         }
         .padding()
-        .frame(maxWidth: 280, maxHeight: .infinity)
+        .frame(maxWidth: 320, maxHeight: .infinity)
         .background(.ultraThinMaterial)
         .transition(.move(edge: .trailing))
     }
@@ -62,5 +91,6 @@ struct HelpOverlay: View {
 #if DEBUG
 #Preview {
     HelpOverlay()
+        .frame(width: 320, height: 480)
 }
 #endif
