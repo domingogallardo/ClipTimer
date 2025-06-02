@@ -44,15 +44,12 @@ struct ClipTimerApp: App {
                     store.replaceTasksFromClipboard()
                 }
                 .keyboardShortcut("v")
-
                 Button("Paste tasks (append)") {
                     store.addTasksFromClipboard()
                 }
                 .keyboardShortcut("V", modifiers: [.command, .shift])
-            }
-
-            // Timer controls
-            CommandMenu("Timer") {
+                // Timer controls
+                Divider()
                 Button("Pause active task") {
                     store.pauseActiveTask()
                 }
@@ -62,19 +59,17 @@ struct ClipTimerApp: App {
                     store.restartLastPausedTask()
                 }
                 .keyboardShortcut("r")
-            }
-
-            // Export tasks with times
-            CommandMenu("Export") {
+                Divider()
+                // Export tasks with times
                 Button("Copy tasks with times") {
                     store.copySummaryToClipboard()
                 }
                 .keyboardShortcut("c")
             }
-        }
+       }
 
         MenuBarExtra {
-            Button("Copy task summary") {
+            Button("Copy tasks with times") {
                 store.copySummaryToClipboard()
             }
             Divider()
