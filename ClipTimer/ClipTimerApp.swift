@@ -25,6 +25,25 @@ struct ClipTimerApp: App {
                 }
         }
         .commands {
+            // 1. Sustituimos completamente el grupo de portapapeles
+            CommandGroup(replacing: .pasteboard) {
+                Button("Paste tasks (replace)") {
+                    store.replaceTasksFromClipboard()
+                }
+                .keyboardShortcut("v")                      // ⌘V
+
+                Button("Paste tasks (append)") {
+                    store.addTasksFromClipboard()
+                }
+                .keyboardShortcut("V", modifiers: [.command, .shift]) // ⇧⌘V
+
+                Divider()
+
+                Button("Copy tasks with times") {
+                    store.copySummaryToClipboard()
+                }
+                .keyboardShortcut("c")                      // ⌘C
+            }
             // Undo / Redo (Edit menu, estándar)
             CommandGroup(replacing: .undoRedo) {
                 Button("Undo") {
@@ -38,33 +57,15 @@ struct ClipTimerApp: App {
                 .keyboardShortcut("Z", modifiers: [.command, .shift])
             }
 
-            // Paste tasks (Tasks menu)
-            CommandMenu("Tasks") {
-                Button("Paste tasks (replace)") {
-                    store.replaceTasksFromClipboard()
-                }
-                .keyboardShortcut("v")
-                Button("Paste tasks (append)") {
-                    store.addTasksFromClipboard()
-                }
-                .keyboardShortcut("V", modifiers: [.command, .shift])
-                // Timer controls
-                Divider()
+            CommandMenu("Timer") {
                 Button("Pause active task") {
                     store.pauseActiveTask()
                 }
                 .keyboardShortcut("p")
-
                 Button("Restart last paused task") {
                     store.restartLastPausedTask()
                 }
                 .keyboardShortcut("r")
-                Divider()
-                // Export tasks with times
-                Button("Copy tasks with times") {
-                    store.copySummaryToClipboard()
-                }
-                .keyboardShortcut("c")
             }
        }
 
