@@ -3,68 +3,10 @@
 
 import SwiftUI
 
-// MARK: - Model
-
-struct Shortcut: Identifiable, Hashable {
-    let id = UUID()
-    let key: String
-    let description: String
-}
-
-// MARK: - Reusable row
-
-private struct ShortcutRow: View {
-    var shortcut: Shortcut
-
-    var body: some View {
-        HStack {
-            Text(shortcut.key)
-                .font(.system(.body, design: .monospaced).weight(.semibold))
-            Spacer(minLength: 16)
-            Text(shortcut.description)
-        }
-    }
-}
-
-// MARK: - Help overlay view
-
 struct HelpOverlay: View {
-    // Shortcut groups ------------------------------------------------------
-    private let taskShortcuts: [Shortcut] = [
-        .init(key: "⌘V",    description: "Paste tasks (replace)"),
-        .init(key: "⇧⌘V",   description: "Paste tasks (append)"),
-        .init(key: "Right-click", description: "Delete task")
-    ]
-
-    private let timerShortcuts: [Shortcut] = [
-        .init(key: "⌘P", description: "Pause active task"),
-        .init(key: "⌘R", description: "Restart last paused task")
-    ]
-
-    private let exportShortcuts: [Shortcut] = [
-        .init(key: "⌘C", description: "Copy tasks with times")
-    ]
-
-    private let undoShortcuts: [Shortcut] = [
-        .init(key: "⌘Z",  description: "Undo"),
-        .init(key: "⇧⌘Z", description: "Redo")
-    ]
-
-    // Helper to render a titled section
-    @ViewBuilder
-    private func section(title: String, _ shortcuts: [Shortcut]) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.headline)
-                .padding(.top, 8)
-                .padding(.bottom, 4)
-            ForEach(shortcuts) { ShortcutRow(shortcut: $0) }
-        }
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            // Header
+            // Encabezado
             HStack(spacing: 8) {
                 Image(systemName: "keyboard")
                     .font(.title2)
@@ -73,10 +15,84 @@ struct HelpOverlay: View {
             }
             .padding(.bottom, 4)
 
-            section(title: "Tasks Management", taskShortcuts)
-            section(title: "Timer Controls", timerShortcuts)
-            section(title: "Export Tasks", exportShortcuts)
-            section(title: "Undo / Redo", undoShortcuts)
+            // Sección: Tasks Management
+            Text("Tasks Management")
+                .font(.headline)
+                .padding(.top, 8)
+                .padding(.bottom, 4)
+            HStack {
+                Text("⌘V")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Paste tasks (replace)")
+            }
+            .padding(.leading, 12)
+            HStack {
+                Text("⇧⌘V")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Paste tasks (append)")
+            }
+            .padding(.leading, 12)
+            HStack {
+                Text("Right-click")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Delete task")
+            }
+            .padding(.leading, 12)
+            // Sección: Timer Controls
+            Text("Timer Controls")
+                .font(.headline)
+                .padding(.top, 8)
+                .padding(.bottom, 4)
+            HStack {
+                Text("⌘P")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Pause active task")
+            }
+            .padding(.leading, 12)
+            HStack {
+                Text("⌘R")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Restart last paused task")
+            }
+            .padding(.leading, 12)
+
+            // Sección: Export Tasks
+            Text("Export Tasks")
+                .font(.headline)
+                .padding(.top, 8)
+                .padding(.bottom, 4)
+            HStack {
+                Text("⌘C")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Copy tasks with times")
+            }
+            .padding(.leading, 12)
+            
+            // Sección: Undo / Redo
+            Text("Undo / Redo")
+                .font(.headline)
+                .padding(.top, 8)
+                .padding(.bottom, 4)
+            HStack {
+                Text("⌘Z")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Undo")
+            }
+            .padding(.leading, 12)
+            HStack {
+                Text("⇧⌘Z")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Redo")
+            }
+            .padding(.leading, 12)
 
             Spacer()
         }
@@ -87,10 +103,11 @@ struct HelpOverlay: View {
     }
 }
 
-// MARK: - Preview
 #if DEBUG
-#Preview {
-    HelpOverlay()
-        .frame(width: 320, height: 480)
+struct HelpOverlay_Previews: PreviewProvider {
+    static var previews: some View {
+        HelpOverlay()
+            .frame(width: 320, height: 480)
+    }
 }
 #endif

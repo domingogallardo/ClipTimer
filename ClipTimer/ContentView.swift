@@ -257,7 +257,7 @@ struct ContentView: View {
             }.onTapGesture {
                 withAnimation(.easeInOut) { showHelp = false }
             }
-            .animation(.easeInOut(duration: 0.35), value: showHelp)
+            .animation(.easeInOut(duration: 0.5), value: showHelp)
         }
     }
 }
