@@ -114,7 +114,7 @@ struct HelpOverlay: View {
 struct HelpOverlay_Previews: PreviewProvider {
     static var previews: some View {
         HelpOverlay()
-            .frame(width: 320, height: 480)
+            .frame(width: 320, height: 540)
     }
 }
 #endif
