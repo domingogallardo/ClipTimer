@@ -178,87 +178,94 @@ struct ContentView: View {
     @EnvironmentObject private var store: TaskStore
     @Environment(\.undoManager) private var undoManager
     @State private var showHelp = false
-    
-    var instruction: String {
-        if store.tasks.isEmpty {
-            return "Press ⌘V to add tasks from the clipboard."
-        } else {
-            return "Press ⌘V to replace tasks or ⇧⌘V to add tasks from the clipboard.\nPress ⌘C to copy a summary."
-        }
-    }
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Text("Tasks")
-                    .font(.system(size: 24, weight: .bold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
-                Spacer()
-                Button {
-                    withAnimation { showHelp.toggle() }
-                } label: {
-                    Image(systemName: "keyboard")
-                        .font(.title2)
-                }
-                .buttonStyle(.borderless)
-                .help("Show keyboard shortcuts")
-                .padding(.horizontal, 16)
-            }
-            
+
+            // ——— Cabecera ———
+            header
+
             Divider()
-            
-            // Lista de tareas
-            List {
-                ForEach(store.tasks) { task in
-                    TaskRow(task: task) { store.toggle(task) }
-                        .contextMenu {                            // ← clic derecho
-                            Button(role: .destructive) {
-                                store.delete(task)
-                            } label: {
-                                Label("Delete", systemImage: "trash")
-                            }
-                        }
+
+            // ——— Lista o marcador ———
+            ZStack {                                   // anima transiciones
+                if store.tasks.isEmpty {
+                    EmptyTasksPlaceholder()             // panel en blanco
+                        .transition(.opacity)
+                } else {
+                    TaskListView()                      // vista separada
+                        .transition(.opacity)
                 }
             }
-            .listStyle(.inset(alternatesRowBackgrounds: true))
-            .frame(minHeight: 300) // Mínimo espacio para la lista
-            .padding(.horizontal)
-            
-            
+            .animation(.easeInOut, value: store.tasks.isEmpty)
+
             Divider()
-            
-            // Total
-            HStack {
-                Text("Working time")
-                    .font(.headline)
-                Spacer()
-                Text(store.totalElapsed.hms)
-                    .font(.headline)
-                    .monospacedDigit()
-            }
-            .padding()
+
+            // ——— Total ———
+            footer
         }
-        .onAppear {
-            store.undoManager = undoManager
-        }.overlay {
-            ZStack(alignment: .trailing) {
-                if showHelp {
-                    Color.clear        // o .clear si no quieres sombreado
-                        .ignoresSafeArea()
-                        .contentShape(Rectangle())
-                        .transition(.opacity)        // fundido de la capa (opcional)
-                    HelpOverlay()
-                        .background(Color(NSColor.windowBackgroundColor))
-                        .compositingGroup()
-                        .shadow(color: Color.black.opacity(0.3), radius: 14, x: -8, y: 0)
-                        .transition(.move(edge: .trailing))
-                }
-            }.onTapGesture {
-                withAnimation(.easeInOut) { showHelp = false }
+        .onAppear { store.undoManager = undoManager }
+        .overlay(helpOverlay)                           // ayuda
+    }
+}
+
+
+private extension ContentView {
+
+    // Cabecera
+    @ViewBuilder                     // permite varias vistas dentro
+    var header: some View {
+        HStack {
+            Text("Tasks")
+                .font(.system(size: 24, weight: .bold))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+
+            Button {
+                withAnimation { showHelp.toggle() }
+            } label: {
+                Image(systemName: "keyboard")
+                    .font(.title2)
             }
-            .animation(.easeInOut(duration: 0.5), value: showHelp)
+            .buttonStyle(.borderless)
+            .help("Show keyboard shortcuts")
+            .padding(.horizontal, 16)
         }
+    }
+
+    // Pie con tiempo total
+    var footer: some View {
+        HStack {
+            Text("Working time")
+                .font(.headline)
+            Spacer()
+            Text(store.totalElapsed.hms)
+                .font(.headline)
+                .monospacedDigit()
+        }
+        .padding()
+    }
+
+    // Overlay de ayuda (aparece/desaparece animado)
+    @ViewBuilder
+    var helpOverlay: some View {
+        ZStack(alignment: .trailing) {
+            if showHelp {
+                Color.clear
+                    .ignoresSafeArea()
+                    .contentShape(Rectangle())
+                HelpOverlay()
+                    .background(Color(NSColor.windowBackgroundColor))
+                    .compositingGroup()
+                    .shadow(color: .black.opacity(0.3),
+                            radius: 14, x: -8, y: 0)
+                    .transition(.move(edge: .trailing))
+            }
+        }
+        .onTapGesture {
+            withAnimation { showHelp = false }
+        }
+        .animation(.easeInOut(duration: 0.5), value: showHelp)
     }
 }
 
