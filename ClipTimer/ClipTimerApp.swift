@@ -27,6 +27,11 @@ struct ClipTimerApp: App {
         .commands {
             // 1. Sustituimos completamente el grupo de portapapeles
             CommandGroup(replacing: .pasteboard) {
+                Button("Cut all tasks") {
+                    store.cutAllTasks()
+                }
+                .keyboardShortcut("x")                      // ⌘X
+                
                 Button("Paste tasks (replace)") {
                     store.replaceTasksFromClipboard()
                 }

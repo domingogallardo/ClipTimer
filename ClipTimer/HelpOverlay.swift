@@ -73,6 +73,13 @@ struct HelpOverlay: View {
                 Text("Copy tasks with times")
             }
             .padding(.leading, 12)
+            HStack {
+                Text("⌘X")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Cut tasks with times")
+            }
+            .padding(.leading, 12)
             
             // Sección: Undo / Redo
             Text("Undo / Redo")

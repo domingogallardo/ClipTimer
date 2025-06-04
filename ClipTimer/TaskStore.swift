@@ -77,6 +77,14 @@ final class TaskStore: ObservableObject {
         }
     }
     
+    func cutAllTasks() {
+        guard !tasks.isEmpty else { return }
+        let before = tasks
+        copySummaryToClipboard()
+        tasks.removeAll()
+        registerUndo(previousTasks: before, actionName: "Cut all tasks")
+    }
+    
     func parseTaskLine(_ rawLine: String) -> Task? {
         let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
@@ -133,8 +141,7 @@ final class TaskStore: ObservableObject {
         }
     }
     
-    @discardableResult
-    func copySummaryToClipboard() -> Bool {
+    func copySummaryToClipboard() {
         let taskSummary = tasks
             .map { "\($0.rawName): \($0.elapsed.hms)" }
             .joined(separator: "\n")
@@ -144,7 +151,7 @@ final class TaskStore: ObservableObject {
             : "\(taskSummary)\n\nTotal: \(total.hms)"
         let pb = NSPasteboard.general
         pb.clearContents()
-        return pb.setString(summaryWithTotal, forType: .string)
+        pb.setString(summaryWithTotal, forType: .string)
     }
     
     var activeTask: Task? { tasks.first(where: { $0.isActive }) }

@@ -15,10 +15,11 @@ struct EmptyTasksPlaceholder: View {
                 Text("No tasks yet")
                     .font(.title2.weight(.semibold))
                     .multilineTextAlignment(.center)
-                Text("Copy the list of tasks (with times) \n to the clipboard and paste them here.")
+                Text("Copy the list of tasks (with/without times)\n to the clipboard and paste them here.")
                     .font(.title3.weight(.medium))
                     .multilineTextAlignment(.center)
                     .foregroundColor(.secondary)
+                    .padding(.horizontal, 16)
             }
             .padding()
             Spacer()
