@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct ClipTimerApp: App {
     @StateObject private var store = TaskStore()
+    @Environment(\.openWindow) private var openWindow // Añade esto
     
     var body: some Scene {
         // ── Ventana principal ─────────────────────────────────────────────
@@ -24,8 +25,16 @@ struct ClipTimerApp: App {
                     NSApp.windows.first?.center()
                 }
         }
+        Window("ClipTimer Help", id: "help") {
+            HelpWindow()
+        }
+        .defaultSize(width: 380, height: 540)
         .commands {
-            // 1. Sustituimos completamente el grupo de portapapeles
+            CommandGroup(replacing: .help) {
+                Button("ClipTimer Help") {
+                    openWindow(id: "help")
+                }
+            }
             CommandGroup(replacing: .pasteboard) {
                 Button("Cut all tasks") {
                     store.cutAllTasks()
