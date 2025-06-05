@@ -36,3 +36,5 @@ Package.resolved
 
 # Ignorar carpeta Misc
 Misc/
+
+# Ignorar el fichero all_files.txt
