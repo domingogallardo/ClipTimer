@@ -10,8 +10,8 @@ import SwiftUI
 @main
 struct ClipTimerApp: App {
     @StateObject private var store = TaskStore()
-    @Environment(\.openWindow) private var openWindow // Añade esto
-    
+    @Environment(\.openWindow) private var openWindow
+
     var body: some Scene {
         // ── Ventana principal ─────────────────────────────────────────────
         Window("CipTimer", id: "main") {
@@ -89,7 +89,21 @@ struct ClipTimerApp: App {
             }
             Divider()
             Button("Open main window") {
-                NSApp.activate(ignoringOtherApps: true)
+                if let win = NSApp.windows.first(where: { $0.identifier?.rawValue == "main" }) {
+
+                    // 1. Si está minimizada, la restauramos sin animación extra
+                    if win.isMiniaturized {
+                        win.deminiaturize(nil)       // ← evita el parpadeo
+                    }
+
+                    // 2. Traemos la ventana al frente y la hacemos clave
+                    win.makeKeyAndOrderFront(nil)
+                    NSApp.activate(ignoringOtherApps: true)
+
+                } else {
+                    // Si no existe (cerrada), creamos una nueva
+                    openWindow(id: "main")
+                }
             }
         } label: {
             Text(store.totalElapsed.hms)
