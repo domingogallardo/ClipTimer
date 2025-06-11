@@ -10,21 +10,21 @@ struct HelpWindow: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-
+                
                 // ── Header ────────────────────────────────────────────────
                 Text("ClipTimer • Quick Start")
                     .font(.largeTitle.bold())
                     .padding(.top, 8)
-
+                
                 Text("""
                      Follow the steps below to start timing your tasks in seconds. \
                      ClipTimer is designed around the clipboard, so you can move fast \
                      without manual typing.
                      """)
-                    .fixedSize(horizontal: false, vertical: true)
-
+                .fixedSize(horizontal: false, vertical: true)
+                
                 Divider()
-
+                
                 // ── Step-by-step guide ───────────────────────────────────
                 Group {
                     step(number: 1,
@@ -34,7 +34,7 @@ struct HelpWindow: View {
                                   existing times such as “Design 1:30:45”). \
                                   Copy it to the clipboard (⌘C).
                                   """)
-
+                    
                     step(number: 2,
                          title: "Paste into ClipTimer",
                          details: """
@@ -42,7 +42,7 @@ struct HelpWindow: View {
                                   Each line becomes an individual task. \
                                   Any timecodes are parsed automatically.
                                   """)
-
+                    
                     step(number: 3,
                          title: "Start or pause a task",
                          details: """
@@ -50,15 +50,15 @@ struct HelpWindow: View {
                                   timing it. Only one task runs at a time. \
                                   Press ⌘P to pause, ⌘R to restart the last paused task.
                                   """)
-
+                    
                     step(number: 4,
                          title: "Edit or delete tasks",
                          details: """
-                                  Right-click a task and choose **Delete** \
+                                  Right-click a task and choose `Delete` \
                                   (or press ⌘Z / ⇧⌘Z to undo/redo). \
                                   You can always paste a fresh list to replace all tasks.
                                   """)
-
+                    
                     step(number: 5,
                          title: "Export your work",
                          details: """
@@ -67,9 +67,9 @@ struct HelpWindow: View {
                                   Paste it anywhere you like—notes, email, timesheet…
                                   """)
                 }
-
+                
                 Divider()
-
+                
                 // ── Need more help? ──────────────────────────────────────
                 Text("Need more help?")
                     .font(.title2.bold())
@@ -82,6 +82,8 @@ struct HelpWindow: View {
             .frame(maxWidth: 520, alignment: .leading)
         }
         .frame(minWidth: 440, minHeight: 600)
+        .background(Color("PanelBackground"))
+
     }
 
     // MARK: – Reusable step view
