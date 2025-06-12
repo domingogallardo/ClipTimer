@@ -1,7 +1,406 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-
+    "%lld." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld."
+          }
+        }
+      }
+    },
+    "• Email support: domingo.gallardo@gmail.com" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Correo de soporte: domingo.gallardo@gmail.com"
+          }
+        }
+      }
+    },
+    "• Project page: https://domingogallardo.com/cliptimer-support/" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Página del proyecto: https://domingogallardo.com/cliptimer-support/"
+          }
+        }
+      }
+    },
+    "⇧⌘V" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⇧⌘V"
+          }
+        }
+      }
+    },
+    "⇧⌘Z" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⇧⌘Z"
+          }
+        }
+      }
+    },
+    "⌘C" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘C"
+          }
+        }
+      }
+    },
+    "⌘P" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘P"
+          }
+        }
+      }
+    },
+    "⌘R" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘R"
+          }
+        }
+      }
+    },
+    "⌘V" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘V"
+          }
+        }
+      }
+    },
+    "⌘X" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘X"
+          }
+        }
+      }
+    },
+    "⌘Z" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘Z"
+          }
+        }
+      }
+    },
+    "CipTimer" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CipTimer"
+          }
+        }
+      }
+    },
+    "ClipTimer • Quick Start" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ClipTimer • Inicio Rápido"
+          }
+        }
+      }
+    },
+    "ClipTimer Help" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda de ClipTimer"
+          }
+        }
+      }
+    },
+    "Copy tasks with times" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiar tareas con tiempos"
+          }
+        }
+      }
+    },
+    "Copy the list of tasks (with/without times)\n to the clipboard and paste them here." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia la lista de tareas (con/sin tiempos)\n al portapapeles y pégalas aquí."
+          }
+        }
+      }
+    },
+    "Cut all tasks" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cortar todas las tareas"
+          }
+        }
+      }
+    },
+    "Cut tasks with times" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cortar tareas con tiempos"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar"
+          }
+        }
+      }
+    },
+    "Delete task" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar tarea"
+          }
+        }
+      }
+    },
+    "Export Tasks" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar Tareas"
+          }
+        }
+      }
+    },
+    "Follow the steps below to start timing your tasks in seconds. ClipTimer is designed around the clipboard, so you can move fast without manual typing." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sigue los siguientes pasos para comenzar a cronometrar tus tareas. ClipTimer está diseñado para trabajar con el portapapeles, por lo que puedes moverte rápidamente sin escribir manualmente."
+          }
+        }
+      }
+    },
+    "Keyboard Shortcuts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atajos de teclado"
+          }
+        }
+      }
+    },
+    "Need more help?" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Necesitas más ayuda?"
+          }
+        }
+      }
+    },
+    "No tasks yet" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no hay tareas"
+          }
+        }
+      }
+    },
+    "Open main window" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ventana principal"
+          }
+        }
+      }
+    },
+    "Paste tasks (append)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar tareas (añadir)"
+          }
+        }
+      }
+    },
+    "Paste tasks (replace)" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pegar tareas (reemplazar)"
+          }
+        }
+      }
+    },
+    "Pause active task" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausar tarea activa"
+          }
+        }
+      }
+    },
+    "Redo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rehacer"
+          }
+        }
+      }
+    },
+    "Restart last paused task" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reiniciar última tarea pausada"
+          }
+        }
+      }
+    },
+    "Right-click" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clic derecho"
+          }
+        }
+      }
+    },
+    "Show keyboard shortcuts" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar atajos de teclado"
+          }
+        }
+      }
+    },
+    "Tasks" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tareas"
+          }
+        }
+      }
+    },
+    "Tasks Management" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestión de tareas"
+          }
+        }
+      }
+    },
+    "Timer" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporizador"
+          }
+        }
+      }
+    },
+    "Timer Controls" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controles del temporizador"
+          }
+        }
+      }
+    },
+    "Undo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deshacer"
+          }
+        }
+      }
+    },
+    "Undo / Redo" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deshacer / Rehacer"
+          }
+        }
+      }
+    },
+    "Working time" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo de trabajo"
+          }
+        }
+      }
+    }
   },
   "version" : "1.0"
 }
