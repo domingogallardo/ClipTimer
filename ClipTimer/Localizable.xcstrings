@@ -121,6 +121,16 @@
         }
       }
     },
+    "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz clic en el icono de encendido junto a una tarea para comenzar a cronometrarla. Solo una tarea se ejecuta a la vez. Presiona ⌘P para pausar, ⌘R para reiniciar la última tarea pausada."
+          }
+        }
+      }
+    },
     "ClipTimer • Quick Start" : {
       "localizations" : {
         "es" : {
@@ -157,6 +167,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copia la lista de tareas (con/sin tiempos)\n al portapapeles y pégalas aquí."
+          }
+        }
+      }
+    },
+    "Copy your task list" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copia tu lista de tareas"
           }
         }
       }
@@ -201,6 +221,16 @@
         }
       }
     },
+    "Edit or delete tasks" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edita o elimina tareas"
+          }
+        }
+      }
+    },
     "Export Tasks" : {
       "localizations" : {
         "es" : {
@@ -211,12 +241,32 @@
         }
       }
     },
+    "Export your work" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporta tu trabajo"
+          }
+        }
+      }
+    },
     "Follow the steps below to start timing your tasks in seconds. ClipTimer is designed around the clipboard, so you can move fast without manual typing." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sigue los siguientes pasos para comenzar a cronometrar tus tareas. ClipTimer está diseñado para trabajar con el portapapeles, por lo que puedes moverte rápidamente sin escribir manualmente."
+          }
+        }
+      }
+    },
+    "In ClipTimer, press ⌘V (or ⇧⌘V to append). Each line becomes an individual task. Any timecodes are parsed automatically." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En ClipTimer, presiona ⌘V (o ⇧⌘V para añadir). Cada línea se convierte en una tarea individual. Los códigos de tiempo se analizan automáticamente."
           }
         }
       }
@@ -261,6 +311,16 @@
         }
       }
     },
+    "Paste into ClipTimer" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pega en ClipTimer"
+          }
+        }
+      }
+    },
     "Paste tasks (append)" : {
       "localizations" : {
         "es" : {
@@ -287,6 +347,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pausar tarea activa"
+          }
+        }
+      }
+    },
+    "Press ⌘C to copy a neatly formatted summary, including the total working time, back to the clipboard. Paste it anywhere you like—notes, email, timesheet…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presiona ⌘C para copiar un resumen formateado, incluyendo el tiempo total de trabajo, al portapapeles. Pégalo donde quieras—notas, correo, hoja de tiempos…"
           }
         }
       }
@@ -321,12 +391,42 @@
         }
       }
     },
+    "Right-click a task and choose `Delete` (or press ⌘Z / ⇧⌘Z to undo/redo). You can always paste a fresh list to replace all tasks." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz clic derecho en una tarea y elige 'Eliminar' (o presiona ⌘Z / ⇧⌘Z para deshacer/rehacer). Siempre puedes pegar una nueva lista para reemplazar todas las tareas."
+          }
+        }
+      }
+    },
+    "Select any plain-text list of tasks (it may include existing times such as “Design 1:30:45”). Copy it to the clipboard (⌘C)." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecciona cualquier lista de texto plano de tareas (puede incluir tiempos existentes como \"Diseño 1:30:45\"). Cópiala al portapapeles (⌘C)."
+          }
+        }
+      }
+    },
     "Show keyboard shortcuts" : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mostrar atajos de teclado"
+          }
+        }
+      }
+    },
+    "Start or pause a task" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia o pausa una tarea"
           }
         }
       }

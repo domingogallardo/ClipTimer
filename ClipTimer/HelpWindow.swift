@@ -83,12 +83,12 @@ struct HelpWindow: View {
         }
         .frame(minWidth: 440, minHeight: 600)
         .background(Color("PanelBackground"))
-
     }
 
     // MARK: – Reusable step view
     @ViewBuilder
-    private func step(number: Int, title: String, details: String) -> some View {
+    private func step(number: Int, title: LocalizedStringResource,
+                      details: LocalizedStringResource) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .top, spacing: 8) {
                 Text("\(number).")
