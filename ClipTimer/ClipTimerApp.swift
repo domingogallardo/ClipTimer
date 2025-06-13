@@ -28,7 +28,7 @@ struct ClipTimerApp: App {
         Window("ClipTimer Help", id: "help") {
             HelpWindow()
         }
-        .defaultSize(width: 380, height: 540)
+        .defaultSize(width: 540, height: 540)
         .commands {
             CommandGroup(replacing: .help) {
                 Button("ClipTimer Help") {
