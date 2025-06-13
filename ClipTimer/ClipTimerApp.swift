@@ -20,7 +20,6 @@ struct ClipTimerApp: App {
                     minWidth: 380, idealWidth: 380,
                     minHeight: 540, idealHeight: 540
                 ).onAppear {
-                    // Centrar la ventana en pantalla al arrancar
                     NSApp.windows.first?.center()
                 }
         }

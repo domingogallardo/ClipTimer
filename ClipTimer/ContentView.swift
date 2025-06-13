@@ -20,13 +20,12 @@ struct ContentView: View {
 
             Divider()
 
-            // ——— Lista o marcador ———
-            ZStack {                                   // anima transiciones
+            ZStack {
                 if store.tasks.isEmpty {
-                    EmptyTasksPlaceholder()             // panel en blanco
+                    EmptyTasksPlaceholder()
                         .transition(.opacity)
                 } else {
-                    TaskListView()                      // vista separada
+                    TaskListView()
                         .transition(.opacity)
                 }
             }

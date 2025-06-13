@@ -6,11 +6,10 @@
 //
 
 
-//  TaskListView.swift
 import SwiftUI
 
 struct TaskListView: View {
-    @EnvironmentObject private var store: TaskStore        // mismo store
+    @EnvironmentObject private var store: TaskStore
 
     var body: some View {
         List {
@@ -26,7 +25,7 @@ struct TaskListView: View {
             }
         }
         .listStyle(.inset(alternatesRowBackgrounds: true))
-        .frame(minHeight: 300)            // mantiene alto mínimo
+        .frame(minHeight: 300)
         .padding(.horizontal)
     }
 }

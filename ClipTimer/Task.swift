@@ -11,7 +11,7 @@ struct Task: Identifiable {
     let id = UUID()
     let rawName: String
     var name: String
-    var elapsed: TimeInterval    // segundos
+    var elapsed: TimeInterval
     var isActive: Bool = false
 }
 

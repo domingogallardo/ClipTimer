@@ -25,7 +25,6 @@ struct HelpWindow: View {
                              """)
                         .fixedSize(horizontal: false, vertical: true)
                         
-                         // ── Step-by-step guide ───────────────────────────────────
                          Group {
                              step(number: 1,
                                   title: "Copy your task list",
@@ -70,7 +69,6 @@ struct HelpWindow: View {
                          
                          Divider()
                          
-                         // ── Need more help? ──────────────────────────────────────
                          Text("Need more help?")
                              .font(.title2.bold())
                          VStack(alignment: .leading, spacing: 6) {
@@ -78,7 +76,7 @@ struct HelpWindow: View {
                              Text("• Email support: domingo.gallardo@gmail.com")
                          }
                     }
-                    .padding(.leading, 40)      // <-- más margen a la izquierda
+                    .padding(.leading, 40)
                     .padding([.top, .bottom, .trailing], 28)
                     .frame(maxWidth: 540, alignment: .leading)
                     Spacer()
@@ -89,7 +87,6 @@ struct HelpWindow: View {
         }
     }
     
-    // MARK: – Reusable step view
     @ViewBuilder
     private func step(number: Int, title: LocalizedStringResource,
                       details: LocalizedStringResource) -> some View {

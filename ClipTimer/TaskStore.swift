@@ -16,7 +16,6 @@ final class TaskStore: ObservableObject {
     private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
 
-    // ------------- Lógica de negocio (sin cambios) ------------------------
     private func registerUndo(previousTasks: [Task], actionName: String) {
         undoManager?.registerUndo(withTarget: self) { target in
             DispatchQueue.main.async {

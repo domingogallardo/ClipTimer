@@ -42,7 +42,6 @@ struct HelpOverlay: View {
                 Text("Delete task")
             }
             .padding(.leading, 12)
-            // Sección: Timer Controls
             Text("Timer Controls")
                 .font(.headline)
                 .padding(.top, 8)
@@ -62,7 +61,6 @@ struct HelpOverlay: View {
             }
             .padding(.leading, 12)
 
-            // Sección: Export Tasks
             Text("Export Tasks")
                 .font(.headline)
                 .padding(.top, 8)
@@ -82,7 +80,6 @@ struct HelpOverlay: View {
             }
             .padding(.leading, 12)
             
-            // Sección: Undo / Redo
             Text("Undo / Redo")
                 .font(.headline)
                 .padding(.top, 8)
