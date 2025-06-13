@@ -1,7 +1,7 @@
 //  HelpWindow.swift
 //  ClipTimer
 //
-//  A step-by-step quick-start guide in English
+//  Created by Domingo Gallardo 
 //
 
 import SwiftUI

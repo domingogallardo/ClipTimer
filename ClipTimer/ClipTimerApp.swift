@@ -2,7 +2,7 @@
 //  ClipTimerApp.swift
 //  ClipTimer
 //
-//  Created by Domingo Gallardo on 22/5/25.
+//  Created by Domingo Gallardo
 //
 
 import SwiftUI
@@ -13,7 +13,6 @@ struct ClipTimerApp: App {
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
-        // ── Ventana principal ─────────────────────────────────────────────
         Window("CipTimer", id: "main") {
             ContentView()
                 .environmentObject(store)
@@ -39,26 +38,25 @@ struct ClipTimerApp: App {
                 Button("Cut all tasks") {
                     store.cutAllTasks()
                 }
-                .keyboardShortcut("x")                      // ⌘X
+                .keyboardShortcut("x")
                 
                 Button("Paste tasks (replace)") {
                     store.replaceTasksFromClipboard()
                 }
-                .keyboardShortcut("v")                      // ⌘V
+                .keyboardShortcut("v")
 
                 Button("Paste tasks (append)") {
                     store.addTasksFromClipboard()
                 }
-                .keyboardShortcut("V", modifiers: [.command, .shift]) // ⇧⌘V
+                .keyboardShortcut("V", modifiers: [.command, .shift])
 
                 Divider()
 
                 Button("Copy tasks with times") {
                     store.copySummaryToClipboard()
                 }
-                .keyboardShortcut("c")                      // ⌘C
+                .keyboardShortcut("c")                     
             }
-            // Undo / Redo (Edit menu, estándar)
             CommandGroup(replacing: .undoRedo) {
                 Button("Undo") {
                     NSApp.keyWindow?.undoManager?.undo()
@@ -90,18 +88,13 @@ struct ClipTimerApp: App {
             Divider()
             Button("Open main window") {
                 if let win = NSApp.windows.first(where: { $0.identifier?.rawValue == "main" }) {
-
-                    // 1. Si está minimizada, la restauramos sin animación extra
                     if win.isMiniaturized {
-                        win.deminiaturize(nil)       // ← evita el parpadeo
+                        win.deminiaturize(nil)
                     }
-
-                    // 2. Traemos la ventana al frente y la hacemos clave
                     win.makeKeyAndOrderFront(nil)
                     NSApp.activate(ignoringOtherApps: true)
 
                 } else {
-                    // Si no existe (cerrada), creamos una nueva
                     openWindow(id: "main")
                 }
             }

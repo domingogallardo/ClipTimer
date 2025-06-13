@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  ClipTimer
 //
-//  Created by Domingo Gallardo on 22/5/25.
+//  Created by Domingo Gallardo
 //
 
 import SwiftUI
@@ -16,7 +16,6 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
 
-            // ——— Cabecera ———
             header
 
             Divider()
@@ -35,19 +34,16 @@ struct ContentView: View {
 
             Divider()
 
-            // ——— Total ———
             footer
         }
         .onAppear { store.undoManager = undoManager }
-        .overlay(helpOverlay)                           // ayuda
+        .overlay(helpOverlay)
     }
 }
 
 
 private extension ContentView {
-
-    // Cabecera
-    @ViewBuilder                     // permite varias vistas dentro
+    @ViewBuilder
     var header: some View {
         HStack {
             Text("Tasks")
@@ -67,7 +63,6 @@ private extension ContentView {
         }
     }
 
-    // Pie con tiempo total
     var footer: some View {
         HStack {
             Text("Working time")
@@ -80,7 +75,6 @@ private extension ContentView {
         .padding()
     }
 
-    // Overlay de ayuda (aparece/desaparece animado)
     @ViewBuilder
     var helpOverlay: some View {
         ZStack(alignment: .trailing) {

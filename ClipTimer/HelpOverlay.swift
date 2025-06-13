@@ -1,12 +1,14 @@
 //  HelpOverlay.swift
 //  ClipTimer
+//
+//  Created by Domingo Gallardo
+//
 
 import SwiftUI
 
 struct HelpOverlay: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            // Encabezado
             HStack(spacing: 8) {
                 Image(systemName: "keyboard")
                     .font(.title2)
@@ -15,7 +17,6 @@ struct HelpOverlay: View {
             }
             .padding(.bottom, 4)
 
-            // Sección: Tasks Management
             Text("Tasks Management")
                 .font(.headline)
                 .padding(.top, 8)

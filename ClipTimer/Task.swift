@@ -2,7 +2,7 @@
 //  Task.swift
 //  ClipTimer
 //
-//  Created by Domingo Gallardo on 4/6/25.
+//  Created by Domingo Gallardo
 //
 
 import Foundation
