@@ -37,6 +37,9 @@ Package.resolved
 # Ignorar carpeta Misc
 Misc/
 
+# Xcode: mantener schemes compartidos, ignorar los privados
+ClipTimer.xcodeproj/xcuserdata/
+
 # Ignorar el fichero all_files.txt
 all_files.txt
 ClipTimer.xcodeproj/xcuserdata/
