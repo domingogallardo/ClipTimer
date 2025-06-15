@@ -20,6 +20,7 @@ struct ContentView: View {
 
             Divider()
 
+            // Animated transition between empty state and task list
             ZStack {
                 if store.tasks.isEmpty {
                     EmptyTasksPlaceholder()
@@ -74,6 +75,7 @@ private extension ContentView {
         .padding()
     }
 
+    // Sliding help overlay with tap-to-dismiss functionality
     @ViewBuilder
     var helpOverlay: some View {
         ZStack(alignment: .trailing) {

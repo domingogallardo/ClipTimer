@@ -16,6 +16,7 @@ final class TaskStore: ObservableObject {
     private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
 
+    // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
         undoManager?.registerUndo(withTarget: self) { target in
             DispatchQueue.main.async {
@@ -41,6 +42,7 @@ final class TaskStore: ObservableObject {
         "\n\nWorking time: \((totalElapsed).hms)"
     }
     
+    // Toggle task activation - only one task can be active at a time
     func toggle(_ task: Task) {
         if let idx = tasks.firstIndex(where: { $0.id == task.id }),
            tasks[idx].isActive {
@@ -84,10 +86,12 @@ final class TaskStore: ObservableObject {
         registerUndo(previousTasks: before, actionName: "Cut all tasks")
     }
     
+    // Parse task line with optional time format (e.g., "Task name: 1:30:45" or "Task name")
     func parseTaskLine(_ rawLine: String) -> Task? {
         let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
         
+        // Regex to extract task name and optional time (hours:minutes:seconds or minutes:seconds)
         let regex = try! NSRegularExpression(
             pattern: #"^(.*?)(?::\s*(\d{1,2}:)?(\d{1,2}):(\d{2}))?\s*$"#)
         
@@ -97,6 +101,7 @@ final class TaskStore: ObservableObject {
             let nameRange = Range(match.range(at: 1), in: trimmed)
             let rawName = nameRange.map { String(trimmed[$0]) } ?? trimmed
             
+            // Extract time components from regex groups
             let hours = match.range(at: 2).location != NSNotFound ?
                 Int(trimmed[Range(match.range(at: 2), in: trimmed)!]
                     .dropLast()
@@ -109,7 +114,7 @@ final class TaskStore: ObservableObject {
             let elapsed = Double(hours * 3600 + minutes * 60 + seconds)
             return Task(
                 rawName: rawName,
-                name: rawName.trimmingCharacters(in: .init(charactersIn: "-*• \t")),
+                name: rawName.trimmingCharacters(in: .init(charactersIn: "-*• \t")), // Clean task name
                 elapsed: elapsed)
         } else {
             return Task(
@@ -134,6 +139,7 @@ final class TaskStore: ObservableObject {
         registerUndo(previousTasks: before, actionName: "Delete task")
     }
     
+    // Timer callback - increments elapsed time for active tasks every second
     @objc private func timerDidFire(_ timer: Timer) {
         for index in tasks.indices where tasks[index].isActive {
             tasks[index].elapsed += 1

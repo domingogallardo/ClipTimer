@@ -16,6 +16,7 @@ struct Task: Identifiable {
 }
 
 extension TimeInterval {
+    // Format seconds as "H:MM:SS" string
     var hms: String {
         let total = Int(self)
         let h = total / 3600

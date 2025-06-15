@@ -20,6 +20,7 @@ struct ClipTimerApp: App {
                     minWidth: 380, idealWidth: 380,
                     minHeight: 540, idealHeight: 540
                 ).onAppear {
+                    // Center window on screen when app launches
                     NSApp.windows.first?.center()
                 }
         }
@@ -80,12 +81,14 @@ struct ClipTimerApp: App {
             }
        }
 
+        // Menu bar timer display with context menu
         MenuBarExtra {
             Button("Copy tasks with times") {
                 store.copySummaryToClipboard()
             }
             Divider()
             Button("Open main window") {
+                // Find and restore main window or create new one
                 if let win = NSApp.windows.first(where: { $0.identifier?.rawValue == "main" }) {
                     if win.isMiniaturized {
                         win.deminiaturize(nil)

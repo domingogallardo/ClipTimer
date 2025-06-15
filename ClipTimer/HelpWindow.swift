@@ -87,6 +87,7 @@ struct HelpWindow: View {
         }
     }
     
+    // Reusable component for help steps
     @ViewBuilder
     private func step(number: Int, title: LocalizedStringResource,
                       details: LocalizedStringResource) -> some View {
