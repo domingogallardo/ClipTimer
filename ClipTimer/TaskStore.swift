@@ -37,13 +37,25 @@ final class TaskStore: ObservableObject {
     }
     
     var totalElapsed: TimeInterval {
-        tasks.reduce(0) { $0 + $1.elapsed }
+        tasks.reduce(0) { $0 + getCurrentElapsed(for: $1) }
+    }
+    
+    // Get current elapsed time for a task (including active time if running)
+    private func getCurrentElapsed(for task: Task) -> TimeInterval {
+        var elapsed = task.elapsed
+        
+        // If this task is currently active, add the time since it started
+        if activeTaskID == task.id, let startTime = task.startTime {
+            elapsed += Date().timeIntervalSince(startTime)
+        }
+        
+        return elapsed
     }
     
     var summaryText: String {
         if tasks.isEmpty { return "No tasks." }
         return tasks
-            .map { "- \($0.name): \($0.elapsed.hms)" }
+            .map { "- \($0.name): \(getCurrentElapsed(for: $0).hms)" }
             .joined(separator: "\n") +
         "\n\nWorking time: \((totalElapsed).hms)"
     }
@@ -51,10 +63,26 @@ final class TaskStore: ObservableObject {
     // Toggle task activation - only one task can be active at a time
     func toggle(_ task: Task) {
         if activeTaskID == task.id {
-            // Task is active, deactivate it
+            // Task is active, deactivate it (pause and save elapsed time)
+            if let activeIndex = tasks.firstIndex(where: { $0.id == task.id }),
+               let startTime = tasks[activeIndex].startTime {
+                tasks[activeIndex].elapsed += Date().timeIntervalSince(startTime)
+                tasks[activeIndex].startTime = nil
+            }
             activeTaskID = nil
         } else {
-            // Activate this task (automatically deactivates any other)
+            // First pause any currently active task
+            if let currentActiveID = activeTaskID,
+               let currentActiveIndex = tasks.firstIndex(where: { $0.id == currentActiveID }),
+               let currentStartTime = tasks[currentActiveIndex].startTime {
+                tasks[currentActiveIndex].elapsed += Date().timeIntervalSince(currentStartTime)
+                tasks[currentActiveIndex].startTime = nil
+            }
+            
+            // Activate this task (set start time)
+            if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+                tasks[index].startTime = Date()
+            }
             activeTaskID = task.id
         }
     }
@@ -153,11 +181,13 @@ final class TaskStore: ObservableObject {
         registerUndo(previousTasks: before, actionName: "Delete task")
     }
     
-    // Timer callback - increments elapsed time for active task every second
+    // Timer callback - updates UI for active task (time calculation is continuous)
     @objc private func timerDidFire(_ timer: Timer) {
-        guard let activeID = activeTaskID,
-              let activeIndex = tasks.firstIndex(where: { $0.id == activeID }) else { return }
-        tasks[activeIndex].elapsed += 1
+        // Timer now only triggers UI updates - actual time is calculated continuously
+        // This ensures the UI updates every second even when laptop lid is closed
+        if hasActiveTasks {
+            objectWillChange.send()
+        }
     }
     
     // Blink timer callback - toggles colon visibility every 0.5 seconds
@@ -175,9 +205,9 @@ final class TaskStore: ObservableObject {
     
     func copySummaryToClipboard() {
         let taskSummary = tasks
-            .map { "\($0.rawName): \($0.elapsed.hms)" }
+            .map { "\($0.rawName): \(getCurrentElapsed(for: $0).hms)" }
             .joined(separator: "\n")
-        let total = tasks.reduce(0) { $0 + $1.elapsed }
+        let total = totalElapsed
         let summaryWithTotal = taskSummary.isEmpty
             ? "Sin tareas."
             : "\(taskSummary)\n\nTotal: \(total.hms)"
@@ -193,13 +223,32 @@ final class TaskStore: ObservableObject {
     
     func pauseActiveTask() {
         guard let activeID = activeTaskID else { return }
+        
+        // Save elapsed time before pausing
+        if let activeIndex = tasks.firstIndex(where: { $0.id == activeID }),
+           let startTime = tasks[activeIndex].startTime {
+            tasks[activeIndex].elapsed += Date().timeIntervalSince(startTime)
+            tasks[activeIndex].startTime = nil
+        }
+        
         lastPausedTaskID = activeID
         activeTaskID = nil
     }
     
     func restartLastPausedTask() {
         guard let pausedID = lastPausedTaskID,
-              tasks.contains(where: { $0.id == pausedID }) else { return }
+              let pausedIndex = tasks.firstIndex(where: { $0.id == pausedID }) else { return }
+        
+        // First pause any currently active task
+        if let currentActiveID = activeTaskID,
+           let currentActiveIndex = tasks.firstIndex(where: { $0.id == currentActiveID }),
+           let currentStartTime = tasks[currentActiveIndex].startTime {
+            tasks[currentActiveIndex].elapsed += Date().timeIntervalSince(currentStartTime)
+            tasks[currentActiveIndex].startTime = nil
+        }
+        
+        // Restart the paused task
+        tasks[pausedIndex].startTime = Date()
         activeTaskID = pausedID
     }
 }

@@ -17,12 +17,23 @@ struct TaskRow: View {
     private var isActive: Bool {
         store.activeTaskID == task.id
     }
+    
+    private var currentElapsed: TimeInterval {
+        var elapsed = task.elapsed
+        
+        // If this task is currently active, add the time since it started
+        if isActive, let startTime = task.startTime {
+            elapsed += Date().timeIntervalSince(startTime)
+        }
+        
+        return elapsed
+    }
 
     var body: some View {
         HStack {
             Text(task.name)
             Spacer()
-            Text(task.elapsed.hms)
+            Text(currentElapsed.hms)
                 .monospacedDigit()
             Button {
                 toggle()

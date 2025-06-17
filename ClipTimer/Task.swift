@@ -12,6 +12,7 @@ struct Task: Identifiable {
     let rawName: String
     var name: String
     var elapsed: TimeInterval
+    var startTime: Date? = nil  // Track when task started for continuous timing
 }
 
 extension TimeInterval {
