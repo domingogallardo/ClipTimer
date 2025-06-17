@@ -109,9 +109,11 @@ private extension ContentView {
 #Preview {
     let store = TaskStore()
     store.tasks = [
-        Task(rawName: "Write Report", name: "Write Report", elapsed: 432, isActive: true),
-        Task(rawName: "Email Review", name: "Email Review", elapsed: 1230, isActive: false)
+        Task(rawName: "Write Report", name: "Write Report", elapsed: 432),
+        Task(rawName: "Email Review", name: "Email Review", elapsed: 1230)
     ]
+    // Make first task active
+    store.activeTaskID = store.tasks[0].id
     
     return ContentView()
         .environmentObject(store)

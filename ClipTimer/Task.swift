@@ -12,7 +12,6 @@ struct Task: Identifiable {
     let rawName: String
     var name: String
     var elapsed: TimeInterval
-    var isActive: Bool = false
 }
 
 extension TimeInterval {

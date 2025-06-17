@@ -13,6 +13,7 @@ import AppKit
 final class TaskStore: ObservableObject {
     @Published var tasks: [Task] = []
     @Published var showColons: Bool = true
+    @Published var activeTaskID: UUID?
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
@@ -49,13 +50,12 @@ final class TaskStore: ObservableObject {
     
     // Toggle task activation - only one task can be active at a time
     func toggle(_ task: Task) {
-        if let idx = tasks.firstIndex(where: { $0.id == task.id }),
-           tasks[idx].isActive {
-            tasks[idx].isActive = false
+        if activeTaskID == task.id {
+            // Task is active, deactivate it
+            activeTaskID = nil
         } else {
-            for index in tasks.indices {
-                tasks[index].isActive = (tasks[index].id == task.id)
-            }
+            // Activate this task (automatically deactivates any other)
+            activeTaskID = task.id
         }
     }
     
@@ -153,11 +153,11 @@ final class TaskStore: ObservableObject {
         registerUndo(previousTasks: before, actionName: "Delete task")
     }
     
-    // Timer callback - increments elapsed time for active tasks every second
+    // Timer callback - increments elapsed time for active task every second
     @objc private func timerDidFire(_ timer: Timer) {
-        for index in tasks.indices where tasks[index].isActive {
-            tasks[index].elapsed += 1
-        }
+        guard let activeID = activeTaskID,
+              let activeIndex = tasks.firstIndex(where: { $0.id == activeID }) else { return }
+        tasks[activeIndex].elapsed += 1
     }
     
     // Blink timer callback - toggles colon visibility every 0.5 seconds
@@ -170,7 +170,7 @@ final class TaskStore: ObservableObject {
     }
     
     var hasActiveTasks: Bool {
-        tasks.contains { $0.isActive }
+        activeTaskID != nil
     }
     
     func copySummaryToClipboard() {
@@ -186,19 +186,20 @@ final class TaskStore: ObservableObject {
         pb.setString(summaryWithTotal, forType: .string)
     }
     
-    var activeTask: Task? { tasks.first(where: { $0.isActive }) }
+    var activeTask: Task? { 
+        guard let activeID = activeTaskID else { return nil }
+        return tasks.first(where: { $0.id == activeID })
+    }
     
     func pauseActiveTask() {
-        if let idx = tasks.firstIndex(where: { $0.isActive }) {
-            tasks[idx].isActive = false
-            lastPausedTaskID = tasks[idx].id
-        }
+        guard let activeID = activeTaskID else { return }
+        lastPausedTaskID = activeID
+        activeTaskID = nil
     }
     
     func restartLastPausedTask() {
-        guard let id = lastPausedTaskID,
-              let idx = tasks.firstIndex(where: { $0.id == id }) else { return }
-        for i in tasks.indices { tasks[i].isActive = false }
-        tasks[idx].isActive = true
+        guard let pausedID = lastPausedTaskID,
+              tasks.contains(where: { $0.id == pausedID }) else { return }
+        activeTaskID = pausedID
     }
 }

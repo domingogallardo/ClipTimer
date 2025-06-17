@@ -11,7 +11,12 @@ import SwiftUI
 struct TaskRow: View {
     let task: Task
     let toggle: () -> Void
+    @EnvironmentObject private var store: TaskStore
     @State private var isAnimating = false
+
+    private var isActive: Bool {
+        store.activeTaskID == task.id
+    }
 
     var body: some View {
         HStack {
@@ -22,20 +27,20 @@ struct TaskRow: View {
             Button {
                 toggle()
             } label: {
-                Image(systemName: task.isActive ? "power.circle.fill" : "power.circle")
+                Image(systemName: isActive ? "power.circle.fill" : "power.circle")
                     .resizable()
                     .frame(width: 22, height: 22)
-                    .foregroundColor(task.isActive ? .green : .secondary)
+                    .foregroundColor(isActive ? .green : .secondary)
                     .scaleEffect(isAnimating ? 1.25 : 1.0)
-                    .animation(task.isActive
+                    .animation(isActive
                         ? .easeInOut(duration: 1).repeatForever(autoreverses: true)
                         : .default,
                         value: isAnimating)
                     .padding(4)
             }
             .buttonStyle(.plain)
-            .onAppear { isAnimating = task.isActive }
-            .onChange(of: task.isActive) { _, newValue in isAnimating = newValue }
+            .onAppear { isAnimating = isActive }
+            .onChange(of: isActive) { _, newValue in isAnimating = newValue }
         }
         .padding(.vertical, 4)
     }
@@ -44,16 +49,25 @@ struct TaskRow: View {
 #if DEBUG
 
 #Preview {
-    VStack(spacing: 12) {
+    let store = TaskStore()
+    store.tasks = [
+        Task(rawName: "Write Report", name: "Write Report", elapsed: 123),
+        Task(rawName: "Review Email", name: "Review Email", elapsed: 4523)
+    ]
+    // Make second task active
+    store.activeTaskID = store.tasks[1].id
+    
+    return VStack(spacing: 12) {
         TaskRow(
-            task: Task(rawName: "Write Report", name: "Write Report", elapsed: 123, isActive: false),
+            task: store.tasks[0],
             toggle: {}
         )
         TaskRow(
-            task: Task(rawName: "Review Email", name: "Review Email", elapsed: 4523, isActive: true),
+            task: store.tasks[1],
             toggle: {}
         )
     }
+    .environmentObject(store)
     .padding()
     .frame(width: 340)
 }
