@@ -12,9 +12,11 @@ import AppKit
 @MainActor
 final class TaskStore: ObservableObject {
     @Published var tasks: [Task] = []
+    @Published var showColons: Bool = true
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
+    private var blinkTimer: Timer?
 
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
@@ -28,7 +30,10 @@ final class TaskStore: ObservableObject {
         undoManager?.setActionName(actionName)
     }
     
-    init() { startTimer() }
+    init() { 
+        startTimer() 
+        startBlinkTimer()
+    }
     
     var totalElapsed: TimeInterval {
         tasks.reduce(0) { $0 + $1.elapsed }
@@ -133,6 +138,15 @@ final class TaskStore: ObservableObject {
             repeats: true)
     }
     
+    private func startBlinkTimer() {
+        blinkTimer = Timer.scheduledTimer(
+            timeInterval: 0.5,
+            target: self,
+            selector: #selector(blinkTimerDidFire(_:)),
+            userInfo: nil,
+            repeats: true)
+    }
+    
     func delete(_ task: Task) {
         let before = tasks
         tasks.removeAll { $0.id == task.id }
@@ -144,6 +158,19 @@ final class TaskStore: ObservableObject {
         for index in tasks.indices where tasks[index].isActive {
             tasks[index].elapsed += 1
         }
+    }
+    
+    // Blink timer callback - toggles colon visibility every 0.5 seconds
+    @objc private func blinkTimerDidFire(_ timer: Timer) {
+        if hasActiveTasks {
+            showColons.toggle()
+        } else {
+            showColons = true
+        }
+    }
+    
+    var hasActiveTasks: Bool {
+        tasks.contains { $0.isActive }
     }
     
     func copySummaryToClipboard() {

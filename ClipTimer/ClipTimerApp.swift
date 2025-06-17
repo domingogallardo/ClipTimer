@@ -13,12 +13,6 @@ struct ClipTimerApp: App {
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
-        // Help window
-        Window("ClipTimer Help", id: "help") {
-            HelpWindow()
-        }
-        .defaultSize(width: 540, height: 540)
-        
         Window("CipTimer", id: "main") {
             ContentView()
                 .environmentObject(store)
@@ -81,7 +75,12 @@ struct ClipTimerApp: App {
                 }
                 .keyboardShortcut("r")
             }
-       }
+        }
+        // Help window
+        Window("ClipTimer Help", id: "help") {
+            HelpWindow()
+        }
+        .defaultSize(width: 540, height: 540)
 
         // Menu bar timer display with context menu
         MenuBarExtra {
@@ -103,12 +102,13 @@ struct ClipTimerApp: App {
                 }
             }
         } label: {
-            Text(store.totalElapsed.hms)
+            Text(store.totalElapsed.hms(showSecondsColon: store.showColons))
                 .monospacedDigit()
                 .font(.system(size: 12, weight: .semibold))
                 .padding(.horizontal, 6)
         }
-    }}
+    }
+}
 
 #Preview {
     ContentView()

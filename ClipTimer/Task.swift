@@ -24,4 +24,14 @@ extension TimeInterval {
         let s = total % 60
         return "\(h):" + String(format: "%02d:%02d", m, s)
     }
+    
+    // Format with blinking seconds colon only
+    func hms(showSecondsColon: Bool) -> String {
+        let total = Int(self)
+        let h = total / 3600
+        let m = (total % 3600) / 60
+        let s = total % 60
+        let secondsColon = showSecondsColon ? ":" : " "
+        return "\(h):" + String(format: "%02d\(secondsColon)%02d", m, s)
+    }
 }
