@@ -13,6 +13,12 @@ struct ClipTimerApp: App {
     @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
+        // Help window
+        Window("ClipTimer Help", id: "help") {
+            HelpWindow()
+        }
+        .defaultSize(width: 540, height: 540)
+        
         Window("CipTimer", id: "main") {
             ContentView()
                 .environmentObject(store)
@@ -24,10 +30,6 @@ struct ClipTimerApp: App {
                     NSApp.windows.first?.center()
                 }
         }
-        Window("ClipTimer Help", id: "help") {
-            HelpWindow()
-        }
-        .defaultSize(width: 540, height: 540)
         .commands {
             CommandGroup(replacing: .help) {
                 Button("ClipTimer Help") {
@@ -107,3 +109,9 @@ struct ClipTimerApp: App {
                 .padding(.horizontal, 6)
         }
     }}
+
+#Preview {
+    ContentView()
+        .environmentObject(TaskStore())
+        .frame(width: 380, height: 540)
+}
