@@ -44,7 +44,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:ClipTimer.xctestplan"
+            reference = "container:ClipTimer/ClipTimer.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
