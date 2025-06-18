@@ -8,17 +8,33 @@
 
 /* Begin PBXBuildFile section */
 		A99A50672DE0C8E900AAED02 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = A99A50662DE0C8DF00AAED02 /* .gitignore */; };
+		A9CTESTS12345678901234567 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CTESTS12345678901234568 /* TaskTests.swift */; };
+		A9CTESTS12345678901234569 /* TaskStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CTESTS12345678901234570 /* TaskStoreTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A9CTESTS12345678901234571 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A99A504E2DDF3D7300AAED02 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A99A50552DDF3D7300AAED02;
+			remoteInfo = ClipTimer;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A99A50562DDF3D7300AAED02 /* ClipTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A99A50662DE0C8DF00AAED02 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		A9CTESTS12345678901234568 /* TaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
+		A9CTESTS12345678901234570 /* TaskStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStoreTests.swift; sourceTree = "<group>"; };
+		A9CTESTS12345678901234572 /* ClipTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ClipTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		A9DCF8492DF762D900D5B330 /* Exceptions for "ClipTimer" folder in "ClipTimer" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				ClipTimer.xctestplan,
 				Info.plist,
 			);
 			target = A99A50552DDF3D7300AAED02 /* ClipTimer */;
@@ -44,6 +60,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9CTESTS12345678901234573 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -52,6 +75,7 @@
 			children = (
 				A99A50662DE0C8DF00AAED02 /* .gitignore */,
 				A99A50582DDF3D7300AAED02 /* ClipTimer */,
+				A9CTESTS12345678901234574 /* ClipTimerTests */,
 				A99A50572DDF3D7300AAED02 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -60,8 +84,18 @@
 			isa = PBXGroup;
 			children = (
 				A99A50562DDF3D7300AAED02 /* ClipTimer.app */,
+				A9CTESTS12345678901234572 /* ClipTimerTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A9CTESTS12345678901234574 /* ClipTimerTests */ = {
+			isa = PBXGroup;
+			children = (
+				A9CTESTS12345678901234568 /* TaskTests.swift */,
+				A9CTESTS12345678901234570 /* TaskStoreTests.swift */,
+			);
+			path = ClipTimerTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -89,6 +123,24 @@
 			productReference = A99A50562DDF3D7300AAED02 /* ClipTimer.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A9CTESTS12345678901234575 /* ClipTimerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A9CTESTS12345678901234576 /* Build configuration list for PBXNativeTarget "ClipTimerTests" */;
+			buildPhases = (
+				A9CTESTS12345678901234577 /* Sources */,
+				A9CTESTS12345678901234573 /* Frameworks */,
+				A9CTESTS12345678901234578 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A9CTESTS12345678901234579 /* PBXTargetDependency */,
+			);
+			name = ClipTimerTests;
+			productName = ClipTimerTests;
+			productReference = A9CTESTS12345678901234572 /* ClipTimerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -101,6 +153,10 @@
 				TargetAttributes = {
 					A99A50552DDF3D7300AAED02 = {
 						CreatedOnToolsVersion = 16.3;
+					};
+					A9CTESTS12345678901234575 = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = A99A50552DDF3D7300AAED02;
 					};
 				};
 			};
@@ -120,6 +176,7 @@
 			projectRoot = "";
 			targets = (
 				A99A50552DDF3D7300AAED02 /* ClipTimer */,
+				A9CTESTS12345678901234575 /* ClipTimerTests */,
 			);
 		};
 /* End PBXProject section */
@@ -133,6 +190,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9CTESTS12345678901234578 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -143,7 +207,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A9CTESTS12345678901234577 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A9CTESTS12345678901234567 /* TaskTests.swift in Sources */,
+				A9CTESTS12345678901234569 /* TaskStoreTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A9CTESTS12345678901234579 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A99A50552DDF3D7300AAED02 /* ClipTimer */;
+			targetProxy = A9CTESTS12345678901234571 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A99A50602DDF3D7500AAED02 /* Debug */ = {
@@ -334,6 +415,44 @@
 			};
 			name = Release;
 		};
+		A9CTESTS12345678901234580 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 858G7EEFMM;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.1;
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = domingogallardo.ClipTimerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ClipTimer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ClipTimer";
+			};
+			name = Debug;
+		};
+		A9CTESTS12345678901234581 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 858G7EEFMM;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.1;
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = domingogallardo.ClipTimerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ClipTimer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ClipTimer";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -351,6 +470,15 @@
 			buildConfigurations = (
 				A99A50632DDF3D7500AAED02 /* Debug */,
 				A99A50642DDF3D7500AAED02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A9CTESTS12345678901234576 /* Build configuration list for PBXNativeTarget "ClipTimerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9CTESTS12345678901234580 /* Debug */,
+				A9CTESTS12345678901234581 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
