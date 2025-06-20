@@ -42,14 +42,7 @@ final class TaskStore: ObservableObject {
     
     // Get current elapsed time for a task (including active time if running)
     private func getCurrentElapsed(for task: Task) -> TimeInterval {
-        var elapsed = task.elapsed
-        
-        // If this task is currently active, add the time since it started
-        if activeTaskID == task.id, let startTime = task.startTime {
-            elapsed += Date().timeIntervalSince(startTime)
-        }
-        
-        return elapsed
+        return task.currentElapsed(activeTaskID: activeTaskID)
     }
     
     var summaryText: String {
