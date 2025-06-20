@@ -49,7 +49,6 @@ final class TaskTests: XCTestCase {
         XCTAssertEqual(task.rawName, "Test Task")
         XCTAssertEqual(task.name, "Test Task")
         XCTAssertEqual(task.elapsed, 120)
-        XCTAssertNil(task.startTime)
     }
     
     func testTaskIdentifiable() {
@@ -66,12 +65,12 @@ final class TaskTests: XCTestCase {
         let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 120)
         
         // When task is not active, should return only stored elapsed time
-        let currentElapsed = task.currentElapsed(activeTaskID: nil)
+        let currentElapsed = task.currentElapsed(activeTaskID: nil, startTime: nil)
         XCTAssertEqual(currentElapsed, 120)
         
         // When task is not active (different ID), should return only stored elapsed time
         let otherTaskID = UUID()
-        let currentElapsedWithOtherID = task.currentElapsed(activeTaskID: otherTaskID)
+        let currentElapsedWithOtherID = task.currentElapsed(activeTaskID: otherTaskID, startTime: nil)
         XCTAssertEqual(currentElapsedWithOtherID, 120)
     }
     
@@ -79,19 +78,18 @@ final class TaskTests: XCTestCase {
         let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 100)
         
         // When task is marked as active but has no start time, should return stored elapsed time
-        let currentElapsed = task.currentElapsed(activeTaskID: task.id)
+        let currentElapsed = task.currentElapsed(activeTaskID: task.id, startTime: nil)
         XCTAssertEqual(currentElapsed, 100)
     }
     
     func testCurrentElapsedWithActiveTaskAndStartTime() {
-        var task = Task(rawName: "Test Task", name: "Test Task", elapsed: 100)
+        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 100)
         
         // Set start time to 5 seconds ago
         let fiveSecondsAgo = Date().addingTimeInterval(-5)
-        task.startTime = fiveSecondsAgo
         
         // When task is active and has start time, should add running time
-        let currentElapsed = task.currentElapsed(activeTaskID: task.id)
+        let currentElapsed = task.currentElapsed(activeTaskID: task.id, startTime: fiveSecondsAgo)
         
         // Should be approximately 100 + 5 = 105 seconds (allowing small tolerance for execution time)
         XCTAssertGreaterThanOrEqual(currentElapsed, 104.9)
@@ -99,27 +97,27 @@ final class TaskTests: XCTestCase {
     }
     
     func testCurrentElapsedWithActiveTaskButDifferentID() {
-        var task = Task(rawName: "Test Task", name: "Test Task", elapsed: 100)
-        task.startTime = Date().addingTimeInterval(-5) // 5 seconds ago
+        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 100)
+        let fiveSecondsAgo = Date().addingTimeInterval(-5) // 5 seconds ago
         
         // When activeTaskID doesn't match task ID, should not add running time
         let otherTaskID = UUID()
-        let currentElapsed = task.currentElapsed(activeTaskID: otherTaskID)
+        let currentElapsed = task.currentElapsed(activeTaskID: otherTaskID, startTime: fiveSecondsAgo)
         XCTAssertEqual(currentElapsed, 100)
     }
     
     func testCurrentElapsedConsistencyWithPreviousImplementation() {
-        var task = Task(rawName: "Test Task", name: "Test Task", elapsed: 200)
-        task.startTime = Date().addingTimeInterval(-10) // 10 seconds ago
+        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 200)
+        let tenSecondsAgo = Date().addingTimeInterval(-10) // 10 seconds ago
         
         // Test that our new method produces same result as old implementation would
         let activeTaskID = task.id
-        let currentElapsed = task.currentElapsed(activeTaskID: activeTaskID)
+        let currentElapsed = task.currentElapsed(activeTaskID: activeTaskID, startTime: tenSecondsAgo)
         
         // Manually calculate what the old implementation would return
         var expectedElapsed = task.elapsed
-        if activeTaskID == task.id, let startTime = task.startTime {
-            expectedElapsed += Date().timeIntervalSince(startTime)
+        if activeTaskID == task.id {
+            expectedElapsed += Date().timeIntervalSince(tenSecondsAgo)
         }
         
         // Should match within small tolerance

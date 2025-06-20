@@ -12,14 +12,13 @@ struct Task: Identifiable {
     let rawName: String
     var name: String
     var elapsed: TimeInterval
-    var startTime: Date? = nil  // Track when task started for continuous timing
     
     // Calculate current elapsed time including active time if running
-    func currentElapsed(activeTaskID: UUID?) -> TimeInterval {
+    func currentElapsed(activeTaskID: UUID?, startTime: Date?) -> TimeInterval {
         var elapsed = self.elapsed
         
         // If this task is currently active, add the time since it started
-        if activeTaskID == self.id, let startTime = self.startTime {
+        if activeTaskID == self.id, let startTime = startTime {
             elapsed += Date().timeIntervalSince(startTime)
         }
         

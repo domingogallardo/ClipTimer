@@ -163,12 +163,12 @@ final class TaskStoreTests: XCTestCase {
         // Activate task
         taskStore.toggle(task)
         XCTAssertEqual(taskStore.activeTaskID, task.id)
-        XCTAssertNotNil(taskStore.tasks[0].startTime)
+        XCTAssertNotNil(taskStore.activeTaskStartTime)
         
         // Deactivate task
         taskStore.toggle(task)
         XCTAssertNil(taskStore.activeTaskID)
-        XCTAssertNil(taskStore.tasks[0].startTime)
+        XCTAssertNil(taskStore.activeTaskStartTime)
     }
     
     func testToggleOnlyOneTaskActiveAtTime() {
@@ -183,8 +183,7 @@ final class TaskStoreTests: XCTestCase {
         // Activate second task (should deactivate first)
         taskStore.toggle(task2)
         XCTAssertEqual(taskStore.activeTaskID, task2.id)
-        XCTAssertNil(taskStore.tasks[0].startTime) // First task should be paused
-        XCTAssertNotNil(taskStore.tasks[1].startTime) // Second task should be active
+        XCTAssertNotNil(taskStore.activeTaskStartTime) // Should have start time for active task
     }
     
     // MARK: - Pause/Resume Tests
@@ -198,7 +197,7 @@ final class TaskStoreTests: XCTestCase {
         taskStore.pauseActiveTask()
         
         XCTAssertNil(taskStore.activeTaskID)
-        XCTAssertNil(taskStore.tasks[0].startTime)
+        XCTAssertNil(taskStore.activeTaskStartTime)
     }
     
     func testRestartLastPausedTask() {
@@ -211,6 +210,6 @@ final class TaskStoreTests: XCTestCase {
         taskStore.restartLastPausedTask()
         
         XCTAssertEqual(taskStore.activeTaskID, task.id)
-        XCTAssertNotNil(taskStore.tasks[0].startTime)
+        XCTAssertNotNil(taskStore.activeTaskStartTime)
     }
 } 

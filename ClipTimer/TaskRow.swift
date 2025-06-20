@@ -19,7 +19,7 @@ struct TaskRow: View {
     }
     
     private var currentElapsed: TimeInterval {
-        return task.currentElapsed(activeTaskID: store.activeTaskID)
+        return task.currentElapsed(activeTaskID: store.activeTaskID, startTime: store.activeTaskStartTime)
     }
 
     var body: some View {
