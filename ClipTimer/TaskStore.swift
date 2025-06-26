@@ -20,6 +20,10 @@ final class TaskStore: ObservableObject {
     private var timer: Timer?
     private var blinkTimer: Timer?
 
+    // MARK: - Local Persistence
+    private let userDefaults = UserDefaults.standard
+    private let localStorageKey = "saved_tasks"
+
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
         undoManager?.registerUndo(withTarget: self) { target in
@@ -35,6 +39,7 @@ final class TaskStore: ObservableObject {
     init() { 
         startTimer() 
         startBlinkTimer()
+        loadTasksLocally()  // 🆕 Load tasks on app start
     }
     
     var totalElapsed: TimeInterval {
@@ -89,6 +94,7 @@ final class TaskStore: ObservableObject {
                 .compactMap { parseTaskLine($0) }
             tasks = newTasks
             registerUndo(previousTasks: before, actionName: "Replace tasks")
+            saveTasksLocally()  // 🆕 Auto-save after modifying tasks
         }
     }
     
@@ -101,6 +107,7 @@ final class TaskStore: ObservableObject {
                 .compactMap { parseTaskLine($0) }
             tasks.append(contentsOf: addedTasks)
             registerUndo(previousTasks: before, actionName: "Add tasks")
+            saveTasksLocally()  // 🆕 Auto-save after modifying tasks
         }
     }
     
@@ -110,6 +117,7 @@ final class TaskStore: ObservableObject {
         copySummaryToClipboard()
         tasks.removeAll()
         registerUndo(previousTasks: before, actionName: "Cut all tasks")
+        saveTasksLocally()  // 🆕 Auto-save after modifying tasks
     }
     
     // Parse task line with optional time format (e.g., "Task name: 1:30:45" or "Task name")
@@ -172,6 +180,7 @@ final class TaskStore: ObservableObject {
         let before = tasks
         tasks.removeAll { $0.id == task.id }
         registerUndo(previousTasks: before, actionName: "Delete task")
+        saveTasksLocally()  // 🆕 Auto-save after modifying tasks
     }
     
     // Timer callback - updates UI for active task (time calculation is continuous)
@@ -231,5 +240,49 @@ final class TaskStore: ObservableObject {
         // Restart the paused task
         activeTaskID = pausedID
         activeTaskStartTime = Date()
+    }
+
+    // MARK: - Local Persistence Methods
+
+    // Save tasks to UserDefaults
+    private func saveTasksLocally() {
+        do {
+            let data = try JSONEncoder().encode(tasks)
+            userDefaults.set(data, forKey: localStorageKey)
+            print("💾 Saved \(tasks.count) tasks locally")
+        } catch {
+            print("❌ Local save error: \(error)")
+        }
+    }
+
+    // Load tasks from UserDefaults
+    private func loadTasksLocally() {
+        guard let data = userDefaults.data(forKey: localStorageKey) else {
+            print("📥 No local data found - starting with empty task list")
+            return
+        }
+        
+        do {
+            let savedTasks = try JSONDecoder().decode([Task].self, from: data)
+            tasks = savedTasks
+            print("📥 Loaded \(savedTasks.count) tasks from local storage")
+        } catch {
+            print("❌ Local load error: \(error)")
+        }
+    }
+
+    // MARK: - Debug Method
+    func testLocalPersistence() {
+        print("🧪 Testing local persistence...")
+        print("Current tasks: \(tasks.count)")
+        saveTasksLocally()
+        
+        // Simulate app restart by clearing and reloading
+        let originalTasks = tasks
+        tasks = []
+        loadTasksLocally()
+        
+        print("After reload: \(tasks.count) tasks")
+        print("Test \(tasks.count == originalTasks.count ? "✅ PASSED" : "❌ FAILED")")
     }
 }

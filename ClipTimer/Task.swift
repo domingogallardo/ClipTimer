@@ -7,11 +7,19 @@
 
 import Foundation
 
-struct Task: Identifiable {
-    let id = UUID()
+struct Task: Identifiable, Codable {
+    let id: UUID
     let rawName: String
     var name: String
     var elapsed: TimeInterval
+    
+    // Custom initializer to generate UUID
+    init(rawName: String, name: String, elapsed: TimeInterval) {
+        self.id = UUID()
+        self.rawName = rawName
+        self.name = name
+        self.elapsed = elapsed
+    }
     
     // Calculate current elapsed time including active time if running
     func currentElapsed(activeTaskID: UUID?, startTime: Date?) -> TimeInterval {

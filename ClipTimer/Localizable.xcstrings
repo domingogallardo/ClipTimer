@@ -451,6 +451,16 @@
         }
       }
     },
+    "Test local persistence" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prueba persistencia local"
+          }
+        }
+      }
+    },
     "Timer" : {
       "localizations" : {
         "es" : {
