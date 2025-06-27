@@ -286,3 +286,54 @@ final class TaskStore: ObservableObject {
         print("Test \(tasks.count == originalTasks.count ? "✅ PASSED" : "❌ FAILED")")
     }
 }
+
+// MARK: - Testing Support
+#if DEBUG
+extension TaskStore {
+    /// Clear all persisted data - for testing only
+    func clearPersistedData() {
+        userDefaults.removeObject(forKey: localStorageKey)
+        print("🧪 Cleared persisted data for testing")
+    }
+    
+    /// Check if there is persisted data - for testing only
+    func hasPersistedData() -> Bool {
+        return userDefaults.data(forKey: localStorageKey) != nil
+    }
+    
+    /// Get count of persisted tasks - for testing only
+    func getPersistedTaskCount() -> Int? {
+        guard let data = userDefaults.data(forKey: localStorageKey) else {
+            return nil
+        }
+        
+        do {
+            let tasks = try JSONDecoder().decode([Task].self, from: data)
+            return tasks.count
+        } catch {
+            print("❌ Error decoding persisted tasks for testing: \(error)")
+            return nil
+        }
+    }
+    
+    /// Get persisted tasks - for testing only
+    func getPersistedTasks() -> [Task]? {
+        guard let data = userDefaults.data(forKey: localStorageKey) else {
+            return nil
+        }
+        
+        do {
+            let tasks = try JSONDecoder().decode([Task].self, from: data)
+            return tasks
+        } catch {
+            print("❌ Error decoding persisted tasks for testing: \(error)")
+            return nil
+        }
+    }
+    
+    /// Force save current tasks - for testing only
+    func forceSave() {
+        saveTasksLocally()
+    }
+}
+#endif
