@@ -452,6 +452,7 @@
       }
     },
     "Test local persistence" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

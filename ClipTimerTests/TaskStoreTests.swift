@@ -289,15 +289,21 @@ final class TaskStoreTests: XCTestCase {
         let task2 = Task(rawName: "Persistent Task 2", name: "Persistent Task 2", elapsed: 250)
         testStore.tasks = [task1, task2]
         
-        // Test the persistence manually
-        testStore.testLocalPersistence()
+        // Force save the tasks
+        testStore.forceSave()
         
-        // Verify tasks are still there and match
-        XCTAssertEqual(testStore.tasks.count, 2)
-        XCTAssertEqual(testStore.tasks[0].name, "Persistent Task 1")
-        XCTAssertEqual(testStore.tasks[0].elapsed, 150)
-        XCTAssertEqual(testStore.tasks[1].name, "Persistent Task 2")
-        XCTAssertEqual(testStore.tasks[1].elapsed, 250)
+        // Clear tasks from memory and reload
+        testStore.tasks = []
+        
+        // Create a new store to simulate app restart
+        let newStore = TaskStore()
+        
+        // Verify tasks were loaded automatically
+        XCTAssertEqual(newStore.tasks.count, 2)
+        XCTAssertEqual(newStore.tasks[0].name, "Persistent Task 1")
+        XCTAssertEqual(newStore.tasks[0].elapsed, 150)
+        XCTAssertEqual(newStore.tasks[1].name, "Persistent Task 2")
+        XCTAssertEqual(newStore.tasks[1].elapsed, 250)
     }
 
     func testAutoSaveOnAddTasks() {
@@ -427,5 +433,148 @@ final class TaskStoreTests: XCTestCase {
         XCTAssertEqual(newStore.tasks[0].elapsed, 300)
         XCTAssertEqual(newStore.tasks[1].name, "Restart Task 2")
         XCTAssertEqual(newStore.tasks[1].elapsed, 400)
+    }
+
+    // MARK: - App Lifecycle Tests
+
+    func testPauseActiveTaskAndSaveWithNoActiveTask() {
+        // Test when no task is active
+        taskStore.tasks = [
+            Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
+        ]
+        
+        // Should not crash and should handle gracefully
+        taskStore.pauseActiveTaskAndSave()
+        
+        // Verify no task is active
+        XCTAssertNil(taskStore.activeTaskID)
+        XCTAssertNil(taskStore.activeTaskStartTime)
+    }
+
+    func testPauseActiveTaskAndSaveWithActiveTask() {
+        // Create a task and make it active
+        let task = Task(rawName: "Active Task", name: "Active Task", elapsed: 100)
+        taskStore.tasks = [task]
+        
+        // Activate the task
+        taskStore.toggle(task)
+        XCTAssertEqual(taskStore.activeTaskID, task.id)
+        XCTAssertNotNil(taskStore.activeTaskStartTime)
+        
+        // Simulate some time passing
+        let originalElapsed = task.elapsed
+        Thread.sleep(forTimeInterval: 0.1) // 100ms
+        
+        // Call pauseActiveTaskAndSave (simulating app termination)
+        taskStore.pauseActiveTaskAndSave()
+        
+        // Verify task is no longer active
+        XCTAssertNil(taskStore.activeTaskID)
+        XCTAssertNil(taskStore.activeTaskStartTime)
+        
+        // Verify the task was set as last paused
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task.id)
+        
+        // Verify elapsed time was updated (should be slightly more than original)
+        XCTAssertGreaterThan(taskStore.tasks[0].elapsed, originalElapsed)
+        
+        // Verify data was saved
+        XCTAssertTrue(taskStore.hasPersistedData())
+    }
+
+    func testPauseActiveTaskAndSavePreservesLastPausedTask() {
+        // Create two tasks
+        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
+        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 200)
+        taskStore.tasks = [task1, task2]
+        
+        // Activate first task, then pause it manually
+        taskStore.toggle(task1)
+        taskStore.pauseActiveTask()
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task1.id)
+        
+        // Activate second task
+        taskStore.toggle(task2)
+        XCTAssertEqual(taskStore.activeTaskID, task2.id)
+        
+        // Call pauseActiveTaskAndSave (simulating app termination)
+        taskStore.pauseActiveTaskAndSave()
+        
+        // Verify the second task is now the last paused task
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task2.id)
+        XCTAssertNil(taskStore.activeTaskID)
+    }
+
+    func testAppTerminationWorkflow() {
+        // Simulate a complete workflow: start task, work on it, app closes, app reopens
+        
+        // Step 1: Create and start a task
+        let task = Task(rawName: "Work Task", name: "Work Task", elapsed: 500)
+        taskStore.tasks = [task]
+        taskStore.toggle(task)
+        
+        let originalElapsed = task.elapsed
+        Thread.sleep(forTimeInterval: 0.1) // Simulate some work time
+        
+        // Step 2: App terminates (pauseActiveTaskAndSave is called)
+        taskStore.pauseActiveTaskAndSave()
+        
+        // Verify state after termination
+        XCTAssertNil(taskStore.activeTaskID)
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task.id)
+        XCTAssertTrue(taskStore.hasPersistedData())
+        
+        // Step 3: Simulate app restart
+        let newTaskStore = TaskStore()
+        
+        // Verify tasks were loaded
+        XCTAssertEqual(newTaskStore.tasks.count, 1)
+        XCTAssertEqual(newTaskStore.tasks[0].name, "Work Task")
+        XCTAssertGreaterThan(newTaskStore.tasks[0].elapsed, originalElapsed)
+        
+        // Verify we can restart the last paused task
+        // Note: lastPausedTaskID is not persisted across app restarts by design
+        // This could be a future enhancement if needed
+    }
+    
+    func testElapsedTimePreservationOnAppTermination() {
+        // Create a task and simulate some elapsed time
+        let task = Task(rawName: "Time Test", name: "Time Test", elapsed: 100.0) // Start with 100 seconds
+        taskStore.tasks = [task]
+        
+        let initialElapsed = task.elapsed
+        print("🔍 Initial elapsed: \(initialElapsed)")
+        
+        // Activate the task (this should start the timer)
+        taskStore.toggle(task)
+        
+        // Simulate some active time
+        Thread.sleep(forTimeInterval: 0.2) // 200ms
+        
+        // Get current elapsed (should be initial + active time)
+        let currentElapsed = task.currentElapsed(activeTaskID: taskStore.activeTaskID, startTime: taskStore.activeTaskStartTime)
+        print("🔍 Current elapsed before termination: \(currentElapsed)")
+        XCTAssertGreaterThan(currentElapsed, initialElapsed)
+        
+        // Terminate app (this should pause and save)
+        taskStore.pauseActiveTaskAndSave()
+        
+        // Verify task is no longer active
+        XCTAssertNil(taskStore.activeTaskID)
+        XCTAssertNil(taskStore.activeTaskStartTime)
+        
+        // Verify elapsed time was preserved in the task itself
+        print("🔍 Task elapsed after pause: \(taskStore.tasks[0].elapsed)")
+        XCTAssertGreaterThan(taskStore.tasks[0].elapsed, initialElapsed)
+        XCTAssertEqual(taskStore.tasks[0].elapsed, currentElapsed, accuracy: 0.01)
+        
+        // Simulate app restart
+        let newTaskStore = TaskStore()
+        
+        // Verify the persisted elapsed time is correct
+        XCTAssertEqual(newTaskStore.tasks.count, 1)
+        print("🔍 Loaded task elapsed: \(newTaskStore.tasks[0].elapsed)")
+        XCTAssertGreaterThan(newTaskStore.tasks[0].elapsed, initialElapsed)
+        XCTAssertEqual(newTaskStore.tasks[0].elapsed, currentElapsed, accuracy: 0.01)
     }
 } 

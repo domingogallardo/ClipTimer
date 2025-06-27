@@ -51,19 +51,6 @@ private extension ContentView {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
 
-            #if DEBUG
-            // 🧪 Temporary test button for persistence
-            Button {
-                store.testLocalPersistence()
-            } label: {
-                Image(systemName: "internaldrive")
-                    .font(.title2)
-            }
-            .buttonStyle(.borderless)
-            .help("Test local persistence")
-            .padding(.horizontal, 8)
-            #endif
-
             Button {
                 withAnimation { showHelp.toggle() }
             } label: {
