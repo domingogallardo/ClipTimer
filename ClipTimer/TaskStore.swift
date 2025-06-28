@@ -14,10 +14,15 @@ final class TaskStore: ObservableObject {
     @Published var tasks: [Task] = []
     @Published var showColons: Bool = true
     @Published var activeTaskID: UUID?
+    @Published var activeTaskStartTime: Date? = nil  // Single Source of Truth for start time
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
     private var blinkTimer: Timer?
+
+    // MARK: - Local Persistence
+    private let userDefaults = UserDefaults.standard
+    private let localStorageKey = "saved_tasks"
 
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
@@ -34,6 +39,7 @@ final class TaskStore: ObservableObject {
     init() { 
         startTimer() 
         startBlinkTimer()
+        loadTasksLocally()  // 🆕 Load tasks on app start
     }
     
     var totalElapsed: TimeInterval {
@@ -42,14 +48,21 @@ final class TaskStore: ObservableObject {
     
     // Get current elapsed time for a task (including active time if running)
     private func getCurrentElapsed(for task: Task) -> TimeInterval {
-        var elapsed = task.elapsed
+        return task.currentElapsed(activeTaskID: activeTaskID, startTime: activeTaskStartTime)
+    }
+    
+    // Pause the currently active task (save elapsed time and clear active state)
+    private func pauseCurrentActiveTask() {
+        guard let activeID = activeTaskID,
+              let activeIndex = tasks.firstIndex(where: { $0.id == activeID }),
+              let startTime = activeTaskStartTime else { return }
         
-        // If this task is currently active, add the time since it started
-        if activeTaskID == task.id, let startTime = task.startTime {
-            elapsed += Date().timeIntervalSince(startTime)
-        }
+        tasks[activeIndex].elapsed += Date().timeIntervalSince(startTime)
+        activeTaskID = nil
+        activeTaskStartTime = nil
         
-        return elapsed
+        // 🚀 Auto-save whenever a task is paused so elapsed time isn't lost
+        saveTasksLocally()
     }
     
     var summaryText: String {
@@ -64,26 +77,14 @@ final class TaskStore: ObservableObject {
     func toggle(_ task: Task) {
         if activeTaskID == task.id {
             // Task is active, deactivate it (pause and save elapsed time)
-            if let activeIndex = tasks.firstIndex(where: { $0.id == task.id }),
-               let startTime = tasks[activeIndex].startTime {
-                tasks[activeIndex].elapsed += Date().timeIntervalSince(startTime)
-                tasks[activeIndex].startTime = nil
-            }
-            activeTaskID = nil
+            pauseCurrentActiveTask()
         } else {
             // First pause any currently active task
-            if let currentActiveID = activeTaskID,
-               let currentActiveIndex = tasks.firstIndex(where: { $0.id == currentActiveID }),
-               let currentStartTime = tasks[currentActiveIndex].startTime {
-                tasks[currentActiveIndex].elapsed += Date().timeIntervalSince(currentStartTime)
-                tasks[currentActiveIndex].startTime = nil
-            }
+            pauseCurrentActiveTask()
             
             // Activate this task (set start time)
-            if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-                tasks[index].startTime = Date()
-            }
             activeTaskID = task.id
+            activeTaskStartTime = Date()
         }
     }
     
@@ -96,6 +97,7 @@ final class TaskStore: ObservableObject {
                 .compactMap { parseTaskLine($0) }
             tasks = newTasks
             registerUndo(previousTasks: before, actionName: "Replace tasks")
+            saveTasksLocally()  // 🆕 Auto-save after modifying tasks
         }
     }
     
@@ -108,6 +110,7 @@ final class TaskStore: ObservableObject {
                 .compactMap { parseTaskLine($0) }
             tasks.append(contentsOf: addedTasks)
             registerUndo(previousTasks: before, actionName: "Add tasks")
+            saveTasksLocally()  // 🆕 Auto-save after modifying tasks
         }
     }
     
@@ -117,6 +120,7 @@ final class TaskStore: ObservableObject {
         copySummaryToClipboard()
         tasks.removeAll()
         registerUndo(previousTasks: before, actionName: "Cut all tasks")
+        saveTasksLocally()  // 🆕 Auto-save after modifying tasks
     }
     
     // Parse task line with optional time format (e.g., "Task name: 1:30:45" or "Task name")
@@ -124,37 +128,39 @@ final class TaskStore: ObservableObject {
         let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
         
-        // Regex to extract task name and optional time (hours:minutes:seconds or minutes:seconds)
-        let regex = try! NSRegularExpression(
-            pattern: #"^(.*?)(?::\s*(\d{1,2}:)?(\d{1,2}):(\d{2}))?\s*$"#)
+        // Define separate regex patterns for different time formats
+        let hoursMinutesSecondsRegex = try! NSRegularExpression(pattern: #"^(.*?):\s*(\d{1,2}):(\d{2}):(\d{2})\s*$"#)
+        let minutesSecondsRegex = try! NSRegularExpression(pattern: #"^(.*?):\s*(\d{1,2}):(\d{2})\s*$"#)
         
-        if let match = regex.firstMatch(
-            in: trimmed, range: NSRange(trimmed.startIndex..., in: trimmed)) {
-            
-            let nameRange = Range(match.range(at: 1), in: trimmed)
-            let rawName = nameRange.map { String(trimmed[$0]) } ?? trimmed
-            
-            // Extract time components from regex groups
-            let hours = match.range(at: 2).location != NSNotFound ?
-                Int(trimmed[Range(match.range(at: 2), in: trimmed)!]
-                    .dropLast()
-                    .trimmingCharacters(in: .whitespaces)) ?? 0 : 0
-            let minutes = match.range(at: 3).location != NSNotFound ?
-                Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0 : 0
-            let seconds = match.range(at: 4).location != NSNotFound ?
-                Int(trimmed[Range(match.range(at: 4), in: trimmed)!]) ?? 0 : 0
-            
+        let range = NSRange(trimmed.startIndex..., in: trimmed)
+        
+        // Try H:MM:SS format first (more specific)
+        if let match = hoursMinutesSecondsRegex.firstMatch(in: trimmed, range: range) {
+            let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
+            let hours = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
+            let minutes = Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0
+            let seconds = Int(trimmed[Range(match.range(at: 4), in: trimmed)!]) ?? 0
             let elapsed = Double(hours * 3600 + minutes * 60 + seconds)
-            return Task(
-                rawName: rawName,
-                name: rawName.trimmingCharacters(in: .init(charactersIn: "-*• \t")), // Clean task name
-                elapsed: elapsed)
-        } else {
-            return Task(
-                rawName: trimmed,
-                name: trimmed.trimmingCharacters(in: .init(charactersIn: "-*• \t")),
-                elapsed: 0)
+            return createTask(from: taskName, elapsed: elapsed)
         }
+        
+        // Try MM:SS format
+        if let match = minutesSecondsRegex.firstMatch(in: trimmed, range: range) {
+            let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
+            let minutes = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
+            let seconds = Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0
+            let elapsed = Double(minutes * 60 + seconds)
+            return createTask(from: taskName, elapsed: elapsed)
+        }
+        
+        // No time found, treat entire line as task name
+        return createTask(from: trimmed, elapsed: 0)
+    }
+    
+    // Helper method to create task with cleaned name
+    private func createTask(from rawName: String, elapsed: TimeInterval) -> Task {
+        let cleanName = rawName.trimmingCharacters(in: .init(charactersIn: "-*• \t"))
+        return Task(rawName: rawName, name: cleanName, elapsed: elapsed)
     }
     
     private func startTimer() {
@@ -179,6 +185,7 @@ final class TaskStore: ObservableObject {
         let before = tasks
         tasks.removeAll { $0.id == task.id }
         registerUndo(previousTasks: before, actionName: "Delete task")
+        saveTasksLocally()  // 🆕 Auto-save after modifying tasks
     }
     
     // Timer callback - updates UI for active task (time calculation is continuous)
@@ -224,31 +231,130 @@ final class TaskStore: ObservableObject {
     func pauseActiveTask() {
         guard let activeID = activeTaskID else { return }
         
-        // Save elapsed time before pausing
-        if let activeIndex = tasks.firstIndex(where: { $0.id == activeID }),
-           let startTime = tasks[activeIndex].startTime {
-            tasks[activeIndex].elapsed += Date().timeIntervalSince(startTime)
-            tasks[activeIndex].startTime = nil
-        }
-        
         lastPausedTaskID = activeID
-        activeTaskID = nil
+        pauseCurrentActiveTask()
     }
     
     func restartLastPausedTask() {
         guard let pausedID = lastPausedTaskID,
-              let pausedIndex = tasks.firstIndex(where: { $0.id == pausedID }) else { return }
+              let _ = tasks.firstIndex(where: { $0.id == pausedID }) else { return }
         
         // First pause any currently active task
-        if let currentActiveID = activeTaskID,
-           let currentActiveIndex = tasks.firstIndex(where: { $0.id == currentActiveID }),
-           let currentStartTime = tasks[currentActiveIndex].startTime {
-            tasks[currentActiveIndex].elapsed += Date().timeIntervalSince(currentStartTime)
-            tasks[currentActiveIndex].startTime = nil
-        }
+        pauseCurrentActiveTask()
         
         // Restart the paused task
-        tasks[pausedIndex].startTime = Date()
         activeTaskID = pausedID
+        activeTaskStartTime = Date()
+    }
+    
+    // MARK: - App Lifecycle Methods
+    
+    /// Pause active task and save state when app is about to terminate
+    func pauseActiveTaskAndSave() {
+        guard let activeID = activeTaskID else {
+#if DEBUG
+            print("🚪 No active task to pause on app termination")
+#endif
+            return
+        }
+        
+#if DEBUG
+        print("🚪 Auto-pausing active task on app termination: \(activeTask?.name ?? "Unknown")")
+#endif
+        
+        // Remember which task was active for potential restart
+        lastPausedTaskID = activeID
+        
+        // Pause the active task (this now also saves)
+        pauseCurrentActiveTask()
+        
+#if DEBUG
+        print("🚪 App state saved successfully")
+#endif
+    }
+
+    // MARK: - Local Persistence Methods
+
+    // Save tasks to UserDefaults
+    private func saveTasksLocally() {
+        do {
+            let data = try JSONEncoder().encode(tasks)
+            userDefaults.set(data, forKey: localStorageKey)
+#if DEBUG
+            print("💾 Saved \(tasks.count) tasks locally")
+#endif
+        } catch {
+            print("❌ Local save error: \(error)")
+        }
+    }
+    
+    // Load tasks from UserDefaults
+    private func loadTasksLocally() {
+        guard let data = userDefaults.data(forKey: localStorageKey) else {
+#if DEBUG
+            print("📥 No local data found - starting with empty task list")
+#endif
+            return
+        }
+        
+        do {
+            let savedTasks = try JSONDecoder().decode([Task].self, from: data)
+            tasks = savedTasks
+#if DEBUG
+            print("📥 Loaded \(savedTasks.count) tasks from local storage")
+#endif
+        } catch {
+            print("❌ Local load error: \(error)")
+        }
+    }
+
+
+}
+
+// MARK: - Testing Support
+#if DEBUG
+extension TaskStore {
+    /// Decode persisted tasks - helper method for testing
+    private func decodePersistentTasks() -> [Task]? {
+        guard let data = userDefaults.data(forKey: localStorageKey) else { return nil }
+        
+        do {
+            return try JSONDecoder().decode([Task].self, from: data)
+        } catch {
+            print("❌ Error decoding persisted tasks for testing: \(error)")
+            return nil
+        }
+    }
+    
+    /// Clear all persisted data - for testing only
+    func clearPersistedData() {
+        userDefaults.removeObject(forKey: localStorageKey)
+        print("🧪 Cleared persisted data for testing")
+    }
+    
+    /// Check if there is persisted data - for testing only
+    func hasPersistedData() -> Bool {
+        return userDefaults.data(forKey: localStorageKey) != nil
+    }
+    
+    /// Get count of persisted tasks - for testing only
+    func getPersistedTaskCount() -> Int? {
+        return decodePersistentTasks()?.count
+    }
+    
+    /// Get persisted tasks - for testing only
+    func getPersistedTasks() -> [Task]? {
+        return decodePersistentTasks()
+    }
+    
+    /// Force save current tasks - for testing only
+    func forceSave() {
+        saveTasksLocally()
+    }
+    
+    /// Get last paused task ID - for testing only
+    func getLastPausedTaskID() -> UUID? {
+        return lastPausedTaskID
     }
 }
+#endif

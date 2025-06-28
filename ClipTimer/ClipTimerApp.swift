@@ -7,10 +7,20 @@
 
 import SwiftUI
 
+// MARK: - AppDelegate for handling app lifecycle
+class AppDelegate: NSObject, NSApplicationDelegate {
+    var taskStore: TaskStore?
+    
+    func applicationWillTerminate(_ notification: Notification) {
+        taskStore?.pauseActiveTaskAndSave()
+    }
+}
+
 @main
 struct ClipTimerApp: App {
     @StateObject private var store = TaskStore()
     @Environment(\.openWindow) private var openWindow
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
         Window("CipTimer", id: "main") {
@@ -22,6 +32,8 @@ struct ClipTimerApp: App {
                 ).onAppear {
                     // Center window on screen when app launches
                     NSApp.windows.first?.center()
+                    // Connect TaskStore to AppDelegate for termination handling
+                    appDelegate.taskStore = store
                 }
         }
         .commands {

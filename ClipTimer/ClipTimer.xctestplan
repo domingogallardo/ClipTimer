@@ -1,0 +1,32 @@
+{
+  "configurations" : [
+    {
+      "id" : "D1234567-89AB-CDEF-0123-456789ABCDEF",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:ClipTimer.xcodeproj",
+          "identifier" : "A99A50552DDF3D7300AAED02",
+          "name" : "ClipTimer"
+        }
+      ]
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:ClipTimer.xcodeproj",
+        "identifier" : "A9CTESTS12345678901234575",
+        "name" : "ClipTimerTests"
+      }
+    }
+  ],
+  "version" : 1
+}
