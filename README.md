@@ -1,6 +1,6 @@
 # ClipTimer ⏱️
 
-A simple, elegant time tracking app for macOS that helps you monitor time spent on different tasks.
+A clipboard-driven time tracking app for macOS that helps you monitor time spent on different tasks. Simply paste your task list and start tracking!
 
 [![macOS](https://img.shields.io/badge/macOS-14.1+-blue.svg)](https://www.apple.com/macos/)
 [![Swift](https://img.shields.io/badge/Swift-5.0+-orange.svg)](https://swift.org/)
@@ -10,16 +10,16 @@ A simple, elegant time tracking app for macOS that helps you monitor time spent 
 ## ✨ Features
 
 ### 🎯 Core Functionality
-- **Task Management**: Create, start, pause, and delete tasks with ease
+- **Clipboard Integration**: Paste task lists directly from your clipboard - no manual typing needed
 - **Time Tracking**: Accurate time measurement with live updates
 - **Auto-Pause**: Automatically pauses active tasks when you quit the app
 - **Data Persistence**: Your tasks and elapsed times are automatically saved
 
 ### 🔄 Smart Workflow
+- **Clipboard-First Design**: Paste task lists from any source (notes, emails, documents)
 - **One-Click Operation**: Start/pause tasks with a single click
 - **Visual Feedback**: Clear indicators for active tasks with blinking colons
-- **Keyboard Shortcuts**: Efficient task management via keyboard
-- **Copy to Clipboard**: Export task summaries with total time
+- **Export to Clipboard**: Copy task summaries with total time back to clipboard
 
 ### 💾 Reliability
 - **Automatic Saving**: All changes are saved instantly to prevent data loss
@@ -54,20 +54,21 @@ A simple, elegant time tracking app for macOS that helps you monitor time spent 
 ## 🎮 Usage
 
 ### Basic Operations
-1. **Add Tasks**: Paste or type task names (supports time formats like "Task: 1:30:45")
+1. **Add Tasks**: Paste task lists from your clipboard (supports time formats like "Task: 1:30:45")
 2. **Start Tracking**: Click the play button next to any task
 3. **Pause/Resume**: Click the pause button or start another task
-4. **View Summary**: Copy all tasks with elapsed times to clipboard
+4. **Export Summary**: Copy all tasks with elapsed times back to clipboard
 
-### Supported Time Formats
-ClipTimer automatically parses various time formats when adding tasks:
+### Supported Clipboard Formats
+ClipTimer automatically parses various time formats when pasting tasks:
 - `Task name: 1:30:45` (H:MM:SS)
 - `Task name: 90:30` (MM:SS)
 - `Task name` (starts at 0:00:00)
+- Multi-line task lists (one task per line)
 
 ### Keyboard Shortcuts
 - `⌘+V`: Paste tasks from clipboard
-- `⌘+C`: Copy task summary
+- `⌘+C`: Copy task summary back to clipboard
 - `⌘+?`: Show help overlay
 
 ## 🏗️ Architecture
