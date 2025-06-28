@@ -35,7 +35,7 @@ A simple, elegant time tracking app for macOS that helps you monitor time spent 
 ### Installation
 
 #### From App Store (Recommended)
-*Coming soon - app store link will be added here*
+[![Download on the Mac App Store](https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg)](https://apps.apple.com/es/app/cliptimer/id6746253223)
 
 #### Build from Source
 1. Clone the repository:
@@ -121,30 +121,11 @@ ClipTimer/
 - **UserDefaults**: Local data persistence
 - **XCTest**: Unit and integration testing
 
-## 📋 Roadmap
-
-### Upcoming Features
-- [ ] Export to CSV/JSON
-- [ ] Time goals and notifications
-- [ ] Dark mode optimization
-- [ ] iCloud sync
-- [ ] Task categories and tags
 
 ### Recent Updates
 - ✅ Auto-pause on app termination (v1.1.0)
 - ✅ Enhanced data persistence (v1.1.0)
 - ✅ Improved reliability and performance (v1.1.0)
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-### Development Setup
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ### Code Style
 - Follow Swift API Design Guidelines
@@ -166,7 +147,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Issues**: [GitHub Issues](https://github.com/domingogallardo/ClipTimer/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/domingogallardo/ClipTimer/discussions)
-- **Email**: [Support](mailto:your-email@example.com) *(replace with your email)*
+- **Email**: [Support](mailto:domingo.gallardo@gmail.com)
 
 ---
 
