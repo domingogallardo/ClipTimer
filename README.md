@@ -35,7 +35,7 @@ A simple, elegant time tracking app for macOS that helps you monitor time spent 
 ### Installation
 
 #### From App Store (Recommended)
-[![Download on the Mac App Store](https://developer.apple.com/assets/elements/badges/download-on-the-mac-app-store.svg)](https://apps.apple.com/es/app/cliptimer/id6746253223)
+[![Download on Mac App Store](https://img.shields.io/badge/Download-Mac%20App%20Store-blue?style=for-the-badge&logo=apple)](https://apps.apple.com/es/app/cliptimer/id6746253223)
 
 #### Build from Source
 1. Clone the repository:
