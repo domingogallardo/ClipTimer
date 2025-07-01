@@ -94,11 +94,12 @@ final class TaskStore: ObservableObject {
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let lines = tasksString.split(separator: "\n").map { String($0) }
             
-            // Detect and set item symbol if needed
-            detectAndSetItemSymbolIfNeeded(from: lines)
+            // Always detect and set item symbol (replacing takes precedence)
+            detectAndSetItemSymbolAlways(from: lines)
             
             let newTasks = lines.compactMap { parseTaskLine($0) }
             tasks = newTasks
+            resetItemSymbolIfNoTasks()
             registerUndo(previousTasks: before, actionName: "Replace tasks")
             saveTasksLocally()  // 🆕 Auto-save after modifying tasks
         }
@@ -124,6 +125,7 @@ final class TaskStore: ObservableObject {
         let before = tasks
         copySummaryToClipboard()
         tasks.removeAll()
+        resetItemSymbolIfNoTasks()
         registerUndo(previousTasks: before, actionName: "Cut all tasks")
         saveTasksLocally()  // 🆕 Auto-save after modifying tasks
     }
@@ -198,7 +200,7 @@ final class TaskStore: ObservableObject {
         return parseItemSymbolAndText(from: line).cleanText
     }
     
-    // Helper method to detect and set item symbol from clipboard lines if needed
+    // Helper method to detect and set item symbol from clipboard lines if needed (for adding tasks)
     private func detectAndSetItemSymbolIfNeeded(from lines: [String]) {
         // If itemSymbol is empty, detect it from the first line that has a symbol
         guard itemSymbol.isEmpty else { return }
@@ -208,6 +210,27 @@ final class TaskStore: ObservableObject {
                 itemSymbol = detectedSymbol
                 break
             }
+        }
+    }
+    
+    // Helper method to always detect and set item symbol from clipboard lines (for replacing tasks)
+    private func detectAndSetItemSymbolAlways(from lines: [String]) {
+        // Always detect symbol from new lines - replacing tasks takes precedence
+        // If no symbol found, reset to empty (fresh start)
+        var newSymbol = ""
+        for line in lines {
+            if let detectedSymbol = detectItemSymbol(from: line) {
+                newSymbol = detectedSymbol
+                break
+            }
+        }
+        itemSymbol = newSymbol
+    }
+    
+    // Helper method to reset item symbol when no tasks remain
+    private func resetItemSymbolIfNoTasks() {
+        if tasks.isEmpty {
+            itemSymbol = ""
         }
     }
     
@@ -232,6 +255,7 @@ final class TaskStore: ObservableObject {
     func delete(_ task: Task) {
         let before = tasks
         tasks.removeAll { $0.id == task.id }
+        resetItemSymbolIfNoTasks()
         registerUndo(previousTasks: before, actionName: "Delete task")
         saveTasksLocally()  // 🆕 Auto-save after modifying tasks
     }
