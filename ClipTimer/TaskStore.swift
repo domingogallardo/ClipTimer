@@ -94,15 +94,8 @@ final class TaskStore: ObservableObject {
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let lines = tasksString.split(separator: "\n").map { String($0) }
             
-            // If itemSymbol is empty, detect it from the first line that has a symbol
-            if itemSymbol.isEmpty {
-                for line in lines {
-                    if let detectedSymbol = detectItemSymbol(from: line) {
-                        itemSymbol = detectedSymbol
-                        break
-                    }
-                }
-            }
+            // Detect and set item symbol if needed
+            detectAndSetItemSymbolIfNeeded(from: lines)
             
             let newTasks = lines.compactMap { parseTaskLine($0) }
             tasks = newTasks
@@ -116,15 +109,8 @@ final class TaskStore: ObservableObject {
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let lines = tasksString.split(separator: "\n").map { String($0) }
             
-            // If itemSymbol is empty, detect it from the first line that has a symbol
-            if itemSymbol.isEmpty {
-                for line in lines {
-                    if let detectedSymbol = detectItemSymbol(from: line) {
-                        itemSymbol = detectedSymbol
-                        break
-                    }
-                }
-            }
+            // Detect and set item symbol if needed
+            detectAndSetItemSymbolIfNeeded(from: lines)
             
             let addedTasks = lines.compactMap { parseTaskLine($0) }
             tasks.append(contentsOf: addedTasks)
@@ -182,16 +168,16 @@ final class TaskStore: ObservableObject {
         return Task(name: cleanName, elapsed: elapsed)
     }
     
+    // Define all supported symbols as static constant to avoid repeated allocations
+    private static let supportedSymbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ ", "-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
+    
     // Parse item symbol and clean text from a task line
     private func parseItemSymbolAndText(from line: String) -> (symbol: String?, cleanText: String) {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return (nil, "") }
         
-        // Define all supported symbols in one place
-        let supportedSymbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ ", "-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
-        
         // Check for any supported symbol
-        for symbol in supportedSymbols {
+        for symbol in Self.supportedSymbols {
             if trimmed.hasPrefix(symbol) {
                 let cleanText = String(trimmed.dropFirst(symbol.count)).trimmingCharacters(in: .whitespacesAndNewlines)
                 return (symbol, cleanText)
@@ -210,6 +196,19 @@ final class TaskStore: ObservableObject {
     // Remove item symbol from the beginning of a task line (uses shared logic)
     private func removeItemSymbolFromStart(_ line: String) -> String {
         return parseItemSymbolAndText(from: line).cleanText
+    }
+    
+    // Helper method to detect and set item symbol from clipboard lines if needed
+    private func detectAndSetItemSymbolIfNeeded(from lines: [String]) {
+        // If itemSymbol is empty, detect it from the first line that has a symbol
+        guard itemSymbol.isEmpty else { return }
+        
+        for line in lines {
+            if let detectedSymbol = detectItemSymbol(from: line) {
+                itemSymbol = detectedSymbol
+                break
+            }
+        }
     }
     
     private func startTimer() {
