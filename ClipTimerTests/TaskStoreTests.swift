@@ -155,22 +155,23 @@ final class TaskStoreTests: XCTestCase {
         NSPasteboard.general.setString(firstContent, forType: .string)
         taskStore.addTasksFromClipboard()
         
-        // Now add tasks with different symbols
+        // Now ADD (not replace) tasks with different symbols
         let secondContent = "- New Task 1\n* New Task 2"
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(secondContent, forType: .string)
-        taskStore.addTasksFromClipboard()
+        taskStore.addTasksFromClipboard()  // Using ADD, not replace
         
-        // Verify all tasks use the existing symbol (bullet)
+        // Verify all tasks use the existing symbol (bullet) when adding
         let summaryText = taskStore.summaryText
         XCTAssertTrue(summaryText.contains("• Existing Task 1: 0:00:00"))
         XCTAssertTrue(summaryText.contains("• Existing Task 2: 0:00:00"))
         XCTAssertTrue(summaryText.contains("• New Task 1: 0:00:00"))
         XCTAssertTrue(summaryText.contains("• New Task 2: 0:00:00"))
         
-        // Verify it doesn't use the new symbols
+        // Verify it doesn't use the new symbols when adding
         XCTAssertFalse(summaryText.contains("- New Task"))
         XCTAssertFalse(summaryText.contains("* New Task"))
+        XCTAssertEqual(taskStore.itemSymbol, "• ")
     }
     
     func testNewSymbolDetectedWhenNoExistingSymbol() {
@@ -194,7 +195,7 @@ final class TaskStoreTests: XCTestCase {
         XCTAssertTrue(summaryText.contains("→ Arrow Task 2: 0:00:00"))
     }
     
-    func testReplaceTasksKeepsExistingSymbol() {
+    func testReplaceTasksAdoptsNewSymbol() {
         // Start with tasks with existing symbol
         taskStore.tasks = []
         
@@ -210,12 +211,13 @@ final class TaskStoreTests: XCTestCase {
         NSPasteboard.general.setString(replaceContent, forType: .string)
         taskStore.replaceTasksFromClipboard()
         
-        // Verify all tasks use the existing symbol (not the new one)
+        // Verify all tasks use the new symbol (replacing takes precedence)
         let summaryText = taskStore.summaryText
-        XCTAssertTrue(summaryText.contains("• New Task 1: 0:00:00"))
-        XCTAssertTrue(summaryText.contains("• New Task 2: 0:00:00"))
-        XCTAssertFalse(summaryText.contains("✓ New Task"))
+        XCTAssertTrue(summaryText.contains("✓ New Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("✓ New Task 2: 0:00:00"))
+        XCTAssertFalse(summaryText.contains("• New Task"))
         XCTAssertFalse(summaryText.contains("• Old Task")) // Old tasks are gone
+        XCTAssertEqual(taskStore.itemSymbol, "✓ ")
     }
     
     func testReplaceTasksDetectsNewSymbolWhenNoExistingSymbol() {
@@ -236,6 +238,34 @@ final class TaskStoreTests: XCTestCase {
         XCTAssertTrue(summaryText.contains("✓ Replacement Task 1: 0:00:00"))
         XCTAssertTrue(summaryText.contains("✓ Replacement Task 2: 0:00:00"))
         XCTAssertFalse(summaryText.contains("Plain Task")) // Old tasks are gone
+    }
+    
+    func testReplaceSymbolizedTasksWithPlainTextResetsSymbol() {
+        // Start with symbolized tasks
+        taskStore.tasks = []
+        
+        // Add tasks with symbol first
+        let symbolContent = "• Bullet Task 1\n• Bullet Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(symbolContent, forType: .string)
+        taskStore.addTasksFromClipboard()
+        
+        // Verify symbol was established
+        XCTAssertEqual(taskStore.itemSymbol, "• ")
+        
+        // Replace with plain text tasks (no symbols)
+        let plainContent = "Plain Task 1\nPlain Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(plainContent, forType: .string)
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify symbol was reset and tasks appear without symbols
+        XCTAssertEqual(taskStore.itemSymbol, "")
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("Plain Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("Plain Task 2: 0:00:00"))
+        XCTAssertFalse(summaryText.contains("• Plain Task"))
+        XCTAssertFalse(summaryText.contains("• Bullet Task"))
     }
     
     func testAddPlainTextToSymbolizedTasksKeepsExistingSymbol() {
@@ -825,5 +855,143 @@ final class TaskStoreTests: XCTestCase {
         print("🔍 Loaded task elapsed: \(newTaskStore.tasks[0].elapsed)")
         XCTAssertGreaterThan(newTaskStore.tasks[0].elapsed, initialElapsed)
         XCTAssertEqual(newTaskStore.tasks[0].elapsed, currentElapsed, accuracy: 0.01)
+    }
+    
+    // MARK: - Item Symbol Reset Tests
+    
+    func testCutAllTasksResetsItemSymbol() {
+        // Setup: Add tasks with symbol
+        let clipboardContent = "• Task 1\n• Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify symbol was detected
+        XCTAssertEqual(taskStore.itemSymbol, "• ")
+        
+        // Cut all tasks
+        taskStore.cutAllTasks()
+        
+        // Verify symbol was reset
+        XCTAssertEqual(taskStore.itemSymbol, "")
+        XCTAssertTrue(taskStore.tasks.isEmpty)
+    }
+    
+    func testDeleteLastTaskResetsItemSymbol() {
+        // Setup: Add tasks with symbol
+        let clipboardContent = "- Only Task"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify symbol was detected and we have one task
+        XCTAssertEqual(taskStore.itemSymbol, "- ")
+        XCTAssertEqual(taskStore.tasks.count, 1)
+        
+        // Delete the only task
+        taskStore.delete(taskStore.tasks[0])
+        
+        // Verify symbol was reset
+        XCTAssertEqual(taskStore.itemSymbol, "")
+        XCTAssertTrue(taskStore.tasks.isEmpty)
+    }
+    
+    func testDeleteTaskKeepsSymbolWhenTasksRemain() {
+        // Setup: Add multiple tasks with symbol
+        let clipboardContent = "* Task 1\n* Task 2\n* Task 3"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify symbol was detected and we have three tasks
+        XCTAssertEqual(taskStore.itemSymbol, "* ")
+        XCTAssertEqual(taskStore.tasks.count, 3)
+        
+        // Delete one task
+        taskStore.delete(taskStore.tasks[0])
+        
+        // Verify symbol is kept and we have two tasks
+        XCTAssertEqual(taskStore.itemSymbol, "* ")
+        XCTAssertEqual(taskStore.tasks.count, 2)
+    }
+    
+    func testReplaceWithEmptyListResetsItemSymbol() {
+        // Setup: Add tasks with symbol
+        let clipboardContent = "→ Task 1\n→ Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify symbol was detected
+        XCTAssertEqual(taskStore.itemSymbol, "→ ")
+        XCTAssertEqual(taskStore.tasks.count, 2)
+        
+        // Replace with empty content
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString("", forType: .string)
+        
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify symbol was reset
+        XCTAssertEqual(taskStore.itemSymbol, "")
+        XCTAssertTrue(taskStore.tasks.isEmpty)
+    }
+    
+    func testReplaceWithWhitespaceOnlyResetsItemSymbol() {
+        // Setup: Add tasks with symbol
+        let clipboardContent = "✓ Task 1\n✓ Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify symbol was detected
+        XCTAssertEqual(taskStore.itemSymbol, "✓ ")
+        XCTAssertEqual(taskStore.tasks.count, 2)
+        
+        // Replace with whitespace only
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString("   \n\t\n   ", forType: .string)
+        
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify symbol was reset
+        XCTAssertEqual(taskStore.itemSymbol, "")
+        XCTAssertTrue(taskStore.tasks.isEmpty)
+    }
+    
+    func testSymbolResetAllowsNewSymbolDetection() {
+        // Setup: Add tasks with first symbol
+        let firstContent = "• Task 1\n• Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(firstContent, forType: .string)
+        
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify first symbol was detected
+        XCTAssertEqual(taskStore.itemSymbol, "• ")
+        
+        // Cut all tasks (resets symbol)
+        taskStore.cutAllTasks()
+        XCTAssertEqual(taskStore.itemSymbol, "")
+        
+        // Add tasks with different symbol
+        let secondContent = "- New Task 1\n- New Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(secondContent, forType: .string)
+        
+        taskStore.addTasksFromClipboard()
+        
+        // Verify new symbol was detected
+        XCTAssertEqual(taskStore.itemSymbol, "- ")
+        
+        // Verify output uses new symbol
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("- New Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("- New Task 2: 0:00:00"))
     }
 } 
