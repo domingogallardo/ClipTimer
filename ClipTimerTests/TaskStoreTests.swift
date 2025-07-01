@@ -28,6 +28,121 @@ final class TaskStoreTests: XCTestCase {
         super.tearDown()
     }
     
+    // MARK: - Task Formatting Tests
+    
+    func testTaskFormattingWithBulletSymbols() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with bullet symbols
+        let clipboardContent = "• Write Report\n• Review Code\n• Fix Bug"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify output uses consistent formatting
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("• Write Report: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("• Review Code: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("• Fix Bug: 0:00:00"))
+    }
+    
+    func testTaskFormattingWithDashSymbols() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with dash symbols
+        let clipboardContent = "- First Task\n- Second Task"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Replace tasks from clipboard
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify output uses consistent formatting
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("- First Task: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("- Second Task: 0:00:00"))
+    }
+    
+    func testTaskFormattingWithMixedSymbols() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with mixed symbols (should use first one found)
+        let clipboardContent = "* Task One\n→ Task Two\n✓ Task Three"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify output uses consistent formatting (first symbol detected)
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("* Task One: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("* Task Two: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("* Task Three: 0:00:00"))
+    }
+    
+    func testTaskFormattingWithPlainText() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Plain text without symbols
+        let clipboardContent = "Plain Task One\nPlain Task Two"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify output without symbols
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("Plain Task One: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("Plain Task Two: 0:00:00"))
+        XCTAssertFalse(summaryText.contains("• Plain"))
+        XCTAssertFalse(summaryText.contains("- Plain"))
+        XCTAssertFalse(summaryText.contains("* Plain"))
+    }
+    
+    func testTaskFormattingWithTabSymbols() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with tab-separated symbols
+        let clipboardContent = "•\tTab Task One\n•\tTab Task Two"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify output uses consistent formatting
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("•\tTab Task One: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("•\tTab Task Two: 0:00:00"))
+    }
+    
+    func testTaskFormattingPreservesSymbolsInTaskNames() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with symbols in the name (not at the beginning)
+        let clipboardContent = "- Fix bug-123\n- Review item • important"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify symbols within task names are preserved
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("- Fix bug-123: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("- Review item • important: 0:00:00"))
+    }
+
     // MARK: - Task Parsing Tests
     
     func testParseTaskLineBasic() {
