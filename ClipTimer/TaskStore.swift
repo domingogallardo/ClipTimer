@@ -178,34 +178,38 @@ final class TaskStore: ObservableObject {
     
     // Helper method to create task with cleaned name
     private func createTask(from rawName: String, elapsed: TimeInterval) -> Task {
-        let cleanName = rawName.trimmingCharacters(in: .init(charactersIn: "-*• \t"))
+        let cleanName = removeItemSymbolFromStart(rawName)
         return Task(rawName: rawName, name: cleanName, elapsed: elapsed)
     }
     
-    // Detect item symbol from a task line (symbol + spaces or symbol + tab)
-    private func detectItemSymbol(from line: String) -> String? {
+    // Parse item symbol and clean text from a task line
+    private func parseItemSymbolAndText(from line: String) -> (symbol: String?, cleanText: String) {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
+        guard !trimmed.isEmpty else { return (nil, "") }
         
-        // Common symbols to check for
-        let symbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ "]
+        // Define all supported symbols in one place
+        let supportedSymbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ ", "-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
         
-        // Check for symbol + spaces
-        for symbol in symbols {
+        // Check for any supported symbol
+        for symbol in supportedSymbols {
             if trimmed.hasPrefix(symbol) {
-                return symbol
+                let cleanText = String(trimmed.dropFirst(symbol.count)).trimmingCharacters(in: .whitespacesAndNewlines)
+                return (symbol, cleanText)
             }
         }
         
-        // Check for symbol + tab
-        let tabSymbols = ["-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
-        for symbol in tabSymbols {
-            if trimmed.hasPrefix(symbol) {
-                return symbol
-            }
-        }
-        
-        return nil
+        // No symbol found
+        return (nil, trimmed)
+    }
+    
+    // Detect item symbol from a task line (uses shared logic)
+    private func detectItemSymbol(from line: String) -> String? {
+        return parseItemSymbolAndText(from: line).symbol
+    }
+    
+    // Remove item symbol from the beginning of a task line (uses shared logic)
+    private func removeItemSymbolFromStart(_ line: String) -> String {
+        return parseItemSymbolAndText(from: line).cleanText
     }
     
     private func startTimer() {
