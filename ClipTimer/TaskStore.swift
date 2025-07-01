@@ -205,11 +205,6 @@ final class TaskStore: ObservableObject {
             }
         }
         
-        // Check for numbered lists (1. , 2. , etc.)
-        if let match = trimmed.range(of: #"^\d+\.\s+"#, options: .regularExpression) {
-            return String(trimmed[match])
-        }
-        
         return nil
     }
     
