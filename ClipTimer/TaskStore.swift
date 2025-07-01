@@ -15,6 +15,7 @@ final class TaskStore: ObservableObject {
     @Published var showColons: Bool = true
     @Published var activeTaskID: UUID?
     @Published var activeTaskStartTime: Date? = nil  // Single Source of Truth for start time
+    @Published var itemSymbol: String = ""  // Símbolo de itemización para todas las tareas
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
@@ -91,10 +92,19 @@ final class TaskStore: ObservableObject {
     func replaceTasksFromClipboard() {
         let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
-            let newTasks = tasksString
-                .split(separator: "\n")
-                .map { String($0) }
-                .compactMap { parseTaskLine($0) }
+            let lines = tasksString.split(separator: "\n").map { String($0) }
+            
+            // If itemSymbol is empty, detect it from the first line that has a symbol
+            if itemSymbol.isEmpty {
+                for line in lines {
+                    if let detectedSymbol = detectItemSymbol(from: line) {
+                        itemSymbol = detectedSymbol
+                        break
+                    }
+                }
+            }
+            
+            let newTasks = lines.compactMap { parseTaskLine($0) }
             tasks = newTasks
             registerUndo(previousTasks: before, actionName: "Replace tasks")
             saveTasksLocally()  // 🆕 Auto-save after modifying tasks
@@ -104,10 +114,19 @@ final class TaskStore: ObservableObject {
     func addTasksFromClipboard() {
         let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
-            let addedTasks = tasksString
-                .split(separator: "\n")
-                .map { String($0) }
-                .compactMap { parseTaskLine($0) }
+            let lines = tasksString.split(separator: "\n").map { String($0) }
+            
+            // If itemSymbol is empty, detect it from the first line that has a symbol
+            if itemSymbol.isEmpty {
+                for line in lines {
+                    if let detectedSymbol = detectItemSymbol(from: line) {
+                        itemSymbol = detectedSymbol
+                        break
+                    }
+                }
+            }
+            
+            let addedTasks = lines.compactMap { parseTaskLine($0) }
             tasks.append(contentsOf: addedTasks)
             registerUndo(previousTasks: before, actionName: "Add tasks")
             saveTasksLocally()  // 🆕 Auto-save after modifying tasks
@@ -161,6 +180,37 @@ final class TaskStore: ObservableObject {
     private func createTask(from rawName: String, elapsed: TimeInterval) -> Task {
         let cleanName = rawName.trimmingCharacters(in: .init(charactersIn: "-*• \t"))
         return Task(rawName: rawName, name: cleanName, elapsed: elapsed)
+    }
+    
+    // Detect item symbol from a task line (symbol + spaces or symbol + tab)
+    private func detectItemSymbol(from line: String) -> String? {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        
+        // Common symbols to check for
+        let symbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ "]
+        
+        // Check for symbol + spaces
+        for symbol in symbols {
+            if trimmed.hasPrefix(symbol) {
+                return symbol
+            }
+        }
+        
+        // Check for symbol + tab
+        let tabSymbols = ["-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
+        for symbol in tabSymbols {
+            if trimmed.hasPrefix(symbol) {
+                return symbol
+            }
+        }
+        
+        // Check for numbered lists (1. , 2. , etc.)
+        if let match = trimmed.range(of: #"^\d+\.\s+"#, options: .regularExpression) {
+            return String(trimmed[match])
+        }
+        
+        return nil
     }
     
     private func startTimer() {
