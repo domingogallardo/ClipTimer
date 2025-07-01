@@ -43,17 +43,16 @@ final class TaskTests: XCTestCase {
     // MARK: - Task Model Tests
     
     func testTaskCreation() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 120)
+        let task = Task(name: "Test Task", elapsed: 120)
         
         XCTAssertFalse(task.id.uuidString.isEmpty)
-        XCTAssertEqual(task.rawName, "Test Task")
         XCTAssertEqual(task.name, "Test Task")
         XCTAssertEqual(task.elapsed, 120)
     }
     
     func testTaskIdentifiable() {
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 0)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 0)
+        let task1 = Task(name: "Task 1", elapsed: 0)
+        let task2 = Task(name: "Task 2", elapsed: 0)
         
         // Each task should have a unique ID
         XCTAssertNotEqual(task1.id, task2.id)
@@ -62,7 +61,7 @@ final class TaskTests: XCTestCase {
     // MARK: - Current Elapsed Time Tests
     
     func testCurrentElapsedWithInactiveTask() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 120)
+        let task = Task(name: "Test Task", elapsed: 120)
         
         // When task is not active, should return only stored elapsed time
         let currentElapsed = task.currentElapsed(activeTaskID: nil, startTime: nil)
@@ -75,7 +74,7 @@ final class TaskTests: XCTestCase {
     }
     
     func testCurrentElapsedWithActiveTaskNoStartTime() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 100)
+        let task = Task(name: "Test Task", elapsed: 100)
         
         // When task is marked as active but has no start time, should return stored elapsed time
         let currentElapsed = task.currentElapsed(activeTaskID: task.id, startTime: nil)
@@ -83,7 +82,7 @@ final class TaskTests: XCTestCase {
     }
     
     func testCurrentElapsedWithActiveTaskAndStartTime() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 100)
+        let task = Task(name: "Test Task", elapsed: 100)
         
         // Set start time to 5 seconds ago
         let fiveSecondsAgo = Date().addingTimeInterval(-5)
@@ -97,7 +96,7 @@ final class TaskTests: XCTestCase {
     }
     
     func testCurrentElapsedWithActiveTaskButDifferentID() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 100)
+        let task = Task(name: "Test Task", elapsed: 100)
         let fiveSecondsAgo = Date().addingTimeInterval(-5) // 5 seconds ago
         
         // When activeTaskID doesn't match task ID, should not add running time
@@ -107,7 +106,7 @@ final class TaskTests: XCTestCase {
     }
     
     func testCurrentElapsedConsistencyWithPreviousImplementation() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 200)
+        let task = Task(name: "Test Task", elapsed: 200)
         let tenSecondsAgo = Date().addingTimeInterval(-10) // 10 seconds ago
         
         // Test that our new method produces same result as old implementation would

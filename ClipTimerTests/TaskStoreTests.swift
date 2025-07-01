@@ -34,7 +34,6 @@ final class TaskStoreTests: XCTestCase {
         let result = taskStore.parseTaskLine("Test Task")
         
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.rawName, "Test Task")
         XCTAssertEqual(result?.name, "Test Task")
         XCTAssertEqual(result?.elapsed, 0)
     }
@@ -43,7 +42,6 @@ final class TaskStoreTests: XCTestCase {
         let result = taskStore.parseTaskLine("Test Task: 1:30:45")
         
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.rawName, "Test Task")
         XCTAssertEqual(result?.name, "Test Task")
         XCTAssertEqual(result?.elapsed, 5445) // 1*3600 + 30*60 + 45
     }
@@ -52,7 +50,6 @@ final class TaskStoreTests: XCTestCase {
         let result = taskStore.parseTaskLine("Test Task: 30:45")
         
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.rawName, "Test Task")
         XCTAssertEqual(result?.name, "Test Task")
         XCTAssertEqual(result?.elapsed, 1845) // 30*60 + 45
     }
@@ -61,7 +58,6 @@ final class TaskStoreTests: XCTestCase {
         let result = taskStore.parseTaskLine("- Test Task")
         
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.rawName, "- Test Task")
         XCTAssertEqual(result?.name, "Test Task") // Should be cleaned
     }
     
@@ -106,7 +102,7 @@ final class TaskStoreTests: XCTestCase {
     
     func testDeleteTask() {
         // Add a task
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         
         // Delete the task
@@ -116,8 +112,8 @@ final class TaskStoreTests: XCTestCase {
     }
     
     func testTotalElapsedCalculation() {
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 200)
+        let task1 = Task(name: "Task 1", elapsed: 100)
+        let task2 = Task(name: "Task 2", elapsed: 200)
         
         taskStore.tasks = [task1, task2]
         
@@ -131,8 +127,8 @@ final class TaskStoreTests: XCTestCase {
     }
     
     func testSummaryTextWithTasks() {
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 60)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 120)
+        let task1 = Task(name: "Task 1", elapsed: 60)
+        let task2 = Task(name: "Task 2", elapsed: 120)
         
         taskStore.tasks = [task1, task2]
         
@@ -145,7 +141,7 @@ final class TaskStoreTests: XCTestCase {
     func testHasActiveTasks() {
         XCTAssertFalse(taskStore.hasActiveTasks)
         
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         taskStore.activeTaskID = task.id
         
@@ -155,7 +151,7 @@ final class TaskStoreTests: XCTestCase {
     func testActiveTask() {
         XCTAssertNil(taskStore.activeTask)
         
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         taskStore.activeTaskID = task.id
         
@@ -167,7 +163,7 @@ final class TaskStoreTests: XCTestCase {
     // MARK: - Task Toggle Tests
     
     func testToggleTaskActivation() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         
         // Activate task
@@ -182,8 +178,8 @@ final class TaskStoreTests: XCTestCase {
     }
     
     func testToggleOnlyOneTaskActiveAtTime() {
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 0)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 0)
+        let task1 = Task(name: "Task 1", elapsed: 0)
+        let task2 = Task(name: "Task 2", elapsed: 0)
         taskStore.tasks = [task1, task2]
         
         // Activate first task
@@ -199,7 +195,7 @@ final class TaskStoreTests: XCTestCase {
     // MARK: - Pause/Resume Tests
     
     func testPauseActiveTask() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         
         // Activate and then pause
@@ -211,7 +207,7 @@ final class TaskStoreTests: XCTestCase {
     }
     
     func testRestartLastPausedTask() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         
         // Activate, pause, then restart
@@ -227,7 +223,7 @@ final class TaskStoreTests: XCTestCase {
 
     func testTaskCodable() {
         // Test Task can be encoded and decoded
-        let originalTask = Task(rawName: "Test Task", name: "Test Task", elapsed: 123.5)
+        let originalTask = Task(name: "Test Task", elapsed: 123.5)
         
         do {
             // Encode
@@ -241,7 +237,6 @@ final class TaskStoreTests: XCTestCase {
             
             // Verify all properties match
             XCTAssertEqual(decodedTask.id, originalTask.id)
-            XCTAssertEqual(decodedTask.rawName, originalTask.rawName)
             XCTAssertEqual(decodedTask.name, originalTask.name)
             XCTAssertEqual(decodedTask.elapsed, originalTask.elapsed)
         } catch {
@@ -252,9 +247,9 @@ final class TaskStoreTests: XCTestCase {
     func testTaskArrayCodable() {
         // Test that arrays of tasks can be encoded/decoded
         let tasks = [
-            Task(rawName: "Task 1", name: "Task 1", elapsed: 100),
-            Task(rawName: "Task 2", name: "Task 2", elapsed: 200),
-            Task(rawName: "Task 3", name: "Task 3", elapsed: 300)
+            Task(name: "Task 1", elapsed: 100),
+            Task(name: "Task 2", elapsed: 200),
+            Task(name: "Task 3", elapsed: 300)
         ]
         
         do {
@@ -268,7 +263,6 @@ final class TaskStoreTests: XCTestCase {
             
             for (original, decoded) in zip(tasks, decodedTasks) {
                 XCTAssertEqual(decoded.id, original.id)
-                XCTAssertEqual(decoded.rawName, original.rawName)
                 XCTAssertEqual(decoded.name, original.name)
                 XCTAssertEqual(decoded.elapsed, original.elapsed)
             }
@@ -285,8 +279,8 @@ final class TaskStoreTests: XCTestCase {
         testStore.clearPersistedData()
         
         // Add some tasks
-        let task1 = Task(rawName: "Persistent Task 1", name: "Persistent Task 1", elapsed: 150)
-        let task2 = Task(rawName: "Persistent Task 2", name: "Persistent Task 2", elapsed: 250)
+        let task1 = Task(name: "Persistent Task 1", elapsed: 150)
+        let task2 = Task(name: "Persistent Task 2", elapsed: 250)
         testStore.tasks = [task1, task2]
         
         // Force save the tasks
@@ -337,7 +331,7 @@ final class TaskStoreTests: XCTestCase {
 
     func testAutoSaveOnReplaceTasks() {
         // Start with some existing tasks
-        taskStore.tasks = [Task(rawName: "Existing", name: "Existing", elapsed: 100)]
+        taskStore.tasks = [Task(name: "Existing", elapsed: 100)]
         
         // Mock clipboard content
         let clipboardContent = "Replacement task"
@@ -365,8 +359,8 @@ final class TaskStoreTests: XCTestCase {
 
     func testAutoSaveOnDeleteTask() {
         // Create tasks
-        let task1 = Task(rawName: "Keep", name: "Keep", elapsed: 100)
-        let task2 = Task(rawName: "Delete", name: "Delete", elapsed: 200)
+        let task1 = Task(name: "Keep", elapsed: 100)
+        let task2 = Task(name: "Delete", elapsed: 200)
         taskStore.tasks = [task1, task2]
         
         // Delete one task
@@ -390,8 +384,8 @@ final class TaskStoreTests: XCTestCase {
 
     func testAutoSaveOnCutAllTasks() {
         // Create tasks
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 200)
+        let task1 = Task(name: "Task 1", elapsed: 100)
+        let task2 = Task(name: "Task 2", elapsed: 200)
         taskStore.tasks = [task1, task2]
         
         // Cut all tasks
@@ -417,8 +411,8 @@ final class TaskStoreTests: XCTestCase {
         originalStore.clearPersistedData() // Clean slate
         
         // Add tasks to original store
-        let task1 = Task(rawName: "Restart Task 1", name: "Restart Task 1", elapsed: 300)
-        let task2 = Task(rawName: "Restart Task 2", name: "Restart Task 2", elapsed: 400)
+        let task1 = Task(name: "Restart Task 1", elapsed: 300)
+        let task2 = Task(name: "Restart Task 2", elapsed: 400)
         originalStore.tasks = [task1, task2]
         
         // Manually save (simulating auto-save)
@@ -440,7 +434,7 @@ final class TaskStoreTests: XCTestCase {
     func testPauseActiveTaskAndSaveWithNoActiveTask() {
         // Test when no task is active
         taskStore.tasks = [
-            Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
+            Task(name: "Task 1", elapsed: 100)
         ]
         
         // Should not crash and should handle gracefully
@@ -453,7 +447,7 @@ final class TaskStoreTests: XCTestCase {
 
     func testPauseActiveTaskAndSaveWithActiveTask() {
         // Create a task and make it active
-        let task = Task(rawName: "Active Task", name: "Active Task", elapsed: 100)
+        let task = Task(name: "Active Task", elapsed: 100)
         taskStore.tasks = [task]
         
         // Activate the task
@@ -484,8 +478,8 @@ final class TaskStoreTests: XCTestCase {
 
     func testPauseActiveTaskAndSavePreservesLastPausedTask() {
         // Create two tasks
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 200)
+        let task1 = Task(name: "Task 1", elapsed: 100)
+        let task2 = Task(name: "Task 2", elapsed: 200)
         taskStore.tasks = [task1, task2]
         
         // Activate first task, then pause it manually
@@ -509,7 +503,7 @@ final class TaskStoreTests: XCTestCase {
         // Simulate a complete workflow: start task, work on it, app closes, app reopens
         
         // Step 1: Create and start a task
-        let task = Task(rawName: "Work Task", name: "Work Task", elapsed: 500)
+        let task = Task(name: "Work Task", elapsed: 500)
         taskStore.tasks = [task]
         taskStore.toggle(task)
         
@@ -539,7 +533,7 @@ final class TaskStoreTests: XCTestCase {
     
     func testElapsedTimePreservationOnAppTermination() {
         // Create a task and simulate some elapsed time
-        let task = Task(rawName: "Time Test", name: "Time Test", elapsed: 100.0) // Start with 100 seconds
+        let task = Task(name: "Time Test", elapsed: 100.0) // Start with 100 seconds
         taskStore.tasks = [task]
         
         let initialElapsed = task.elapsed

@@ -177,9 +177,9 @@ final class TaskStore: ObservableObject {
     }
     
     // Helper method to create task with cleaned name
-    private func createTask(from rawName: String, elapsed: TimeInterval) -> Task {
-        let cleanName = removeItemSymbolFromStart(rawName)
-        return Task(rawName: rawName, name: cleanName, elapsed: elapsed)
+    private func createTask(from rawText: String, elapsed: TimeInterval) -> Task {
+        let cleanName = removeItemSymbolFromStart(rawText)
+        return Task(name: cleanName, elapsed: elapsed)
     }
     
     // Parse item symbol and clean text from a task line
