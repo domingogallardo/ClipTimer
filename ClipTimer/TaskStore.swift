@@ -69,7 +69,7 @@ final class TaskStore: ObservableObject {
     var summaryText: String {
         if tasks.isEmpty { return "No tasks." }
         return tasks
-            .map { "- \($0.name): \(getCurrentElapsed(for: $0).hms)" }
+            .map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
             .joined(separator: "\n") +
         "\n\nWorking time: \((totalElapsed).hms)"
     }
@@ -257,7 +257,7 @@ final class TaskStore: ObservableObject {
     
     func copySummaryToClipboard() {
         let taskSummary = tasks
-            .map { "\($0.rawName): \(getCurrentElapsed(for: $0).hms)" }
+            .map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
             .joined(separator: "\n")
         let total = totalElapsed
         let summaryWithTotal = taskSummary.isEmpty
