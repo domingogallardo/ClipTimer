@@ -9,14 +9,12 @@ import Foundation
 
 struct Task: Identifiable, Codable {
     let id: UUID
-    let rawName: String
     var name: String
     var elapsed: TimeInterval
     
     // Custom initializer to generate UUID
-    init(rawName: String, name: String, elapsed: TimeInterval) {
+    init(name: String, elapsed: TimeInterval) {
         self.id = UUID()
-        self.rawName = rawName
         self.name = name
         self.elapsed = elapsed
     }

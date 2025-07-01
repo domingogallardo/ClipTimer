@@ -28,13 +28,267 @@ final class TaskStoreTests: XCTestCase {
         super.tearDown()
     }
     
+    // MARK: - Task Formatting Tests
+    
+    func testTaskFormattingWithBulletSymbols() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with bullet symbols
+        let clipboardContent = "• Write Report\n• Review Code\n• Fix Bug"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify output uses consistent formatting
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("• Write Report: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("• Review Code: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("• Fix Bug: 0:00:00"))
+    }
+    
+    func testTaskFormattingWithDashSymbols() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with dash symbols
+        let clipboardContent = "- First Task\n- Second Task"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Replace tasks from clipboard
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify output uses consistent formatting
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("- First Task: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("- Second Task: 0:00:00"))
+    }
+    
+    func testTaskFormattingWithMixedSymbols() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with mixed symbols (should use first one found)
+        let clipboardContent = "* Task One\n→ Task Two\n✓ Task Three"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify output uses consistent formatting (first symbol detected)
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("* Task One: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("* Task Two: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("* Task Three: 0:00:00"))
+    }
+    
+    func testTaskFormattingWithPlainText() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Plain text without symbols
+        let clipboardContent = "Plain Task One\nPlain Task Two"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify output without symbols
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("Plain Task One: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("Plain Task Two: 0:00:00"))
+        XCTAssertFalse(summaryText.contains("• Plain"))
+        XCTAssertFalse(summaryText.contains("- Plain"))
+        XCTAssertFalse(summaryText.contains("* Plain"))
+    }
+    
+    func testTaskFormattingWithTabSymbols() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with tab-separated symbols
+        let clipboardContent = "•\tTab Task One\n•\tTab Task Two"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify output uses consistent formatting
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("•\tTab Task One: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("•\tTab Task Two: 0:00:00"))
+    }
+    
+    func testTaskFormattingPreservesSymbolsInTaskNames() {
+        // Clear any existing tasks
+        taskStore.tasks = []
+        
+        // Input: Tasks with symbols in the name (not at the beginning)
+        let clipboardContent = "- Fix bug-123\n- Review item • important"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        
+        // Add tasks from clipboard
+        taskStore.addTasksFromClipboard()
+        
+        // Verify symbols within task names are preserved
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("- Fix bug-123: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("- Review item • important: 0:00:00"))
+    }
+    
+    // MARK: - Symbol Precedence Behavior Tests
+    
+    func testExistingSymbolTakesPrecedenceWhenAddingTasks() {
+        // Start with tasks that have an established symbol
+        taskStore.tasks = []
+        
+        // First, add tasks with bullet symbols to establish the symbol
+        let firstContent = "• Existing Task 1\n• Existing Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(firstContent, forType: .string)
+        taskStore.addTasksFromClipboard()
+        
+        // Now add tasks with different symbols
+        let secondContent = "- New Task 1\n* New Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(secondContent, forType: .string)
+        taskStore.addTasksFromClipboard()
+        
+        // Verify all tasks use the existing symbol (bullet)
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("• Existing Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("• Existing Task 2: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("• New Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("• New Task 2: 0:00:00"))
+        
+        // Verify it doesn't use the new symbols
+        XCTAssertFalse(summaryText.contains("- New Task"))
+        XCTAssertFalse(summaryText.contains("* New Task"))
+    }
+    
+    func testNewSymbolDetectedWhenNoExistingSymbol() {
+        // Start with plain text tasks (no symbols)
+        taskStore.tasks = [
+            Task(name: "Plain Task 1", elapsed: 30),
+            Task(name: "Plain Task 2", elapsed: 45)
+        ]
+        
+        // Add tasks with symbols
+        let clipboardContent = "→ Arrow Task 1\n→ Arrow Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(clipboardContent, forType: .string)
+        taskStore.addTasksFromClipboard()
+        
+        // Verify ALL tasks (existing + new) use the newly detected symbol
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("→ Plain Task 1: 0:00:30"))
+        XCTAssertTrue(summaryText.contains("→ Plain Task 2: 0:00:45"))
+        XCTAssertTrue(summaryText.contains("→ Arrow Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("→ Arrow Task 2: 0:00:00"))
+    }
+    
+    func testReplaceTasksKeepsExistingSymbol() {
+        // Start with tasks with existing symbol
+        taskStore.tasks = []
+        
+        // Add tasks with bullet symbol first
+        let firstContent = "• Old Task 1\n• Old Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(firstContent, forType: .string)
+        taskStore.addTasksFromClipboard()
+        
+        // Replace all tasks with different symbol
+        let replaceContent = "✓ New Task 1\n✓ New Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(replaceContent, forType: .string)
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify all tasks use the existing symbol (not the new one)
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("• New Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("• New Task 2: 0:00:00"))
+        XCTAssertFalse(summaryText.contains("✓ New Task"))
+        XCTAssertFalse(summaryText.contains("• Old Task")) // Old tasks are gone
+    }
+    
+    func testReplaceTasksDetectsNewSymbolWhenNoExistingSymbol() {
+        // Start with plain text tasks (no symbol established)
+        taskStore.tasks = [
+            Task(name: "Plain Task 1", elapsed: 30),
+            Task(name: "Plain Task 2", elapsed: 60)
+        ]
+        
+        // Replace with symbolized tasks
+        let replaceContent = "✓ Replacement Task 1\n✓ Replacement Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(replaceContent, forType: .string)
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify new tasks use the detected symbol
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("✓ Replacement Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("✓ Replacement Task 2: 0:00:00"))
+        XCTAssertFalse(summaryText.contains("Plain Task")) // Old tasks are gone
+    }
+    
+    func testAddPlainTextToSymbolizedTasksKeepsExistingSymbol() {
+        // Start with tasks that have symbols
+        taskStore.tasks = []
+        
+        // First, establish symbol with formatted tasks
+        let symbolContent = "☐ Checkbox Task 1\n☐ Checkbox Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(symbolContent, forType: .string)
+        taskStore.addTasksFromClipboard()
+        
+        // Add plain text tasks
+        let plainContent = "Plain Task 1\nPlain Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(plainContent, forType: .string)
+        taskStore.addTasksFromClipboard()
+        
+        // Verify all tasks use the existing symbol
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("☐ Checkbox Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("☐ Checkbox Task 2: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("☐ Plain Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("☐ Plain Task 2: 0:00:00"))
+    }
+    
+    func testAddSymbolizedTasksToPlainTextDetectsNewSymbol() {
+        // Start with plain text tasks only
+        taskStore.tasks = [
+            Task(name: "Existing Plain 1", elapsed: 60),
+            Task(name: "Existing Plain 2", elapsed: 120)
+        ]
+        
+        // Add symbolized tasks 
+        let symbolContent = "* Star Task 1\n* Star Task 2"
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(symbolContent, forType: .string)
+        taskStore.addTasksFromClipboard()
+        
+        // Verify ALL tasks now use the detected symbol
+        let summaryText = taskStore.summaryText
+        XCTAssertTrue(summaryText.contains("* Existing Plain 1: 0:01:00"))
+        XCTAssertTrue(summaryText.contains("* Existing Plain 2: 0:02:00"))
+        XCTAssertTrue(summaryText.contains("* Star Task 1: 0:00:00"))
+        XCTAssertTrue(summaryText.contains("* Star Task 2: 0:00:00"))
+    }
+
     // MARK: - Task Parsing Tests
     
     func testParseTaskLineBasic() {
         let result = taskStore.parseTaskLine("Test Task")
         
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.rawName, "Test Task")
         XCTAssertEqual(result?.name, "Test Task")
         XCTAssertEqual(result?.elapsed, 0)
     }
@@ -43,7 +297,6 @@ final class TaskStoreTests: XCTestCase {
         let result = taskStore.parseTaskLine("Test Task: 1:30:45")
         
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.rawName, "Test Task")
         XCTAssertEqual(result?.name, "Test Task")
         XCTAssertEqual(result?.elapsed, 5445) // 1*3600 + 30*60 + 45
     }
@@ -52,7 +305,6 @@ final class TaskStoreTests: XCTestCase {
         let result = taskStore.parseTaskLine("Test Task: 30:45")
         
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.rawName, "Test Task")
         XCTAssertEqual(result?.name, "Test Task")
         XCTAssertEqual(result?.elapsed, 1845) // 30*60 + 45
     }
@@ -61,7 +313,6 @@ final class TaskStoreTests: XCTestCase {
         let result = taskStore.parseTaskLine("- Test Task")
         
         XCTAssertNotNil(result)
-        XCTAssertEqual(result?.rawName, "- Test Task")
         XCTAssertEqual(result?.name, "Test Task") // Should be cleaned
     }
     
@@ -106,7 +357,7 @@ final class TaskStoreTests: XCTestCase {
     
     func testDeleteTask() {
         // Add a task
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         
         // Delete the task
@@ -116,8 +367,8 @@ final class TaskStoreTests: XCTestCase {
     }
     
     func testTotalElapsedCalculation() {
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 200)
+        let task1 = Task(name: "Task 1", elapsed: 100)
+        let task2 = Task(name: "Task 2", elapsed: 200)
         
         taskStore.tasks = [task1, task2]
         
@@ -131,8 +382,8 @@ final class TaskStoreTests: XCTestCase {
     }
     
     func testSummaryTextWithTasks() {
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 60)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 120)
+        let task1 = Task(name: "Task 1", elapsed: 60)
+        let task2 = Task(name: "Task 2", elapsed: 120)
         
         taskStore.tasks = [task1, task2]
         
@@ -145,7 +396,7 @@ final class TaskStoreTests: XCTestCase {
     func testHasActiveTasks() {
         XCTAssertFalse(taskStore.hasActiveTasks)
         
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         taskStore.activeTaskID = task.id
         
@@ -155,7 +406,7 @@ final class TaskStoreTests: XCTestCase {
     func testActiveTask() {
         XCTAssertNil(taskStore.activeTask)
         
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         taskStore.activeTaskID = task.id
         
@@ -167,7 +418,7 @@ final class TaskStoreTests: XCTestCase {
     // MARK: - Task Toggle Tests
     
     func testToggleTaskActivation() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         
         // Activate task
@@ -182,8 +433,8 @@ final class TaskStoreTests: XCTestCase {
     }
     
     func testToggleOnlyOneTaskActiveAtTime() {
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 0)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 0)
+        let task1 = Task(name: "Task 1", elapsed: 0)
+        let task2 = Task(name: "Task 2", elapsed: 0)
         taskStore.tasks = [task1, task2]
         
         // Activate first task
@@ -199,7 +450,7 @@ final class TaskStoreTests: XCTestCase {
     // MARK: - Pause/Resume Tests
     
     func testPauseActiveTask() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         
         // Activate and then pause
@@ -211,7 +462,7 @@ final class TaskStoreTests: XCTestCase {
     }
     
     func testRestartLastPausedTask() {
-        let task = Task(rawName: "Test Task", name: "Test Task", elapsed: 0)
+        let task = Task(name: "Test Task", elapsed: 0)
         taskStore.tasks = [task]
         
         // Activate, pause, then restart
@@ -227,7 +478,7 @@ final class TaskStoreTests: XCTestCase {
 
     func testTaskCodable() {
         // Test Task can be encoded and decoded
-        let originalTask = Task(rawName: "Test Task", name: "Test Task", elapsed: 123.5)
+        let originalTask = Task(name: "Test Task", elapsed: 123.5)
         
         do {
             // Encode
@@ -241,7 +492,6 @@ final class TaskStoreTests: XCTestCase {
             
             // Verify all properties match
             XCTAssertEqual(decodedTask.id, originalTask.id)
-            XCTAssertEqual(decodedTask.rawName, originalTask.rawName)
             XCTAssertEqual(decodedTask.name, originalTask.name)
             XCTAssertEqual(decodedTask.elapsed, originalTask.elapsed)
         } catch {
@@ -252,9 +502,9 @@ final class TaskStoreTests: XCTestCase {
     func testTaskArrayCodable() {
         // Test that arrays of tasks can be encoded/decoded
         let tasks = [
-            Task(rawName: "Task 1", name: "Task 1", elapsed: 100),
-            Task(rawName: "Task 2", name: "Task 2", elapsed: 200),
-            Task(rawName: "Task 3", name: "Task 3", elapsed: 300)
+            Task(name: "Task 1", elapsed: 100),
+            Task(name: "Task 2", elapsed: 200),
+            Task(name: "Task 3", elapsed: 300)
         ]
         
         do {
@@ -268,7 +518,6 @@ final class TaskStoreTests: XCTestCase {
             
             for (original, decoded) in zip(tasks, decodedTasks) {
                 XCTAssertEqual(decoded.id, original.id)
-                XCTAssertEqual(decoded.rawName, original.rawName)
                 XCTAssertEqual(decoded.name, original.name)
                 XCTAssertEqual(decoded.elapsed, original.elapsed)
             }
@@ -285,8 +534,8 @@ final class TaskStoreTests: XCTestCase {
         testStore.clearPersistedData()
         
         // Add some tasks
-        let task1 = Task(rawName: "Persistent Task 1", name: "Persistent Task 1", elapsed: 150)
-        let task2 = Task(rawName: "Persistent Task 2", name: "Persistent Task 2", elapsed: 250)
+        let task1 = Task(name: "Persistent Task 1", elapsed: 150)
+        let task2 = Task(name: "Persistent Task 2", elapsed: 250)
         testStore.tasks = [task1, task2]
         
         // Force save the tasks
@@ -337,7 +586,7 @@ final class TaskStoreTests: XCTestCase {
 
     func testAutoSaveOnReplaceTasks() {
         // Start with some existing tasks
-        taskStore.tasks = [Task(rawName: "Existing", name: "Existing", elapsed: 100)]
+        taskStore.tasks = [Task(name: "Existing", elapsed: 100)]
         
         // Mock clipboard content
         let clipboardContent = "Replacement task"
@@ -365,8 +614,8 @@ final class TaskStoreTests: XCTestCase {
 
     func testAutoSaveOnDeleteTask() {
         // Create tasks
-        let task1 = Task(rawName: "Keep", name: "Keep", elapsed: 100)
-        let task2 = Task(rawName: "Delete", name: "Delete", elapsed: 200)
+        let task1 = Task(name: "Keep", elapsed: 100)
+        let task2 = Task(name: "Delete", elapsed: 200)
         taskStore.tasks = [task1, task2]
         
         // Delete one task
@@ -390,8 +639,8 @@ final class TaskStoreTests: XCTestCase {
 
     func testAutoSaveOnCutAllTasks() {
         // Create tasks
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 200)
+        let task1 = Task(name: "Task 1", elapsed: 100)
+        let task2 = Task(name: "Task 2", elapsed: 200)
         taskStore.tasks = [task1, task2]
         
         // Cut all tasks
@@ -417,8 +666,8 @@ final class TaskStoreTests: XCTestCase {
         originalStore.clearPersistedData() // Clean slate
         
         // Add tasks to original store
-        let task1 = Task(rawName: "Restart Task 1", name: "Restart Task 1", elapsed: 300)
-        let task2 = Task(rawName: "Restart Task 2", name: "Restart Task 2", elapsed: 400)
+        let task1 = Task(name: "Restart Task 1", elapsed: 300)
+        let task2 = Task(name: "Restart Task 2", elapsed: 400)
         originalStore.tasks = [task1, task2]
         
         // Manually save (simulating auto-save)
@@ -440,7 +689,7 @@ final class TaskStoreTests: XCTestCase {
     func testPauseActiveTaskAndSaveWithNoActiveTask() {
         // Test when no task is active
         taskStore.tasks = [
-            Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
+            Task(name: "Task 1", elapsed: 100)
         ]
         
         // Should not crash and should handle gracefully
@@ -453,7 +702,7 @@ final class TaskStoreTests: XCTestCase {
 
     func testPauseActiveTaskAndSaveWithActiveTask() {
         // Create a task and make it active
-        let task = Task(rawName: "Active Task", name: "Active Task", elapsed: 100)
+        let task = Task(name: "Active Task", elapsed: 100)
         taskStore.tasks = [task]
         
         // Activate the task
@@ -484,8 +733,8 @@ final class TaskStoreTests: XCTestCase {
 
     func testPauseActiveTaskAndSavePreservesLastPausedTask() {
         // Create two tasks
-        let task1 = Task(rawName: "Task 1", name: "Task 1", elapsed: 100)
-        let task2 = Task(rawName: "Task 2", name: "Task 2", elapsed: 200)
+        let task1 = Task(name: "Task 1", elapsed: 100)
+        let task2 = Task(name: "Task 2", elapsed: 200)
         taskStore.tasks = [task1, task2]
         
         // Activate first task, then pause it manually
@@ -509,7 +758,7 @@ final class TaskStoreTests: XCTestCase {
         // Simulate a complete workflow: start task, work on it, app closes, app reopens
         
         // Step 1: Create and start a task
-        let task = Task(rawName: "Work Task", name: "Work Task", elapsed: 500)
+        let task = Task(name: "Work Task", elapsed: 500)
         taskStore.tasks = [task]
         taskStore.toggle(task)
         
@@ -539,7 +788,7 @@ final class TaskStoreTests: XCTestCase {
     
     func testElapsedTimePreservationOnAppTermination() {
         // Create a task and simulate some elapsed time
-        let task = Task(rawName: "Time Test", name: "Time Test", elapsed: 100.0) // Start with 100 seconds
+        let task = Task(name: "Time Test", elapsed: 100.0) // Start with 100 seconds
         taskStore.tasks = [task]
         
         let initialElapsed = task.elapsed

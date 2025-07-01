@@ -34,8 +34,8 @@ struct TaskListView: View {
 #Preview {
     let store = TaskStore()
     store.tasks = [
-        Task(rawName: "Demo 1", name: "Demo 1", elapsed: 120),
-        Task(rawName: "Demo 2", name: "Demo 2", elapsed: 45)
+        Task(name: "Demo 1", elapsed: 120),
+        Task(name: "Demo 2", elapsed: 45)
     ]
     // Make second task active
     store.activeTaskID = store.tasks[1].id

@@ -15,6 +15,7 @@ final class TaskStore: ObservableObject {
     @Published var showColons: Bool = true
     @Published var activeTaskID: UUID?
     @Published var activeTaskStartTime: Date? = nil  // Single Source of Truth for start time
+    @Published var itemSymbol: String = ""  // Símbolo de itemización para todas las tareas
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
@@ -68,7 +69,7 @@ final class TaskStore: ObservableObject {
     var summaryText: String {
         if tasks.isEmpty { return "No tasks." }
         return tasks
-            .map { "- \($0.name): \(getCurrentElapsed(for: $0).hms)" }
+            .map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
             .joined(separator: "\n") +
         "\n\nWorking time: \((totalElapsed).hms)"
     }
@@ -91,10 +92,12 @@ final class TaskStore: ObservableObject {
     func replaceTasksFromClipboard() {
         let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
-            let newTasks = tasksString
-                .split(separator: "\n")
-                .map { String($0) }
-                .compactMap { parseTaskLine($0) }
+            let lines = tasksString.split(separator: "\n").map { String($0) }
+            
+            // Detect and set item symbol if needed
+            detectAndSetItemSymbolIfNeeded(from: lines)
+            
+            let newTasks = lines.compactMap { parseTaskLine($0) }
             tasks = newTasks
             registerUndo(previousTasks: before, actionName: "Replace tasks")
             saveTasksLocally()  // 🆕 Auto-save after modifying tasks
@@ -104,10 +107,12 @@ final class TaskStore: ObservableObject {
     func addTasksFromClipboard() {
         let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
-            let addedTasks = tasksString
-                .split(separator: "\n")
-                .map { String($0) }
-                .compactMap { parseTaskLine($0) }
+            let lines = tasksString.split(separator: "\n").map { String($0) }
+            
+            // Detect and set item symbol if needed
+            detectAndSetItemSymbolIfNeeded(from: lines)
+            
+            let addedTasks = lines.compactMap { parseTaskLine($0) }
             tasks.append(contentsOf: addedTasks)
             registerUndo(previousTasks: before, actionName: "Add tasks")
             saveTasksLocally()  // 🆕 Auto-save after modifying tasks
@@ -158,9 +163,52 @@ final class TaskStore: ObservableObject {
     }
     
     // Helper method to create task with cleaned name
-    private func createTask(from rawName: String, elapsed: TimeInterval) -> Task {
-        let cleanName = rawName.trimmingCharacters(in: .init(charactersIn: "-*• \t"))
-        return Task(rawName: rawName, name: cleanName, elapsed: elapsed)
+    private func createTask(from rawText: String, elapsed: TimeInterval) -> Task {
+        let cleanName = removeItemSymbolFromStart(rawText)
+        return Task(name: cleanName, elapsed: elapsed)
+    }
+    
+    // Define all supported symbols as static constant to avoid repeated allocations
+    private static let supportedSymbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ ", "-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
+    
+    // Parse item symbol and clean text from a task line
+    private func parseItemSymbolAndText(from line: String) -> (symbol: String?, cleanText: String) {
+        let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return (nil, "") }
+        
+        // Check for any supported symbol
+        for symbol in Self.supportedSymbols {
+            if trimmed.hasPrefix(symbol) {
+                let cleanText = String(trimmed.dropFirst(symbol.count)).trimmingCharacters(in: .whitespacesAndNewlines)
+                return (symbol, cleanText)
+            }
+        }
+        
+        // No symbol found
+        return (nil, trimmed)
+    }
+    
+    // Detect item symbol from a task line (uses shared logic)
+    private func detectItemSymbol(from line: String) -> String? {
+        return parseItemSymbolAndText(from: line).symbol
+    }
+    
+    // Remove item symbol from the beginning of a task line (uses shared logic)
+    private func removeItemSymbolFromStart(_ line: String) -> String {
+        return parseItemSymbolAndText(from: line).cleanText
+    }
+    
+    // Helper method to detect and set item symbol from clipboard lines if needed
+    private func detectAndSetItemSymbolIfNeeded(from lines: [String]) {
+        // If itemSymbol is empty, detect it from the first line that has a symbol
+        guard itemSymbol.isEmpty else { return }
+        
+        for line in lines {
+            if let detectedSymbol = detectItemSymbol(from: line) {
+                itemSymbol = detectedSymbol
+                break
+            }
+        }
     }
     
     private func startTimer() {
@@ -212,7 +260,7 @@ final class TaskStore: ObservableObject {
     
     func copySummaryToClipboard() {
         let taskSummary = tasks
-            .map { "\($0.rawName): \(getCurrentElapsed(for: $0).hms)" }
+            .map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
             .joined(separator: "\n")
         let total = totalElapsed
         let summaryWithTotal = taskSummary.isEmpty

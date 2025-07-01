@@ -55,8 +55,8 @@ struct TaskRow: View {
 #Preview {
     let store = TaskStore()
     store.tasks = [
-        Task(rawName: "Write Report", name: "Write Report", elapsed: 123),
-        Task(rawName: "Review Email", name: "Review Email", elapsed: 4523)
+        Task(name: "Write Report", elapsed: 123),
+        Task(name: "Review Email", elapsed: 4523)
     ]
     // Make second task active
     store.activeTaskID = store.tasks[1].id
