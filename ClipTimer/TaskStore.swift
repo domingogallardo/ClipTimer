@@ -134,32 +134,41 @@ final class TaskStore: ObservableObject {
     func parseTaskLine(_ rawLine: String) -> Task? {
         let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
-        
-        // Define separate regex patterns for different time formats
-        let hoursMinutesSecondsRegex = try! NSRegularExpression(pattern: #"^(.*?):\s*(\d{1,2}):(\d{2}):(\d{2})\s*$"#)
-        let minutesSecondsRegex = try! NSRegularExpression(pattern: #"^(.*?):\s*(\d{1,2}):(\d{2})\s*$"#)
-        
+
+        // Único patrón que detecta "Nombre: H:MM:SS" o "Nombre: MM:SS"
+        // 1- Task name (lazily up to colon)
+        // 2- Primer bloque numérico (horas o minutos)
+        // 3- Segundo bloque numérico opcional (minutos o segundos)
+        // 4- Tercer bloque numérico opcional (segundos)
+        let pattern = #"^(.*?):\s*(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?\s*$"#
+        let regex = try! NSRegularExpression(pattern: pattern)
         let range = NSRange(trimmed.startIndex..., in: trimmed)
-        
-        // Try H:MM:SS format first (more specific)
-        if let match = hoursMinutesSecondsRegex.firstMatch(in: trimmed, range: range) {
+
+        if let match = regex.firstMatch(in: trimmed, range: range) {
             let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
-            let hours = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
-            let minutes = Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0
-            let seconds = Int(trimmed[Range(match.range(at: 4), in: trimmed)!]) ?? 0
+            let first  = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
+            let second = match.range(at: 3).location != NSNotFound ? Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0 : nil
+            let third  = match.range(at: 4).location != NSNotFound ? Int(trimmed[Range(match.range(at: 4), in: trimmed)!]) ?? 0 : nil
+
+            let (hours, minutes, seconds): (Int, Int, Int)
+            if let third = third { // H:MM:SS (all three numbers present)
+                hours = first
+                minutes = second ?? 0
+                seconds = third
+            } else if let second = second { // MM:SS
+                hours = 0
+                minutes = first
+                seconds = second
+            } else { // Solo un número tras los dos puntos → tratamos como segundos
+                hours = 0
+                minutes = 0
+                seconds = first
+            }
+
             let elapsed = Double(hours * 3600 + minutes * 60 + seconds)
             return createTask(from: taskName, elapsed: elapsed)
         }
-        
-        // Try MM:SS format
-        if let match = minutesSecondsRegex.firstMatch(in: trimmed, range: range) {
-            let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
-            let minutes = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
-            let seconds = Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0
-            let elapsed = Double(minutes * 60 + seconds)
-            return createTask(from: taskName, elapsed: elapsed)
-        }
-        
+
         // No time found, treat entire line as task name
         return createTask(from: trimmed, elapsed: 0)
     }
