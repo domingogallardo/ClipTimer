@@ -202,29 +202,13 @@ final class TaskStore: ObservableObject {
     
     // Helper method to detect and set item symbol from clipboard lines
     private func detectAndSetItemSymbol(from lines: [String], forceDetection: Bool = false) {
-        // If forceDetection is false (adding), only detect when itemSymbol is empty
-        // If forceDetection is true (replacing), always detect and set (or reset to empty)
+        // Reglas:
+        // • Replacing (forceDetection = true) → siempre recalcular símbolo (o vaciar si no se encuentra)
+        // • Adding  (forceDetection = false) → sólo si aún no había símbolo
         guard forceDetection || itemSymbol.isEmpty else { return }
-        
-        if forceDetection {
-            // For replacing: always set symbol (or empty if none found)
-            var newSymbol = ""
-            for line in lines {
-                if let detectedSymbol = detectItemSymbol(from: line) {
-                    newSymbol = detectedSymbol
-                    break
-                }
-            }
-            itemSymbol = newSymbol
-        } else {
-            // For adding: only set if currently empty
-            for line in lines {
-                if let detectedSymbol = detectItemSymbol(from: line) {
-                    itemSymbol = detectedSymbol
-                    break
-                }
-            }
-        }
+
+        // Buscar el primer símbolo válido en las líneas recibidas; si no hay, quedará "".
+        itemSymbol = lines.compactMap(detectItemSymbol).first ?? ""
     }
     
     // Helper method to reset item symbol when no tasks remain
