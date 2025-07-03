@@ -148,8 +148,29 @@ final class TaskStore: ObservableObject {
                 // Detect and set item symbol if needed (adding mode)
                 detectAndSetItemSymbol(from: lines, forceDetection: false)
                 
-                let addedTasks = lines.compactMap { parseTaskLine($0) }
-                tasks.append(contentsOf: addedTasks)
+                let newTasks = lines.compactMap { parseTaskLine($0) }
+                updateOrAddTasks(newTasks, to: &tasks)
+            }
+        }
+    }
+    
+    /// Helper method to update existing tasks or add new ones
+    private func updateOrAddTasks(_ newTasks: [Task], to tasks: inout [Task]) {
+        for newTask in newTasks {
+            if let existingIndex = tasks.firstIndex(where: { $0.name == newTask.name }) {
+                // Task already exists - update its time
+                let existingTask = tasks[existingIndex]
+                
+                // Special case: if the existing task is currently active, pause it first
+                if activeTaskID == existingTask.id {
+                    pauseCurrentActiveTask()
+                }
+                
+                // Update the task's elapsed time
+                tasks[existingIndex].elapsed = newTask.elapsed
+            } else {
+                // New task - add it to the list
+                tasks.append(newTask)
             }
         }
     }
