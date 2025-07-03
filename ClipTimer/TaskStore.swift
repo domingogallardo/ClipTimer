@@ -8,6 +8,7 @@
 
 import SwiftUI
 import AppKit
+import Combine
 
 @MainActor
 final class TaskStore: ObservableObject {
@@ -18,29 +19,62 @@ final class TaskStore: ObservableObject {
     @Published var itemSymbol: String = ""  // Símbolo de itemización para todas las tareas
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
-    private var timer: Timer?
-    private var blinkTimer: Timer?
+    private var timerCancellable: AnyCancellable?
+    private var blinkCancellable: AnyCancellable?
 
     // MARK: - Local Persistence
     private let userDefaults = UserDefaults.standard
     private let localStorageKey = "saved_tasks"
+    
+    // MARK: - Constants
+    
+    /// Supported item symbols for task formatting
+    private static let supportedSymbols = ["• ", "- ", "* ", "→ ", "✓ ", "☐ ", "•\t"]
+    
+    /// Static regex for parsing task lines with time format
+    private static let timeParsingRegex: NSRegularExpression = {
+        // Pattern matches "Task name: H:MM:SS" or "Task name: MM:SS" or "Task name: SS"
+        // 1- Task name (lazily up to colon)
+        // 2- First numeric block (hours or minutes)
+        // 3- Second numeric block optional (minutes or seconds)
+        // 4- Third numeric block optional (seconds)
+        let pattern = #"^(.*?):\s*(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?\s*$"#
+        return try! NSRegularExpression(pattern: pattern)
+    }()
 
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
         undoManager?.registerUndo(withTarget: self) { target in
-            DispatchQueue.main.async {
-                let current = target.tasks
-                target.tasks = previousTasks
-                target.registerUndo(previousTasks: current, actionName: actionName)
-            }
+            let current = target.tasks
+            target.tasks = previousTasks
+            target.resetItemSymbolIfNoTasks()
+            target.registerUndo(previousTasks: current, actionName: actionName)
+            target.saveTasksLocally()
         }
         undoManager?.setActionName(actionName)
     }
     
-    init() { 
-        startTimer() 
-        startBlinkTimer()
+    // MARK: - Undo/Redo Helper
+    
+    /// Centralizes task mutation with automatic undo registration and saving
+    private func mutateTasks(actionName: String, mutation: (inout [Task]) -> Void) {
+        let before = tasks
+        mutation(&tasks)
+        resetItemSymbolIfNoTasks()
+        registerUndo(previousTasks: before, actionName: actionName)
+        saveTasksLocally()
+    }
+    
+    init(timerPublisher: AnyPublisher<Date, Never>? = nil,
+         blinkPublisher: AnyPublisher<Date, Never>? = nil) {
+        startTimer(with: timerPublisher)
+        startBlinkTimer(with: blinkPublisher)
         loadTasksLocally()  // 🆕 Load tasks on app start
+    }
+    
+    deinit {
+        timerCancellable?.cancel()
+        blinkCancellable?.cancel()
     }
     
     var totalElapsed: TimeInterval {
@@ -66,12 +100,15 @@ final class TaskStore: ObservableObject {
         saveTasksLocally()
     }
     
+    // MARK: - Helper para construir líneas de resumen
+    private func taskLines() -> [String] {
+        tasks.map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
+    }
+    
     var summaryText: String {
-        if tasks.isEmpty { return "No tasks." }
-        return tasks
-            .map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
-            .joined(separator: "\n") +
-        "\n\nWorking time: \((totalElapsed).hms)"
+        if tasks.isEmpty { return NSLocalizedString("No tasks yet", comment: "Message shown when there are no tasks") }
+        return taskLines().joined(separator: "\n") +
+        "\n\n\(NSLocalizedString("Working time", comment: "Label for working time")): \(totalElapsed.hms)"
     }
     
     // Toggle task activation - only one task can be active at a time
@@ -90,76 +127,72 @@ final class TaskStore: ObservableObject {
     }
     
     func replaceTasksFromClipboard() {
-        let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let lines = tasksString.split(separator: "\n").map { String($0) }
             
-            // Always detect and set item symbol (replacing mode)
-            detectAndSetItemSymbol(from: lines, forceDetection: true)
-            
-            let newTasks = lines.compactMap { parseTaskLine($0) }
-            tasks = newTasks
-            resetItemSymbolIfNoTasks()
-            registerUndo(previousTasks: before, actionName: "Replace tasks")
-            saveTasksLocally()  // 🆕 Auto-save after modifying tasks
+            mutateTasks(actionName: "Replace tasks") { tasks in
+                // Always detect and set item symbol (replacing mode)
+                detectAndSetItemSymbol(from: lines, forceDetection: true)
+                
+                let newTasks = lines.compactMap { parseTaskLine($0) }
+                tasks = newTasks
+            }
         }
     }
     
     func addTasksFromClipboard() {
-        let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let lines = tasksString.split(separator: "\n").map { String($0) }
             
-            // Detect and set item symbol if needed (adding mode)
-            detectAndSetItemSymbol(from: lines, forceDetection: false)
-            
-            let addedTasks = lines.compactMap { parseTaskLine($0) }
-            tasks.append(contentsOf: addedTasks)
-            registerUndo(previousTasks: before, actionName: "Add tasks")
-            saveTasksLocally()  // 🆕 Auto-save after modifying tasks
+            mutateTasks(actionName: "Add tasks") { tasks in
+                // Detect and set item symbol if needed (adding mode)
+                detectAndSetItemSymbol(from: lines, forceDetection: false)
+                
+                let addedTasks = lines.compactMap { parseTaskLine($0) }
+                tasks.append(contentsOf: addedTasks)
+            }
         }
     }
     
     func cutAllTasks() {
         guard !tasks.isEmpty else { return }
-        let before = tasks
         copySummaryToClipboard()
-        tasks.removeAll()
-        resetItemSymbolIfNoTasks()
-        registerUndo(previousTasks: before, actionName: "Cut all tasks")
-        saveTasksLocally()  // 🆕 Auto-save after modifying tasks
+        mutateTasks(actionName: "Cut all tasks") { tasks in
+            tasks.removeAll()
+        }
     }
     
     // Parse task line with optional time format (e.g., "Task name: 1:30:45" or "Task name")
     func parseTaskLine(_ rawLine: String) -> Task? {
         let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
-        
-        // Define separate regex patterns for different time formats
-        let hoursMinutesSecondsRegex = try! NSRegularExpression(pattern: #"^(.*?):\s*(\d{1,2}):(\d{2}):(\d{2})\s*$"#)
-        let minutesSecondsRegex = try! NSRegularExpression(pattern: #"^(.*?):\s*(\d{1,2}):(\d{2})\s*$"#)
-        
+
         let range = NSRange(trimmed.startIndex..., in: trimmed)
-        
-        // Try H:MM:SS format first (more specific)
-        if let match = hoursMinutesSecondsRegex.firstMatch(in: trimmed, range: range) {
+        if let match = Self.timeParsingRegex.firstMatch(in: trimmed, range: range) {
             let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
-            let hours = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
-            let minutes = Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0
-            let seconds = Int(trimmed[Range(match.range(at: 4), in: trimmed)!]) ?? 0
+            let first  = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
+            let second = match.range(at: 3).location != NSNotFound ? Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0 : nil
+            let third  = match.range(at: 4).location != NSNotFound ? Int(trimmed[Range(match.range(at: 4), in: trimmed)!]) ?? 0 : nil
+
+            let (hours, minutes, seconds): (Int, Int, Int)
+            if let third = third { // H:MM:SS (all three numbers present)
+                hours = first
+                minutes = second ?? 0
+                seconds = third
+            } else if let second = second { // MM:SS
+                hours = 0
+                minutes = first
+                seconds = second
+            } else { // Solo un número tras los dos puntos → tratamos como segundos
+                hours = 0
+                minutes = 0
+                seconds = first
+            }
+
             let elapsed = Double(hours * 3600 + minutes * 60 + seconds)
             return createTask(from: taskName, elapsed: elapsed)
         }
-        
-        // Try MM:SS format
-        if let match = minutesSecondsRegex.firstMatch(in: trimmed, range: range) {
-            let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
-            let minutes = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
-            let seconds = Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0
-            let elapsed = Double(minutes * 60 + seconds)
-            return createTask(from: taskName, elapsed: elapsed)
-        }
-        
+
         // No time found, treat entire line as task name
         return createTask(from: trimmed, elapsed: 0)
     }
@@ -170,16 +203,13 @@ final class TaskStore: ObservableObject {
         return Task(name: cleanName, elapsed: elapsed)
     }
     
-    // Define all supported symbols as static constant to avoid repeated allocations
-    private static let supportedSymbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ ", "-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
-    
     // Parse item symbol and clean text from a task line
     private func parseItemSymbolAndText(from line: String) -> (symbol: String?, cleanText: String) {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return (nil, "") }
         
         // Check for any supported symbol
-        for symbol in Self.supportedSymbols {
+        for symbol in TaskStore.supportedSymbols {
             if trimmed.hasPrefix(symbol) {
                 let cleanText = String(trimmed.dropFirst(symbol.count)).trimmingCharacters(in: .whitespacesAndNewlines)
                 return (symbol, cleanText)
@@ -202,29 +232,13 @@ final class TaskStore: ObservableObject {
     
     // Helper method to detect and set item symbol from clipboard lines
     private func detectAndSetItemSymbol(from lines: [String], forceDetection: Bool = false) {
-        // If forceDetection is false (adding), only detect when itemSymbol is empty
-        // If forceDetection is true (replacing), always detect and set (or reset to empty)
+        // Reglas:
+        // • Replacing (forceDetection = true) → siempre recalcular símbolo (o vaciar si no se encuentra)
+        // • Adding  (forceDetection = false) → sólo si aún no había símbolo
         guard forceDetection || itemSymbol.isEmpty else { return }
-        
-        if forceDetection {
-            // For replacing: always set symbol (or empty if none found)
-            var newSymbol = ""
-            for line in lines {
-                if let detectedSymbol = detectItemSymbol(from: line) {
-                    newSymbol = detectedSymbol
-                    break
-                }
-            }
-            itemSymbol = newSymbol
-        } else {
-            // For adding: only set if currently empty
-            for line in lines {
-                if let detectedSymbol = detectItemSymbol(from: line) {
-                    itemSymbol = detectedSymbol
-                    break
-                }
-            }
-        }
+
+        // Buscar el primer símbolo válido en las líneas recibidas; si no hay, quedará "".
+        itemSymbol = lines.compactMap(detectItemSymbol).first ?? ""
     }
     
     // Helper method to reset item symbol when no tasks remain
@@ -234,47 +248,38 @@ final class TaskStore: ObservableObject {
         }
     }
     
-    private func startTimer() {
-        timer = Timer.scheduledTimer(
-            timeInterval: 1,
-            target: self,
-            selector: #selector(timerDidFire(_:)),
-            userInfo: nil,
-            repeats: true)
+    private func startTimer(with publisher: AnyPublisher<Date, Never>? = nil) {
+        // Cancel previous subscription if any
+        timerCancellable?.cancel()
+        let pub = publisher ?? Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .eraseToAnyPublisher()
+        timerCancellable = pub
+            .sink { [weak self] _ in
+                guard let self, self.hasActiveTasks else { return }
+                self.objectWillChange.send()
+            }
     }
     
-    private func startBlinkTimer() {
-        blinkTimer = Timer.scheduledTimer(
-            timeInterval: 0.5,
-            target: self,
-            selector: #selector(blinkTimerDidFire(_:)),
-            userInfo: nil,
-            repeats: true)
+    private func startBlinkTimer(with publisher: AnyPublisher<Date, Never>? = nil) {
+        blinkCancellable?.cancel()
+        let pub = publisher ?? Timer.publish(every: 0.5, on: .main, in: .common)
+            .autoconnect()
+            .eraseToAnyPublisher()
+        blinkCancellable = pub
+            .sink { [weak self] _ in
+                guard let self else { return }
+                if self.hasActiveTasks {
+                    self.showColons.toggle()
+                } else {
+                    self.showColons = true
+                }
+            }
     }
     
     func delete(_ task: Task) {
-        let before = tasks
-        tasks.removeAll { $0.id == task.id }
-        resetItemSymbolIfNoTasks()
-        registerUndo(previousTasks: before, actionName: "Delete task")
-        saveTasksLocally()  // 🆕 Auto-save after modifying tasks
-    }
-    
-    // Timer callback - updates UI for active task (time calculation is continuous)
-    @objc private func timerDidFire(_ timer: Timer) {
-        // Timer now only triggers UI updates - actual time is calculated continuously
-        // This ensures the UI updates every second even when laptop lid is closed
-        if hasActiveTasks {
-            objectWillChange.send()
-        }
-    }
-    
-    // Blink timer callback - toggles colon visibility every 0.5 seconds
-    @objc private func blinkTimerDidFire(_ timer: Timer) {
-        if hasActiveTasks {
-            showColons.toggle()
-        } else {
-            showColons = true
+        mutateTasks(actionName: "Delete task") { tasks in
+            tasks.removeAll { $0.id == task.id }
         }
     }
     
@@ -283,13 +288,11 @@ final class TaskStore: ObservableObject {
     }
     
     func copySummaryToClipboard() {
-        let taskSummary = tasks
-            .map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
-            .joined(separator: "\n")
+        let taskSummary = taskLines().joined(separator: "\n")
         let total = totalElapsed
         let summaryWithTotal = taskSummary.isEmpty
-            ? "Sin tareas."
-            : "\(taskSummary)\n\nTotal: \(total.hms)"
+            ? NSLocalizedString("No tasks yet", comment: "Message shown when there are no tasks")
+            : "\(taskSummary)\n\n\(NSLocalizedString("Total", comment: "Label for total time")): \(total.hms)"
         let pb = NSPasteboard.general
         pb.clearContents()
         pb.setString(summaryWithTotal, forType: .string)
