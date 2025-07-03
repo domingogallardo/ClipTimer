@@ -8,8 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		A99A50672DE0C8E900AAED02 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = A99A50662DE0C8DF00AAED02 /* .gitignore */; };
+		A99C9ACA2E16CB3C00B0B126 /* TaskStoreFormattingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99C9AC62E16CB3C00B0B126 /* TaskStoreFormattingTests.swift */; };
+		A99C9ACB2E16CB3C00B0B126 /* TaskStoreBasicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99C9AC52E16CB3C00B0B126 /* TaskStoreBasicTests.swift */; };
+		A99C9ACC2E16CB3C00B0B126 /* TaskStorePersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99C9AC72E16CB3C00B0B126 /* TaskStorePersistenceTests.swift */; };
+		A99C9ACD2E16CB3C00B0B126 /* TaskStoreTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99C9AC82E16CB3C00B0B126 /* TaskStoreTimerTests.swift */; };
+		A99C9ACE2E16CB3C00B0B126 /* TaskStoreUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99C9AC92E16CB3C00B0B126 /* TaskStoreUITests.swift */; };
 		A9CTESTS12345678901234567 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CTESTS12345678901234568 /* TaskTests.swift */; };
-		A9CTESTS12345678901234569 /* TaskStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CTESTS12345678901234570 /* TaskStoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,8 +29,12 @@
 /* Begin PBXFileReference section */
 		A99A50562DDF3D7300AAED02 /* ClipTimer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClipTimer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A99A50662DE0C8DF00AAED02 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		A99C9AC52E16CB3C00B0B126 /* TaskStoreBasicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStoreBasicTests.swift; sourceTree = "<group>"; };
+		A99C9AC62E16CB3C00B0B126 /* TaskStoreFormattingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStoreFormattingTests.swift; sourceTree = "<group>"; };
+		A99C9AC72E16CB3C00B0B126 /* TaskStorePersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStorePersistenceTests.swift; sourceTree = "<group>"; };
+		A99C9AC82E16CB3C00B0B126 /* TaskStoreTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStoreTimerTests.swift; sourceTree = "<group>"; };
+		A99C9AC92E16CB3C00B0B126 /* TaskStoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStoreUITests.swift; sourceTree = "<group>"; };
 		A9CTESTS12345678901234568 /* TaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
-		A9CTESTS12345678901234570 /* TaskStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStoreTests.swift; sourceTree = "<group>"; };
 		A9CTESTS12345678901234572 /* ClipTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ClipTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -92,8 +100,12 @@
 		A9CTESTS12345678901234574 /* ClipTimerTests */ = {
 			isa = PBXGroup;
 			children = (
+				A99C9AC52E16CB3C00B0B126 /* TaskStoreBasicTests.swift */,
+				A99C9AC62E16CB3C00B0B126 /* TaskStoreFormattingTests.swift */,
+				A99C9AC72E16CB3C00B0B126 /* TaskStorePersistenceTests.swift */,
+				A99C9AC82E16CB3C00B0B126 /* TaskStoreTimerTests.swift */,
+				A99C9AC92E16CB3C00B0B126 /* TaskStoreUITests.swift */,
 				A9CTESTS12345678901234568 /* TaskTests.swift */,
-				A9CTESTS12345678901234570 /* TaskStoreTests.swift */,
 			);
 			path = ClipTimerTests;
 			sourceTree = "<group>";
@@ -212,7 +224,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				A9CTESTS12345678901234567 /* TaskTests.swift in Sources */,
-				A9CTESTS12345678901234569 /* TaskStoreTests.swift in Sources */,
+				A99C9ACA2E16CB3C00B0B126 /* TaskStoreFormattingTests.swift in Sources */,
+				A99C9ACB2E16CB3C00B0B126 /* TaskStoreBasicTests.swift in Sources */,
+				A99C9ACC2E16CB3C00B0B126 /* TaskStorePersistenceTests.swift in Sources */,
+				A99C9ACD2E16CB3C00B0B126 /* TaskStoreTimerTests.swift in Sources */,
+				A99C9ACE2E16CB3C00B0B126 /* TaskStoreUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
