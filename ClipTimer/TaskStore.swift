@@ -25,6 +25,11 @@ final class TaskStore: ObservableObject {
     // MARK: - Local Persistence
     private let userDefaults = UserDefaults.standard
     private let localStorageKey = "saved_tasks"
+    
+    // MARK: - Constants
+    
+    /// All supported task list symbols for parsing and formatting
+    private static let supportedSymbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ ", "-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
 
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
@@ -195,16 +200,13 @@ final class TaskStore: ObservableObject {
         return Task(name: cleanName, elapsed: elapsed)
     }
     
-    // Define all supported symbols as static constant to avoid repeated allocations
-    private static let supportedSymbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ ", "-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
-    
     // Parse item symbol and clean text from a task line
     private func parseItemSymbolAndText(from line: String) -> (symbol: String?, cleanText: String) {
         let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return (nil, "") }
         
         // Check for any supported symbol
-        for symbol in Self.supportedSymbols {
+        for symbol in TaskStore.supportedSymbols {
             if trimmed.hasPrefix(symbol) {
                 let cleanText = String(trimmed.dropFirst(symbol.count)).trimmingCharacters(in: .whitespacesAndNewlines)
                 return (symbol, cleanText)
