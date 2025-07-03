@@ -420,6 +420,139 @@ final class TaskStoreFormattingTests: XCTestCase {
         ], in: summaryText)
     }
     
+    // MARK: - Update Existing Tasks Tests
+    
+    func testAddTasksUpdatesExistingTaskTime() {
+        clearTasks()
+        
+        // Start with some existing tasks
+        taskStore.tasks = [
+            Task(name: "Task 1", elapsed: 100),
+            Task(name: "Task 2", elapsed: 200),
+            Task(name: "Task 3", elapsed: 300)
+        ]
+        
+        // Add tasks where some already exist with different times
+        setupClipboard(with: "Task 1: 5:00\nTask 4: 2:30\nTask 2: 10:15")
+        taskStore.addTasksFromClipboard()
+        
+        // Verify we have 4 tasks total (3 original + 1 new)
+        XCTAssertEqual(taskStore.tasks.count, 4)
+        
+        // Verify existing tasks were updated
+        let task1 = taskStore.tasks.first { $0.name == "Task 1" }!
+        XCTAssertEqual(task1.elapsed, 300) // 5:00 = 300 seconds
+        
+        let task2 = taskStore.tasks.first { $0.name == "Task 2" }!
+        XCTAssertEqual(task2.elapsed, 615) // 10:15 = 615 seconds
+        
+        // Verify unchanged task remains the same
+        let task3 = taskStore.tasks.first { $0.name == "Task 3" }!
+        XCTAssertEqual(task3.elapsed, 300) // Unchanged
+        
+        // Verify new task was added
+        let task4 = taskStore.tasks.first { $0.name == "Task 4" }!
+        XCTAssertEqual(task4.elapsed, 150) // 2:30 = 150 seconds
+    }
+    
+    func testAddTasksUpdatesActiveTaskAndPausesIt() {
+        clearTasks()
+        
+        // Create tasks with one active
+        let task1 = Task(name: "Active Task", elapsed: 100)
+        let task2 = Task(name: "Inactive Task", elapsed: 200)
+        taskStore.tasks = [task1, task2]
+        
+        // Make task1 active
+        taskStore.activeTaskID = task1.id
+        taskStore.activeTaskStartTime = Date()
+        
+        // Verify task is active
+        XCTAssertEqual(taskStore.activeTaskID, task1.id)
+        XCTAssertNotNil(taskStore.activeTaskStartTime)
+        
+        // Add tasks that update the active task
+        setupClipboard(with: "Active Task: 15:30\nNew Task: 5:00")
+        taskStore.addTasksFromClipboard()
+        
+        // Verify the active task was paused (no longer active)
+        XCTAssertNil(taskStore.activeTaskID)
+        XCTAssertNil(taskStore.activeTaskStartTime)
+        
+        // Verify the task's time was updated
+        let updatedTask = taskStore.tasks.first { $0.name == "Active Task" }!
+        XCTAssertEqual(updatedTask.elapsed, 930) // 15:30 = 930 seconds
+        
+        // Verify we have 3 tasks total
+        XCTAssertEqual(taskStore.tasks.count, 3)
+        
+        // Verify new task was added
+        let newTask = taskStore.tasks.first { $0.name == "New Task" }!
+        XCTAssertEqual(newTask.elapsed, 300) // 5:00 = 300 seconds
+    }
+    
+    func testAddTasksWithExistingNamesButNoTimes() {
+        clearTasks()
+        
+        // Start with existing tasks
+        taskStore.tasks = [
+            Task(name: "Task A", elapsed: 500),
+            Task(name: "Task B", elapsed: 1000)
+        ]
+        
+        // Add tasks with same names but no times (should reset to 0)
+        setupClipboard(with: "Task A\nTask C\nTask B")
+        taskStore.addTasksFromClipboard()
+        
+        // Verify we have 3 tasks total
+        XCTAssertEqual(taskStore.tasks.count, 3)
+        
+        // Verify existing tasks were reset to 0
+        let taskA = taskStore.tasks.first { $0.name == "Task A" }!
+        XCTAssertEqual(taskA.elapsed, 0)
+        
+        let taskB = taskStore.tasks.first { $0.name == "Task B" }!
+        XCTAssertEqual(taskB.elapsed, 0)
+        
+        // Verify new task was added
+        let taskC = taskStore.tasks.first { $0.name == "Task C" }!
+        XCTAssertEqual(taskC.elapsed, 0)
+    }
+    
+    func testAddTasksWithSymbolsUpdatesExistingTasks() {
+        clearTasks()
+        
+        // Start with existing tasks with symbols
+        setupClipboard(with: "• Task One: 1:00\n• Task Two: 2:00")
+        taskStore.replaceTasksFromClipboard()
+        
+        // Verify initial state
+        XCTAssertEqual(taskStore.tasks.count, 2)
+        XCTAssertEqual(taskStore.itemSymbol, "• ")
+        
+        // Add tasks that update existing ones
+        setupClipboard(with: "• Task One: 5:30\n• Task Three: 3:45")
+        taskStore.addTasksFromClipboard()
+        
+        // Verify we have 3 tasks total
+        XCTAssertEqual(taskStore.tasks.count, 3)
+        
+        // Verify existing task was updated
+        let taskOne = taskStore.tasks.first { $0.name == "Task One" }!
+        XCTAssertEqual(taskOne.elapsed, 330) // 5:30 = 330 seconds
+        
+        // Verify unchanged task remains the same
+        let taskTwo = taskStore.tasks.first { $0.name == "Task Two" }!
+        XCTAssertEqual(taskTwo.elapsed, 120) // 2:00 = 120 seconds
+        
+        // Verify new task was added
+        let taskThree = taskStore.tasks.first { $0.name == "Task Three" }!
+        XCTAssertEqual(taskThree.elapsed, 225) // 3:45 = 225 seconds
+        
+        // Verify symbol is preserved
+        XCTAssertEqual(taskStore.itemSymbol, "• ")
+    }
+    
     // MARK: - Test Helpers
     
     /// Helper method to set up clipboard with given content
