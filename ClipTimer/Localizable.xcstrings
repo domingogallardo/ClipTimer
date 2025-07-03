@@ -292,6 +292,7 @@
       }
     },
     "No tasks yet" : {
+      "comment" : "Message shown when there are no tasks",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -482,6 +483,17 @@
         }
       }
     },
+    "Total" : {
+      "comment" : "Label for total time",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
+    },
     "Undo" : {
       "localizations" : {
         "es" : {
@@ -503,21 +515,12 @@
       }
     },
     "Working time" : {
+      "comment" : "Label for working time",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tiempo de trabajo"
-          }
-        }
-      }
-    },
-    "Total" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Total"
           }
         }
       }
