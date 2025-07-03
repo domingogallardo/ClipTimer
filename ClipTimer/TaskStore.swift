@@ -29,13 +29,24 @@ final class TaskStore: ObservableObject {
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
         undoManager?.registerUndo(withTarget: self) { target in
-            DispatchQueue.main.async {
-                let current = target.tasks
-                target.tasks = previousTasks
-                target.registerUndo(previousTasks: current, actionName: actionName)
-            }
+            let current = target.tasks
+            target.tasks = previousTasks
+            target.resetItemSymbolIfNoTasks()
+            target.registerUndo(previousTasks: current, actionName: actionName)
+            target.saveTasksLocally()
         }
         undoManager?.setActionName(actionName)
+    }
+    
+    // MARK: - Undo/Redo Helper
+    
+    /// Centralizes task mutation with automatic undo registration and saving
+    private func mutateTasks(actionName: String, mutation: (inout [Task]) -> Void) {
+        let before = tasks
+        mutation(&tasks)
+        resetItemSymbolIfNoTasks()
+        registerUndo(previousTasks: before, actionName: actionName)
+        saveTasksLocally()
     }
     
     init(timerPublisher: AnyPublisher<Date, Never>? = nil,
@@ -100,44 +111,39 @@ final class TaskStore: ObservableObject {
     }
     
     func replaceTasksFromClipboard() {
-        let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let lines = tasksString.split(separator: "\n").map { String($0) }
             
-            // Always detect and set item symbol (replacing mode)
-            detectAndSetItemSymbol(from: lines, forceDetection: true)
-            
-            let newTasks = lines.compactMap { parseTaskLine($0) }
-            tasks = newTasks
-            resetItemSymbolIfNoTasks()
-            registerUndo(previousTasks: before, actionName: "Replace tasks")
-            saveTasksLocally()  // 🆕 Auto-save after modifying tasks
+            mutateTasks(actionName: "Replace tasks") { tasks in
+                // Always detect and set item symbol (replacing mode)
+                detectAndSetItemSymbol(from: lines, forceDetection: true)
+                
+                let newTasks = lines.compactMap { parseTaskLine($0) }
+                tasks = newTasks
+            }
         }
     }
     
     func addTasksFromClipboard() {
-        let before = tasks
         if let tasksString = NSPasteboard.general.string(forType: .string) {
             let lines = tasksString.split(separator: "\n").map { String($0) }
             
-            // Detect and set item symbol if needed (adding mode)
-            detectAndSetItemSymbol(from: lines, forceDetection: false)
-            
-            let addedTasks = lines.compactMap { parseTaskLine($0) }
-            tasks.append(contentsOf: addedTasks)
-            registerUndo(previousTasks: before, actionName: "Add tasks")
-            saveTasksLocally()  // 🆕 Auto-save after modifying tasks
+            mutateTasks(actionName: "Add tasks") { tasks in
+                // Detect and set item symbol if needed (adding mode)
+                detectAndSetItemSymbol(from: lines, forceDetection: false)
+                
+                let addedTasks = lines.compactMap { parseTaskLine($0) }
+                tasks.append(contentsOf: addedTasks)
+            }
         }
     }
     
     func cutAllTasks() {
         guard !tasks.isEmpty else { return }
-        let before = tasks
         copySummaryToClipboard()
-        tasks.removeAll()
-        resetItemSymbolIfNoTasks()
-        registerUndo(previousTasks: before, actionName: "Cut all tasks")
-        saveTasksLocally()  // 🆕 Auto-save after modifying tasks
+        mutateTasks(actionName: "Cut all tasks") { tasks in
+            tasks.removeAll()
+        }
     }
     
     // Parse task line with optional time format (e.g., "Task name: 1:30:45" or "Task name")
@@ -267,11 +273,9 @@ final class TaskStore: ObservableObject {
     }
     
     func delete(_ task: Task) {
-        let before = tasks
-        tasks.removeAll { $0.id == task.id }
-        resetItemSymbolIfNoTasks()
-        registerUndo(previousTasks: before, actionName: "Delete task")
-        saveTasksLocally()  // 🆕 Auto-save after modifying tasks
+        mutateTasks(actionName: "Delete task") { tasks in
+            tasks.removeAll { $0.id == task.id }
+        }
     }
     
     var hasActiveTasks: Bool {
