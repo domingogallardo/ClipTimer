@@ -511,6 +511,16 @@
           }
         }
       }
+    },
+    "Total" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Total"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

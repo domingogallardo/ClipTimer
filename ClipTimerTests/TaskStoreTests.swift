@@ -373,7 +373,7 @@ final class TaskStoreTests: XCTestCase {
     func testSummaryTextEmpty() {
         // Ensure we start with empty tasks
         taskStore.tasks = []
-        XCTAssertEqual(taskStore.summaryText, "No tasks.")
+        XCTAssertEqual(taskStore.summaryText, NSLocalizedString("No tasks yet", comment: "Message shown when there are no tasks"))
     }
     
     func testSummaryTextWithTasks() {
@@ -385,7 +385,7 @@ final class TaskStoreTests: XCTestCase {
         let summary = taskStore.summaryText
         XCTAssertTrue(summary.contains("Task 1: 0:01:00"))
         XCTAssertTrue(summary.contains("Task 2: 0:02:00"))
-        XCTAssertTrue(summary.contains("Working time: 0:03:00"))
+        XCTAssertTrue(summary.contains("\(NSLocalizedString("Working time", comment: "Label for working time")): 0:03:00"))
     }
     
     func testHasActiveTasks() {

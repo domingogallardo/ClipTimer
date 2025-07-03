@@ -28,8 +28,19 @@ final class TaskStore: ObservableObject {
     
     // MARK: - Constants
     
-    /// All supported task list symbols for parsing and formatting
-    private static let supportedSymbols = ["- ", "• ", "* ", "→ ", "✓ ", "☐ ", "-\t", "•\t", "*\t", "→\t", "✓\t", "☐\t"]
+    /// Supported item symbols for task formatting
+    private static let supportedSymbols = ["• ", "- ", "* ", "→ ", "✓ ", "☐ ", "•\t"]
+    
+    /// Static regex for parsing task lines with time format
+    private static let timeParsingRegex: NSRegularExpression = {
+        // Pattern matches "Task name: H:MM:SS" or "Task name: MM:SS" or "Task name: SS"
+        // 1- Task name (lazily up to colon)
+        // 2- First numeric block (hours or minutes)
+        // 3- Second numeric block optional (minutes or seconds)
+        // 4- Third numeric block optional (seconds)
+        let pattern = #"^(.*?):\s*(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?\s*$"#
+        return try! NSRegularExpression(pattern: pattern)
+    }()
 
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
@@ -95,9 +106,9 @@ final class TaskStore: ObservableObject {
     }
     
     var summaryText: String {
-        if tasks.isEmpty { return "No tasks." }
+        if tasks.isEmpty { return NSLocalizedString("No tasks yet", comment: "Message shown when there are no tasks") }
         return taskLines().joined(separator: "\n") +
-        "\n\nWorking time: \(totalElapsed.hms)"
+        "\n\n\(NSLocalizedString("Working time", comment: "Label for working time")): \(totalElapsed.hms)"
     }
     
     // Toggle task activation - only one task can be active at a time
@@ -156,16 +167,8 @@ final class TaskStore: ObservableObject {
         let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
 
-        // Único patrón que detecta "Nombre: H:MM:SS" o "Nombre: MM:SS"
-        // 1- Task name (lazily up to colon)
-        // 2- Primer bloque numérico (horas o minutos)
-        // 3- Segundo bloque numérico opcional (minutos o segundos)
-        // 4- Tercer bloque numérico opcional (segundos)
-        let pattern = #"^(.*?):\s*(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?\s*$"#
-        let regex = try! NSRegularExpression(pattern: pattern)
         let range = NSRange(trimmed.startIndex..., in: trimmed)
-
-        if let match = regex.firstMatch(in: trimmed, range: range) {
+        if let match = Self.timeParsingRegex.firstMatch(in: trimmed, range: range) {
             let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
             let first  = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
             let second = match.range(at: 3).location != NSNotFound ? Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0 : nil
@@ -288,8 +291,8 @@ final class TaskStore: ObservableObject {
         let taskSummary = taskLines().joined(separator: "\n")
         let total = totalElapsed
         let summaryWithTotal = taskSummary.isEmpty
-            ? "Sin tareas."
-            : "\(taskSummary)\n\nTotal: \(total.hms)"
+            ? NSLocalizedString("No tasks yet", comment: "Message shown when there are no tasks")
+            : "\(taskSummary)\n\n\(NSLocalizedString("Total", comment: "Label for total time")): \(total.hms)"
         let pb = NSPasteboard.general
         pb.clearContents()
         pb.setString(summaryWithTotal, forType: .string)
