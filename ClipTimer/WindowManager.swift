@@ -11,6 +11,7 @@ import AppKit
 @MainActor
 class WindowManager: ObservableObject {
     private var taskEditorWindow: NSWindow?
+    private var taskEditorWindowDelegate: TaskEditorWindowDelegate?
     
     func openTaskEditor(store: TaskStore) {
         // If window already exists, just bring it to front
@@ -38,15 +39,19 @@ class WindowManager: ObservableObject {
         // Store reference
         taskEditorWindow = window
         
-        // Clean up reference when window closes
-        window.delegate = TaskEditorWindowDelegate { [weak self] in
+        // Create and store delegate to prevent immediate deallocation
+        let delegate = TaskEditorWindowDelegate { [weak self] in
             self?.taskEditorWindow = nil
+            self?.taskEditorWindowDelegate = nil
         }
+        taskEditorWindowDelegate = delegate
+        window.delegate = delegate
     }
     
     func closeTaskEditor() {
         taskEditorWindow?.close()
         taskEditorWindow = nil
+        taskEditorWindowDelegate = nil
     }
 }
 

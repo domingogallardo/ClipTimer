@@ -122,9 +122,6 @@ private extension TaskEditorWindow {
     }
     
     private func addTasksFromText() {
-        // Use the existing TaskStore functionality to parse and add tasks
-        let lines = tasksText.split(separator: "\n").map { String($0) }
-        
         // Temporarily put the text in clipboard to use existing functionality
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()

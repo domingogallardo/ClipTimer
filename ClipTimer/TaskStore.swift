@@ -45,11 +45,13 @@ final class TaskStore: ObservableObject {
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
         undoManager?.registerUndo(withTarget: self) { target in
-            let current = target.tasks
-            target.tasks = previousTasks
-            target.resetItemSymbolIfNoTasks()
-            target.registerUndo(previousTasks: current, actionName: actionName)
-            target.saveTasksLocally()
+            MainActor.assumeIsolated {
+                let current = target.tasks
+                target.tasks = previousTasks
+                target.resetItemSymbolIfNoTasks()
+                target.registerUndo(previousTasks: current, actionName: actionName)
+                target.saveTasksLocally()
+            }
         }
         undoManager?.setActionName(actionName)
     }

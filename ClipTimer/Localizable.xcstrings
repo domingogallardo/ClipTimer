@@ -111,6 +111,9 @@
         }
       }
     },
+    "Add Tasks" : {
+
+    },
     "CipTimer" : {
       "localizations" : {
         "es" : {
@@ -120,6 +123,9 @@
           }
         }
       }
+    },
+    "Clear" : {
+
     },
     "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task." : {
       "localizations" : {
@@ -150,6 +156,12 @@
           }
         }
       }
+    },
+    "Close" : {
+
+    },
+    "Copy Current Tasks" : {
+
     },
     "Copy tasks with times" : {
       "localizations" : {
@@ -312,6 +324,9 @@
         }
       }
     },
+    "Open Task Editor" : {
+
+    },
     "Paste into ClipTimer" : {
       "localizations" : {
         "es" : {
@@ -432,6 +447,9 @@
         }
       }
     },
+    "Task Editor" : {
+
+    },
     "Tasks" : {
       "localizations" : {
         "es" : {
@@ -442,6 +460,9 @@
         }
       }
     },
+    "Tasks added successfully!" : {
+
+    },
     "Tasks Management" : {
       "localizations" : {
         "es" : {
@@ -451,6 +472,9 @@
           }
         }
       }
+    },
+    "Tasks:" : {
+
     },
     "Test local persistence" : {
       "extractionState" : "stale",
@@ -524,6 +548,9 @@
           }
         }
       }
+    },
+    "Write or paste your tasks here, one per line. Format: 'Task name' or 'Task name: 1:30:45'" : {
+
     }
   },
   "version" : "1.0"
