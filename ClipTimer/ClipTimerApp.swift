@@ -19,6 +19,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct ClipTimerApp: App {
     @StateObject private var store = TaskStore()
+    @StateObject private var windowManager = WindowManager()
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
@@ -26,6 +27,7 @@ struct ClipTimerApp: App {
         Window("CipTimer", id: "main") {
             ContentView()
                 .environmentObject(store)
+                .environmentObject(windowManager)
                 .frame(
                     minWidth: 380, idealWidth: 380,
                     minHeight: 540, idealHeight: 540
@@ -86,6 +88,13 @@ struct ClipTimerApp: App {
                     store.restartLastPausedTask()
                 }
                 .keyboardShortcut("r")
+            }
+            
+            CommandMenu("Tasks") {
+                Button("Open Task Editor") {
+                    windowManager.openTaskEditor(store: store)
+                }
+                .keyboardShortcut("e")
             }
         }
         // Help window
