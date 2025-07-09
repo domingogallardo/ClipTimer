@@ -10,8 +10,8 @@ import AppKit
 
 struct ContentView: View {
     @EnvironmentObject private var store: TaskStore
-    @EnvironmentObject private var windowManager: WindowManager
     @Environment(\.undoManager) private var undoManager
+    @Environment(\.openWindow) private var openWindow
     @State private var showHelp = false
 
     var body: some View {
@@ -53,7 +53,7 @@ private extension ContentView {
                 .padding()
 
             Button {
-                windowManager.openTaskEditor(store: store)
+                openWindow(id: "task-editor")
             } label: {
                 Image(systemName: "square.and.pencil")
                     .font(.title2)
@@ -114,7 +114,6 @@ private extension ContentView {
 #Preview {
     ContentView()
         .environmentObject(TaskStore())
-        .environmentObject(WindowManager())
         .frame(width: 380, height: 600)
 }
 
@@ -129,7 +128,6 @@ private extension ContentView {
     
     return ContentView()
         .environmentObject(store)
-        .environmentObject(WindowManager())
         .frame(width: 380, height: 600)
 }
 

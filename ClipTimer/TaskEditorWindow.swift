@@ -10,9 +10,9 @@ import AppKit
 
 struct TaskEditorWindow: View {
     @EnvironmentObject private var store: TaskStore
-    @EnvironmentObject private var windowManager: WindowManager
     @State private var tasksText: String = ""
     @State private var showSuccessMessage: Bool = false
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         VStack(spacing: 16) {
@@ -51,10 +51,7 @@ private extension TaskEditorWindow {
             Spacer()
             
             Button("Close") {
-                // Get the current window and close it naturally
-                if let window = NSApplication.shared.keyWindow {
-                    window.performClose(nil)
-                }
+                dismiss()
             }
             .keyboardShortcut(.cancelAction)
         }
@@ -153,6 +150,5 @@ private extension TaskEditorWindow {
 #Preview {
     TaskEditorWindow()
         .environmentObject(TaskStore())
-        .environmentObject(WindowManager())
 }
 #endif 
