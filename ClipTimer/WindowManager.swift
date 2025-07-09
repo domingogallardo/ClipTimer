@@ -23,6 +23,7 @@ class WindowManager: ObservableObject {
         // Create new window
         let contentView = TaskEditorWindow()
             .environmentObject(store)
+            .environmentObject(self)
         
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 500, height: 400),
@@ -41,15 +42,20 @@ class WindowManager: ObservableObject {
         
         // Create and store delegate to prevent immediate deallocation
         let delegate = TaskEditorWindowDelegate { [weak self] in
-            self?.taskEditorWindow = nil
-            self?.taskEditorWindowDelegate = nil
+            self?.cleanupTaskEditor()
         }
         taskEditorWindowDelegate = delegate
         window.delegate = delegate
     }
     
     func closeTaskEditor() {
-        taskEditorWindow?.close()
+        // Only close if not already being closed
+        if let window = taskEditorWindow {
+            window.close()
+        }
+    }
+    
+    private func cleanupTaskEditor() {
         taskEditorWindow = nil
         taskEditorWindowDelegate = nil
     }
@@ -62,8 +68,11 @@ private class TaskEditorWindowDelegate: NSObject, NSWindowDelegate {
     init(onClose: @escaping () -> Void) {
         self.onClose = onClose
     }
-    
-    func windowWillClose(_ notification: Notification) {
+}
+
+// Extension to avoid warning about method name similarity
+extension TaskEditorWindowDelegate {
+    func windowDidClose(_ notification: Notification) {
         onClose()
     }
 } 
