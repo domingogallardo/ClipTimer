@@ -23,7 +23,7 @@ struct ClipTimerApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        Window("CipTimer", id: "main") {
+        WindowGroup("ClipTimer", id: "main") {
             ContentView()
                 .environmentObject(store)
                 .frame(
@@ -36,6 +36,7 @@ struct ClipTimerApp: App {
                     appDelegate.taskStore = store
                 }
         }
+        .defaultSize(width: 380, height: 540)
         .commands {
             CommandGroup(replacing: .help) {
                 Button("ClipTimer Help") {

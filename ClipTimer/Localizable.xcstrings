@@ -115,6 +115,7 @@
 
     },
     "CipTimer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -136,6 +137,9 @@
           }
         }
       }
+    },
+    "ClipTimer" : {
+
     },
     "ClipTimer • Quick Start" : {
       "localizations" : {
