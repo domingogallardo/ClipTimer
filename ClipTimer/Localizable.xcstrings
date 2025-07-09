@@ -111,9 +111,6 @@
         }
       }
     },
-    "Add Tasks" : {
-
-    },
     "CipTimer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -124,9 +121,6 @@
           }
         }
       }
-    },
-    "Clear" : {
-
     },
     "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task." : {
       "localizations" : {
@@ -160,12 +154,6 @@
           }
         }
       }
-    },
-    "Close" : {
-
-    },
-    "Copy Current Tasks" : {
-
     },
     "Copy tasks with times" : {
       "localizations" : {
@@ -342,6 +330,7 @@
       }
     },
     "Paste tasks (append)" : {
+      "comment" : "Button to add new tasks to existing ones",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -352,6 +341,7 @@
       }
     },
     "Paste tasks (replace)" : {
+      "comment" : "Button to replace all tasks with new ones",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -455,6 +445,7 @@
 
     },
     "Tasks" : {
+      "comment" : "Label for tasks text area",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -463,9 +454,6 @@
           }
         }
       }
-    },
-    "Tasks added successfully!" : {
-
     },
     "Tasks Management" : {
       "localizations" : {
@@ -478,7 +466,7 @@
       }
     },
     "Tasks:" : {
-
+      "comment" : "Label for tasks text area"
     },
     "Test local persistence" : {
       "extractionState" : "stale",
@@ -553,8 +541,16 @@
         }
       }
     },
-    "Write or paste your tasks here, one per line. Format: 'Task name' or 'Task name: 1:30:45'" : {
-
+    "Write one task per line. Format: 'Task name' or 'Task name: 1:30:45'" : {
+      "comment" : "Instructions for task editor format",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribe una tarea por línea. Formato: 'Nombre de tarea' o 'Nombre de tarea: 1:30:45'"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

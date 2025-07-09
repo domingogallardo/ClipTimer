@@ -93,7 +93,6 @@ struct ClipTimerApp: App {
                 Button("Open Task Editor") {
                     openWindow(id: "task-editor")
                 }
-                .keyboardShortcut("e")
             }
         }
         // Help window
@@ -108,6 +107,7 @@ struct ClipTimerApp: App {
                 .environmentObject(store)
         }
         .defaultSize(width: 500, height: 400)
+        .keyboardShortcut("e", modifiers: .command)
 
         // Menu bar timer display with context menu
         MenuBarExtra {

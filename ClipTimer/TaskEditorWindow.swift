@@ -11,7 +11,6 @@ import AppKit
 struct TaskEditorWindow: View {
     @EnvironmentObject private var store: TaskStore
     @State private var tasksText: String = ""
-    @State private var showSuccessMessage: Bool = false
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -28,7 +27,8 @@ struct TaskEditorWindow: View {
         .padding(20)
         .frame(width: 500, height: 400)
         .onAppear {
-            setupInitialText()
+            // Clear text every time the window opens
+            tasksText = ""
         }
     }
 }
@@ -37,41 +37,17 @@ private extension TaskEditorWindow {
     
     @ViewBuilder
     var header: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Task Editor")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Text("Write or paste your tasks here, one per line. Format: 'Task name' or 'Task name: 1:30:45'")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            Button("Close") {
-                dismiss()
-            }
-            .keyboardShortcut(.cancelAction)
-        }
+        Text("Write one task per line. Format: 'Task name' or 'Task name: 1:30:45'", comment: "Instructions for task editor format")
+            .font(.caption)
+            .foregroundColor(.secondary)
+            .multilineTextAlignment(.leading)
     }
     
     @ViewBuilder
     var textEditor: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Tasks:")
-                    .font(.headline)
-                
-                Spacer()
-                
-                if showSuccessMessage {
-                    Label("Tasks added successfully!", systemImage: "checkmark.circle.fill")
-                        .font(.caption)
-                        .foregroundColor(.green)
-                }
-            }
+            Text("Tasks:", comment: "Label for tasks text area")
+                .font(.headline)
             
             TextEditor(text: $tasksText)
                 .font(.system(.body, design: .monospaced))
@@ -88,20 +64,19 @@ private extension TaskEditorWindow {
     @ViewBuilder
     var actionButtons: some View {
         HStack {
-            Button("Clear") {
-                tasksText = ""
+            Button {
+                replaceTasksFromText()
+            } label: {
+                Text("Paste tasks (replace)", comment: "Button to replace all tasks with new ones")
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.borderedProminent)
+            .keyboardShortcut(.return, modifiers: [.command, .shift])
+            .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             
-            Button("Copy Current Tasks") {
-                copySummaryToClipboard()
-            }
-            .buttonStyle(.plain)
-            
-            Spacer()
-            
-            Button("Add Tasks") {
+            Button {
                 addTasksFromText()
+            } label: {
+                Text("Paste tasks (append)", comment: "Button to add new tasks to existing ones")
             }
             .buttonStyle(.borderedProminent)
             .keyboardShortcut(.return, modifiers: .command)
@@ -111,16 +86,6 @@ private extension TaskEditorWindow {
     
     // MARK: - Helper Methods
     
-    private func setupInitialText() {
-        // Pre-populate with current tasks if any
-        if !store.tasks.isEmpty {
-            tasksText = store.tasks.map { task in
-                let elapsed = task.currentElapsed(activeTaskID: store.activeTaskID, startTime: store.activeTaskStartTime)
-                return "\(task.name): \(elapsed.hms)"
-            }.joined(separator: "\n")
-        }
-    }
-    
     private func addTasksFromText() {
         // Temporarily put the text in clipboard to use existing functionality
         let pasteboard = NSPasteboard.general
@@ -129,21 +94,22 @@ private extension TaskEditorWindow {
         
         // Use existing add tasks from clipboard functionality
         store.addTasksFromClipboard()
-        
-        // Show success message
-        showSuccessMessage = true
-        
-        // Hide success message after 2 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            showSuccessMessage = false
-        }
+
+        // Close the editor after adding tasks
+        dismiss()
     }
-    
-    private func copySummaryToClipboard() {
+
+    private func replaceTasksFromText() {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString(store.summaryText, forType: .string)
+        pasteboard.setString(tasksText, forType: .string)
+
+        store.replaceTasksFromClipboard()
+
+        dismiss()
     }
+    
+    // copySummary no longer needed
 }
 
 #if DEBUG
