@@ -12,6 +12,10 @@ struct TaskEditorWindow: View {
     @EnvironmentObject private var store: TaskStore
     @State private var tasksText: String = ""
     @Environment(\.dismiss) private var dismiss
+
+    // Tamaños constantes para evitar números mágicos
+    private static let editorWidth: CGFloat = 380
+    private static let editorHeight: CGFloat = 400
     
     var body: some View {
         VStack(spacing: 16) {
@@ -25,7 +29,7 @@ struct TaskEditorWindow: View {
             actionButtons
         }
         .padding(20)
-        .frame(width: 500, height: 400)
+        .frame(width: Self.editorWidth, height: Self.editorHeight)
         .onAppear {
             // Clear text every time the window opens
             tasksText = ""
@@ -65,7 +69,7 @@ private extension TaskEditorWindow {
     var actionButtons: some View {
         HStack {
             Button {
-                replaceTasksFromText()
+                commitTasks(replacing: true)
             } label: {
                 Text("Paste tasks (replace)", comment: "Button to replace all tasks with new ones")
             }
@@ -74,7 +78,7 @@ private extension TaskEditorWindow {
             .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             
             Button {
-                addTasksFromText()
+                commitTasks(replacing: false)
             } label: {
                 Text("Paste tasks (append)", comment: "Button to add new tasks to existing ones")
             }
@@ -85,31 +89,22 @@ private extension TaskEditorWindow {
     }
     
     // MARK: - Helper Methods
-    
-    private func addTasksFromText() {
-        // Temporarily put the text in clipboard to use existing functionality
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(tasksText, forType: .string)
-        
-        // Use existing add tasks from clipboard functionality
-        store.addTasksFromClipboard()
 
-        // Close the editor after adding tasks
-        dismiss()
-    }
+    /// Agrega o reemplaza las tareas según `replacing`.
+    private func commitTasks(replacing: Bool) {
+        let trimmedText = tasksText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedText.isEmpty else { return }
 
-    private func replaceTasksFromText() {
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(tasksText, forType: .string)
-
-        store.replaceTasksFromClipboard()
+        if replacing {
+            store.replaceTasks(from: trimmedText)
+        } else {
+            store.addTasks(from: trimmedText)
+        }
 
         dismiss()
     }
     
-    // copySummary no longer needed
+    // copySummary ya no es necesario
 }
 
 #if DEBUG

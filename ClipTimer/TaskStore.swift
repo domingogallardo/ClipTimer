@@ -45,13 +45,11 @@ final class TaskStore: ObservableObject {
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
         undoManager?.registerUndo(withTarget: self) { target in
-            MainActor.assumeIsolated {
-                let current = target.tasks
-                target.tasks = previousTasks
-                target.resetItemSymbolIfNoTasks()
-                target.registerUndo(previousTasks: current, actionName: actionName)
-                target.saveTasksLocally()
-            }
+            let current = target.tasks
+            target.tasks = previousTasks
+            target.resetItemSymbolIfNoTasks()
+            target.registerUndo(previousTasks: current, actionName: actionName)
+            target.saveTasksLocally()
         }
         undoManager?.setActionName(actionName)
     }
@@ -130,29 +128,43 @@ final class TaskStore: ObservableObject {
     
     func replaceTasksFromClipboard() {
         if let tasksString = NSPasteboard.general.string(forType: .string) {
-            let lines = tasksString.split(separator: "\n").map { String($0) }
-            
-            mutateTasks(actionName: "Replace tasks") { tasks in
-                // Always detect and set item symbol (replacing mode)
-                detectAndSetItemSymbol(from: lines, forceDetection: true)
-                
-                let newTasks = lines.compactMap { parseTaskLine($0) }
-                tasks = newTasks
-            }
+            replaceTasks(from: tasksString)
         }
     }
     
     func addTasksFromClipboard() {
         if let tasksString = NSPasteboard.general.string(forType: .string) {
-            let lines = tasksString.split(separator: "\n").map { String($0) }
-            
-            mutateTasks(actionName: "Add tasks") { tasks in
-                // Detect and set item symbol if needed (adding mode)
-                detectAndSetItemSymbol(from: lines, forceDetection: false)
-                
-                let newTasks = lines.compactMap { parseTaskLine($0) }
-                updateOrAddTasks(newTasks, to: &tasks)
-            }
+            addTasks(from: tasksString)
+        }
+    }
+
+    // MARK: - String-based task import helpers 🆕
+
+    /// Replace the current list of tasks with the lines contained in `rawString`.
+    /// Each line may optionally include a time (e.g. "Design: 1:30:45").
+    func replaceTasks(from rawString: String) {
+        let lines = rawString.split(separator: "\n").map(String.init)
+
+        mutateTasks(actionName: "Replace tasks") { tasks in
+            // Always detect and set item symbol (replacing mode)
+            detectAndSetItemSymbol(from: lines, forceDetection: true)
+
+            let newTasks = lines.compactMap { parseTaskLine($0) }
+            tasks = newTasks
+        }
+    }
+
+    /// Add or update tasks using the lines contained in `rawString`.
+    /// Existing tasks with the same name are updated; new ones are appended.
+    func addTasks(from rawString: String) {
+        let lines = rawString.split(separator: "\n").map(String.init)
+
+        mutateTasks(actionName: "Add tasks") { tasks in
+            // Detect and set item symbol if needed (adding mode)
+            detectAndSetItemSymbol(from: lines, forceDetection: false)
+
+            let newTasks = lines.compactMap { parseTaskLine($0) }
+            updateOrAddTasks(newTasks, to: &tasks)
         }
     }
     
