@@ -15,13 +15,10 @@ struct TaskEditorWindow: View {
 
     // Tamaños constantes para evitar números mágicos
     private static let editorWidth: CGFloat = 380
-    private static let editorHeight: CGFloat = 400
+    private static let editorHeight: CGFloat = 250
     
     var body: some View {
         VStack(spacing: 16) {
-            // Header
-            header
-            
             // Text editor area
             textEditor
             
@@ -29,7 +26,10 @@ struct TaskEditorWindow: View {
             actionButtons
         }
         .padding(20)
-        .frame(width: Self.editorWidth, height: Self.editorHeight)
+        .frame(
+            minWidth: Self.editorWidth, idealWidth: Self.editorWidth, maxWidth: Self.editorWidth,
+            minHeight: Self.editorHeight, idealHeight: Self.editorHeight, maxHeight: Self.editorHeight
+        )
         .onAppear {
             // Clear text every time the window opens
             tasksText = ""
@@ -38,21 +38,9 @@ struct TaskEditorWindow: View {
 }
 
 private extension TaskEditorWindow {
-    
-    @ViewBuilder
-    var header: some View {
-        Text("Write one task per line. Format: 'Task name' or 'Task name: 1:30:45'", comment: "Instructions for task editor format")
-            .font(.caption)
-            .foregroundColor(.secondary)
-            .multilineTextAlignment(.leading)
-    }
-    
     @ViewBuilder
     var textEditor: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Tasks:", comment: "Label for tasks text area")
-                .font(.headline)
-            
+        ZStack(alignment: .topLeading) {
             TextEditor(text: $tasksText)
                 .font(.system(.body, design: .monospaced))
                 .scrollContentBackground(.hidden)
@@ -61,7 +49,16 @@ private extension TaskEditorWindow {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
                 )
-                .frame(minHeight: 200)
+                .frame(minHeight: 180)
+            
+            // Placeholder text
+            if tasksText.isEmpty {
+                Text("- Task 1\n- Task 2: 1:30:00")
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.secondary.opacity(0.6))
+                    .padding(.horizontal, 4)
+                    .allowsHitTesting(false)
+            }
         }
     }
     
@@ -71,19 +68,19 @@ private extension TaskEditorWindow {
             Button {
                 commitTasks(replacing: true)
             } label: {
-                Text("Paste tasks (replace)", comment: "Button to replace all tasks with new ones")
+                Text("Replace tasks (⌘⏎)", comment: "Button to replace all tasks with new ones")
             }
             .buttonStyle(.borderedProminent)
-            .keyboardShortcut(.return, modifiers: [.command, .shift])
+            .keyboardShortcut(.return, modifiers: .command)
             .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             
             Button {
                 commitTasks(replacing: false)
             } label: {
-                Text("Paste tasks (append)", comment: "Button to add new tasks to existing ones")
+                Text("Add tasks (⇧⌘⏎)")
             }
             .buttonStyle(.borderedProminent)
-            .keyboardShortcut(.return, modifiers: .command)
+            .keyboardShortcut(.return, modifiers: [.command, .shift])
             .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
     }
@@ -100,11 +97,9 @@ private extension TaskEditorWindow {
         } else {
             store.addTasks(from: trimmedText)
         }
-
+        
         dismiss()
     }
-    
-    // copySummary ya no es necesario
 }
 
 #if DEBUG

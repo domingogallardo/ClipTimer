@@ -106,7 +106,8 @@ struct ClipTimerApp: App {
             TaskEditorWindow()
                 .environmentObject(store)
         }
-        .defaultSize(width: 380, height: 400)
+        .windowResizability(.contentSize)
+        .defaultSize(width: 380, height: 250)
         .keyboardShortcut("e", modifiers: .command)
 
         // Menu bar timer display with context menu
