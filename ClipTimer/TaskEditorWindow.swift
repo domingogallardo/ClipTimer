@@ -13,7 +13,7 @@ struct TaskEditorWindow: View {
     @State private var tasksText: String = ""
     @Environment(\.dismiss) private var dismiss
 
-    // Tamaños constantes para evitar números mágicos
+    // Size constants to avoid magic numbers
     private static let editorWidth: CGFloat = 380
     private static let editorHeight: CGFloat = 250
     
@@ -87,7 +87,7 @@ private extension TaskEditorWindow {
     
     // MARK: - Helper Methods
 
-    /// Agrega o reemplaza las tareas según `replacing`.
+    /// Adds or replaces tasks based on `replacing` parameter.
     private func commitTasks(replacing: Bool) {
         let trimmedText = tasksText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else { return }
