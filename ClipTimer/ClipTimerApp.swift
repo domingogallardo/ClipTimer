@@ -95,11 +95,7 @@ struct ClipTimerApp: App {
                 .keyboardShortcut("r")
             }
             
-            CommandMenu("Tasks") {
-                Button("Open Task Editor") {
-                    openWindow(id: "task-editor")
-                }
-            }
+
         }
         // Help window
         Window("ClipTimer Help", id: "help") {

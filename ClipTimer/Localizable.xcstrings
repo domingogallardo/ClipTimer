@@ -122,6 +122,7 @@
       }
     },
     "Add tasks (⇧⌘⏎)" : {
+      "comment" : "Button to add new tasks to existing ones",
       "localizations" : {
         "es" : {
           "stringUnit" : {
