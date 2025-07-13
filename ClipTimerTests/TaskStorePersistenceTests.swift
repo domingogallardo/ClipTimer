@@ -69,8 +69,7 @@ final class TaskStorePersistenceTests: XCTestCase {
     func testAutoSaveOnAddTasks() {
         clearTasks()
         
-        setupClipboard(with: "Task from clipboard: 1:23:45\nAnother task")
-        taskStore.addTasksFromClipboard()
+        taskStore.addTasks(from: "Task from clipboard: 1:23:45\nAnother task")
         
         XCTAssertEqual(taskStore.tasks.count, 2)
         
@@ -92,8 +91,7 @@ final class TaskStorePersistenceTests: XCTestCase {
         // Start with some existing tasks
         taskStore.tasks = [Task(name: "Existing", elapsed: 100)]
         
-        setupClipboard(with: "Replacement task")
-        taskStore.replaceTasksFromClipboard()
+        taskStore.replaceTasks(from: "Replacement task")
         
         XCTAssertEqual(taskStore.tasks.count, 1)
         XCTAssertEqual(taskStore.tasks[0].name, "Replacement task")
@@ -327,11 +325,7 @@ final class TaskStorePersistenceTests: XCTestCase {
     
     // MARK: - Test Helpers
     
-    /// Helper method to set up clipboard with given content
-    private func setupClipboard(with content: String) {
-        NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(content, forType: .string)
-    }
+
     
     /// Helper method to clear tasks and verify empty state
     private func clearTasks() {

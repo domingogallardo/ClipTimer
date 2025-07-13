@@ -11,6 +11,11 @@ import SwiftUI
 class AppDelegate: NSObject, NSApplicationDelegate {
     var taskStore: TaskStore?
     
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Disable automatic window tabbing for single-window app
+        NSWindow.allowsAutomaticWindowTabbing = false
+    }
+    
     func applicationWillTerminate(_ notification: Notification) {
         taskStore?.pauseActiveTaskAndSave()
     }
@@ -23,7 +28,7 @@ struct ClipTimerApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
-        Window("CipTimer", id: "main") {
+        Window("ClipTimer", id: "main") {
             ContentView()
                 .environmentObject(store)
                 .frame(
@@ -36,6 +41,8 @@ struct ClipTimerApp: App {
                     appDelegate.taskStore = store
                 }
         }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 380, height: 540)
         .commands {
             CommandGroup(replacing: .help) {
                 Button("ClipTimer Help") {
@@ -87,12 +94,23 @@ struct ClipTimerApp: App {
                 }
                 .keyboardShortcut("r")
             }
+            
+
         }
         // Help window
         Window("ClipTimer Help", id: "help") {
             HelpWindow()
         }
         .defaultSize(width: 540, height: 540)
+        
+        // Task Editor window
+        Window("Task Editor", id: "task-editor") {
+            TaskEditorWindow()
+                .environmentObject(store)
+        }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 380, height: 250)
+        .keyboardShortcut("e", modifiers: .command)
 
         // Menu bar timer display with context menu
         MenuBarExtra {

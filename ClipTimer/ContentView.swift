@@ -11,6 +11,7 @@ import AppKit
 struct ContentView: View {
     @EnvironmentObject private var store: TaskStore
     @Environment(\.undoManager) private var undoManager
+    @Environment(\.openWindow) private var openWindow
     @State private var showHelp = false
 
     var body: some View {
@@ -52,6 +53,16 @@ private extension ContentView {
                 .padding()
 
             Button {
+                openWindow(id: "task-editor")
+            } label: {
+                Image(systemName: "square.and.pencil")
+                    .font(.title2)
+            }
+            .buttonStyle(.borderless)
+            .help("Open Task Editor")
+            .padding(.horizontal, 8)
+
+            Button {
                 withAnimation { showHelp.toggle() }
             } label: {
                 Image(systemName: "keyboard")
@@ -59,7 +70,7 @@ private extension ContentView {
             }
             .buttonStyle(.borderless)
             .help("Show keyboard shortcuts")
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 8)
         }
     }
 

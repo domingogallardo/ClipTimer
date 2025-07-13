@@ -16,7 +16,7 @@ final class TaskStore: ObservableObject {
     @Published var showColons: Bool = true
     @Published var activeTaskID: UUID?
     @Published var activeTaskStartTime: Date? = nil  // Single Source of Truth for start time
-    @Published var itemSymbol: String = ""  // Símbolo de itemización para todas las tareas
+    @Published var itemSymbol: String = ""  // Item symbol for all tasks
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
     private var timerCancellable: AnyCancellable?
@@ -100,7 +100,7 @@ final class TaskStore: ObservableObject {
         saveTasksLocally()
     }
     
-    // MARK: - Helper para construir líneas de resumen
+    // MARK: - Helper to build summary lines
     private func taskLines() -> [String] {
         tasks.map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
     }
@@ -128,29 +128,43 @@ final class TaskStore: ObservableObject {
     
     func replaceTasksFromClipboard() {
         if let tasksString = NSPasteboard.general.string(forType: .string) {
-            let lines = tasksString.split(separator: "\n").map { String($0) }
-            
-            mutateTasks(actionName: "Replace tasks") { tasks in
-                // Always detect and set item symbol (replacing mode)
-                detectAndSetItemSymbol(from: lines, forceDetection: true)
-                
-                let newTasks = lines.compactMap { parseTaskLine($0) }
-                tasks = newTasks
-            }
+            replaceTasks(from: tasksString)
         }
     }
     
     func addTasksFromClipboard() {
         if let tasksString = NSPasteboard.general.string(forType: .string) {
-            let lines = tasksString.split(separator: "\n").map { String($0) }
-            
-            mutateTasks(actionName: "Add tasks") { tasks in
-                // Detect and set item symbol if needed (adding mode)
-                detectAndSetItemSymbol(from: lines, forceDetection: false)
-                
-                let newTasks = lines.compactMap { parseTaskLine($0) }
-                updateOrAddTasks(newTasks, to: &tasks)
-            }
+            addTasks(from: tasksString)
+        }
+    }
+
+    // MARK: - String-based task import helpers 🆕
+
+    /// Replace the current list of tasks with the lines contained in `rawString`.
+    /// Each line may optionally include a time (e.g. "Design: 1:30:45").
+    func replaceTasks(from rawString: String) {
+        let lines = rawString.split(separator: "\n").map(String.init)
+
+        mutateTasks(actionName: "Replace tasks") { tasks in
+            // Always detect and set item symbol (replacing mode)
+            detectAndSetItemSymbol(from: lines, forceDetection: true)
+
+            let newTasks = lines.compactMap { parseTaskLine($0) }
+            tasks = newTasks
+        }
+    }
+
+    /// Add or update tasks using the lines contained in `rawString`.
+    /// Existing tasks with the same name are updated; new ones are appended.
+    func addTasks(from rawString: String) {
+        let lines = rawString.split(separator: "\n").map(String.init)
+
+        mutateTasks(actionName: "Add tasks") { tasks in
+            // Detect and set item symbol if needed (adding mode)
+            detectAndSetItemSymbol(from: lines, forceDetection: false)
+
+            let newTasks = lines.compactMap { parseTaskLine($0) }
+            updateOrAddTasks(newTasks, to: &tasks)
         }
     }
     
@@ -204,7 +218,7 @@ final class TaskStore: ObservableObject {
                 hours = 0
                 minutes = first
                 seconds = second
-            } else { // Solo un número tras los dos puntos → tratamos como segundos
+            } else { // Only one number after colon → treat as seconds
                 hours = 0
                 minutes = 0
                 seconds = first
@@ -253,12 +267,12 @@ final class TaskStore: ObservableObject {
     
     // Helper method to detect and set item symbol from clipboard lines
     private func detectAndSetItemSymbol(from lines: [String], forceDetection: Bool = false) {
-        // Reglas:
-        // • Replacing (forceDetection = true) → siempre recalcular símbolo (o vaciar si no se encuentra)
-        // • Adding  (forceDetection = false) → sólo si aún no había símbolo
+        // Rules:
+        // • Replacing (forceDetection = true) → always recalculate symbol (or clear if not found)
+        // • Adding  (forceDetection = false) → only if there was no symbol yet
         guard forceDetection || itemSymbol.isEmpty else { return }
 
-        // Buscar el primer símbolo válido en las líneas recibidas; si no hay, quedará "".
+        // Find the first valid symbol in the received lines; if none, it will remain "".
         itemSymbol = lines.compactMap(detectItemSymbol).first ?? ""
     }
     

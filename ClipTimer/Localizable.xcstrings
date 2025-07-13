@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "- Task 1\n- Task 2: 1:30:00" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "- Tarea 1\n- Tarea 2: 1:30:00"
+          }
+        }
+      }
+    },
     "%lld." : {
       "localizations" : {
         "es" : {
@@ -111,12 +121,13 @@
         }
       }
     },
-    "CipTimer" : {
+    "Add tasks (⇧⌘⏎)" : {
+      "comment" : "Button to add new tasks to existing ones",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "CipTimer"
+            "value" : "Añadir tareas (⇧⌘⏎)"
           }
         }
       }
@@ -127,6 +138,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Haz clic en el icono de encendido junto a una tarea para comenzar a cronometrarla. Solo una tarea se ejecuta a la vez. Presiona ⌘P para pausar, ⌘R para reiniciar la última tarea pausada."
+          }
+        }
+      }
+    },
+    "ClipTimer" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ClipTimer"
           }
         }
       }
@@ -312,6 +333,16 @@
         }
       }
     },
+    "Open Task Editor" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Editor de tareas"
+          }
+        }
+      }
+    },
     "Paste into ClipTimer" : {
       "localizations" : {
         "es" : {
@@ -323,6 +354,7 @@
       }
     },
     "Paste tasks (append)" : {
+      "comment" : "Button to add new tasks to existing ones",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -333,6 +365,7 @@
       }
     },
     "Paste tasks (replace)" : {
+      "comment" : "Button to replace all tasks with new ones",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -368,6 +401,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rehacer"
+          }
+        }
+      }
+    },
+    "Replace tasks (⌘⏎)" : {
+      "comment" : "Button to replace all tasks with new ones",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reemplazar tareas (⌘⏎)"
           }
         }
       }
@@ -432,7 +476,18 @@
         }
       }
     },
+    "Task Editor" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editor de tareas"
+          }
+        }
+      }
+    },
     "Tasks" : {
+      "comment" : "Label for tasks text area",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -448,17 +503,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gestión de tareas"
-          }
-        }
-      }
-    },
-    "Test local persistence" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prueba persistencia local"
           }
         }
       }
