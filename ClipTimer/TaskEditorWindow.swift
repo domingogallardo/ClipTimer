@@ -66,21 +66,21 @@ private extension TaskEditorWindow {
     var actionButtons: some View {
         HStack {
             Button {
+                commitTasks(replacing: false)
+            } label: {
+                Text("Add tasks (⇧⌘⏎)", comment: "Button to add new tasks to existing ones")
+            }
+            .buttonStyle(.borderedProminent)
+            .keyboardShortcut(.return, modifiers: [.command, .shift])
+            .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            
+            Button {
                 commitTasks(replacing: true)
             } label: {
                 Text("Replace tasks (⌘⏎)", comment: "Button to replace all tasks with new ones")
             }
             .buttonStyle(.borderedProminent)
             .keyboardShortcut(.return, modifiers: .command)
-            .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            
-            Button {
-                commitTasks(replacing: false)
-            } label: {
-                Text("Add tasks (⇧⌘⏎)")
-            }
-            .buttonStyle(.borderedProminent)
-            .keyboardShortcut(.return, modifiers: [.command, .shift])
             .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
     }
