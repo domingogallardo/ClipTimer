@@ -28,9 +28,8 @@ final class TaskStoreFormattingTests: XCTestCase {
     
     func testTaskFormattingWithBulletSymbols() {
         clearTasks()
-        setupClipboard(with: bulletTasksContent())
         
-        taskStore.addTasksFromClipboard()
+        taskStore.addTasks(from: bulletTasksContent())
         
         let summaryText = taskStore.summaryText
         assertTasksInSummary([
@@ -42,9 +41,8 @@ final class TaskStoreFormattingTests: XCTestCase {
     
     func testTaskFormattingWithDashSymbols() {
         clearTasks()
-        setupClipboard(with: dashTasksContent())
         
-        taskStore.replaceTasksFromClipboard()
+        taskStore.replaceTasks(from: dashTasksContent())
         
         let summaryText = taskStore.summaryText
         assertTasksInSummary([
@@ -55,9 +53,8 @@ final class TaskStoreFormattingTests: XCTestCase {
     
     func testTaskFormattingWithMixedSymbols() {
         clearTasks()
-        setupClipboard(with: mixedSymbolTasksContent())
         
-        taskStore.addTasksFromClipboard()
+        taskStore.addTasks(from: mixedSymbolTasksContent())
         
         // Verify output uses consistent formatting (first symbol detected)
         let summaryText = taskStore.summaryText
@@ -70,9 +67,8 @@ final class TaskStoreFormattingTests: XCTestCase {
     
     func testTaskFormattingWithPlainText() {
         clearTasks()
-        setupClipboard(with: plainTextTasksContent())
         
-        taskStore.addTasksFromClipboard()
+        taskStore.addTasks(from: plainTextTasksContent())
         
         let summaryText = taskStore.summaryText
         assertTasksInSummary([
@@ -88,9 +84,8 @@ final class TaskStoreFormattingTests: XCTestCase {
     
     func testTaskFormattingWithTabSymbols() {
         clearTasks()
-        setupClipboard(with: tabSymbolTasksContent())
         
-        taskStore.addTasksFromClipboard()
+        taskStore.addTasks(from: tabSymbolTasksContent())
         
         let summaryText = taskStore.summaryText
         assertTasksInSummary([
@@ -101,9 +96,8 @@ final class TaskStoreFormattingTests: XCTestCase {
     
     func testTaskFormattingPreservesSymbolsInTaskNames() {
         clearTasks()
-        setupClipboard(with: "- Fix bug-123\n- Review item • important")
         
-        taskStore.addTasksFromClipboard()
+        taskStore.addTasks(from: "- Fix bug-123\n- Review item • important")
         
         let summaryText = taskStore.summaryText
         assertTasksInSummary([
@@ -118,12 +112,11 @@ final class TaskStoreFormattingTests: XCTestCase {
         clearTasks()
         
         // First, add tasks with bullet symbols to establish the symbol
-        setupClipboard(with: "• Existing Task 1\n• Existing Task 2")
-        taskStore.addTasksFromClipboard()
+        
+        taskStore.addTasks(from: "• Existing Task 1\n• Existing Task 2")
         
         // Now ADD (not replace) tasks with different symbols
-        setupClipboard(with: "- New Task 1\n* New Task 2")
-        taskStore.addTasksFromClipboard()  // Using ADD, not replace
+        taskStore.addTasks(from: "- New Task 1\n* New Task 2")  // Using ADD, not replace
         
         // Verify all tasks use the existing symbol (bullet) when adding
         let summaryText = taskStore.summaryText
