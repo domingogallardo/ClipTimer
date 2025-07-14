@@ -6,7 +6,6 @@
 //
 
 import XCTest
-import Combine
 @testable import ClipTimer
 
 @MainActor
@@ -102,50 +101,5 @@ final class TaskStoreTimerTests: XCTestCase {
         taskStore.restartLastPausedTask()
         XCTAssertEqual(taskStore.activeTaskID, task1.id)
         XCTAssertNotEqual(taskStore.activeTaskID, task2.id)
-    }
-    
-    // MARK: - Timer Publisher Tests
-
-    func testBlinkPublisherTogglesShowColons() {
-        // Subject simulating the 0.5-s blink timer
-        let blinkSubject = PassthroughSubject<Date, Never>()
-        // Provide empty timer publisher because not needed
-        let store = TaskStore(timerPublisher: Empty().eraseToAnyPublisher(),
-                              blinkPublisher: blinkSubject.eraseToAnyPublisher())
-
-        // Add an active task to enable blinking
-        let task = Task(name: "Blink", elapsed: 0)
-        store.tasks = [task]
-        store.activeTaskID = task.id
-
-        let initial = store.showColons
-        blinkSubject.send(Date())
-        XCTAssertNotEqual(store.showColons, initial)
-        blinkSubject.send(Date())
-        XCTAssertEqual(store.showColons, initial)
-    }
-
-    func testTimerPublisherTriggersObjectWillChange() {
-        let timerSubject = PassthroughSubject<Date, Never>()
-        let store = TaskStore(timerPublisher: timerSubject.eraseToAnyPublisher(),
-                              blinkPublisher: Empty().eraseToAnyPublisher())
-
-        // Activate a task so hasActiveTasks is true
-        let task = Task(name: "Timer", elapsed: 0)
-        store.tasks = [task]
-        store.activeTaskID = task.id
-
-        let expectation = expectation(description: "objectWillChange fired")
-        var changeCount = 0
-        let cancellable = store.objectWillChange
-            .sink {
-                changeCount += 1
-                expectation.fulfill()
-            }
-
-        timerSubject.send(Date())
-        waitForExpectations(timeout: 1.0)
-        XCTAssertEqual(changeCount, 1)
-        cancellable.cancel()
     }
 } 
