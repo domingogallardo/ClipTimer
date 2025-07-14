@@ -12,6 +12,7 @@ struct TaskEditorWindow: View {
     @EnvironmentObject private var store: TaskStore
     @State private var tasksText: String = ""
     @Environment(\.dismiss) private var dismiss
+    @FocusState private var isTextEditorFocused: Bool
 
     // Size constants to avoid magic numbers
     private static let editorWidth: CGFloat = 380
@@ -33,6 +34,8 @@ struct TaskEditorWindow: View {
         .onAppear {
             // Clear text every time the window opens
             tasksText = ""
+            // Focus the text editor so it can receive key events
+            isTextEditorFocused = true
         }
     }
 }
@@ -50,6 +53,8 @@ private extension TaskEditorWindow {
                         .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
                 )
                 .frame(minHeight: 180)
+                .focusable()
+                .focused($isTextEditorFocused)
             
             // Placeholder text
             if tasksText.isEmpty {
@@ -100,6 +105,8 @@ private extension TaskEditorWindow {
         
         dismiss()
     }
+    
+
 }
 
 #if DEBUG
