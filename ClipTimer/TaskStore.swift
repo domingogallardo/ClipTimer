@@ -8,7 +8,6 @@
 
 import SwiftUI
 import AppKit
-import Combine
 
 @MainActor
 final class TaskStore: ObservableObject {
@@ -19,8 +18,8 @@ final class TaskStore: ObservableObject {
     @Published var itemSymbol: String = ""  // Item symbol for all tasks
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
-    private var timerCancellable: AnyCancellable?
-    private var blinkCancellable: AnyCancellable?
+    private var timer: Timer?
+    private var blinkTimer: Timer?
 
     // MARK: - Local Persistence
     private let userDefaults = UserDefaults.standard
@@ -65,16 +64,15 @@ final class TaskStore: ObservableObject {
         saveTasksLocally()
     }
     
-    init(timerPublisher: AnyPublisher<Date, Never>? = nil,
-         blinkPublisher: AnyPublisher<Date, Never>? = nil) {
-        startTimer(with: timerPublisher)
-        startBlinkTimer(with: blinkPublisher)
+    init() { 
+        startTimer() 
+        startBlinkTimer()
         loadTasksLocally()  // 🆕 Load tasks on app start
     }
     
     deinit {
-        timerCancellable?.cancel()
-        blinkCancellable?.cancel()
+        timer?.invalidate()
+        blinkTimer?.invalidate()
     }
     
     var totalElapsed: TimeInterval {
@@ -283,33 +281,22 @@ final class TaskStore: ObservableObject {
         }
     }
     
-    private func startTimer(with publisher: AnyPublisher<Date, Never>? = nil) {
-        // Cancel previous subscription if any
-        timerCancellable?.cancel()
-        let pub = publisher ?? Timer.publish(every: 1, on: .main, in: .common)
-            .autoconnect()
-            .eraseToAnyPublisher()
-        timerCancellable = pub
-            .sink { [weak self] _ in
-                guard let self, self.hasActiveTasks else { return }
-                self.objectWillChange.send()
-            }
+    private func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            guard let self, self.hasActiveTasks else { return }
+            self.objectWillChange.send()
+        }
     }
     
-    private func startBlinkTimer(with publisher: AnyPublisher<Date, Never>? = nil) {
-        blinkCancellable?.cancel()
-        let pub = publisher ?? Timer.publish(every: 0.5, on: .main, in: .common)
-            .autoconnect()
-            .eraseToAnyPublisher()
-        blinkCancellable = pub
-            .sink { [weak self] _ in
-                guard let self else { return }
-                if self.hasActiveTasks {
-                    self.showColons.toggle()
-                } else {
-                    self.showColons = true
-                }
+    private func startBlinkTimer() {
+        blinkTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            if self.hasActiveTasks {
+                self.showColons.toggle()
+            } else {
+                self.showColons = true
             }
+        }
     }
     
     func delete(_ task: Task) {
