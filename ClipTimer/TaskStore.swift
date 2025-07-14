@@ -282,44 +282,26 @@ final class TaskStore: ObservableObject {
     }
     
     private func startTimer() {
-        timer = Timer.scheduledTimer(
-            timeInterval: 1,
-            target: self,
-            selector: #selector(timerDidFire(_:)),
-            userInfo: nil,
-            repeats: true)
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            guard let self, self.hasActiveTasks else { return }
+            self.objectWillChange.send()
+        }
     }
     
     private func startBlinkTimer() {
-        blinkTimer = Timer.scheduledTimer(
-            timeInterval: 0.5,
-            target: self,
-            selector: #selector(blinkTimerDidFire(_:)),
-            userInfo: nil,
-            repeats: true)
+        blinkTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            if self.hasActiveTasks {
+                self.showColons.toggle()
+            } else {
+                self.showColons = true
+            }
+        }
     }
     
     func delete(_ task: Task) {
         mutateTasks(actionName: "Delete task") { tasks in
             tasks.removeAll { $0.id == task.id }
-        }
-    }
-    
-    // Timer callback - updates UI for active task (time calculation is continuous)
-    @objc private func timerDidFire(_ timer: Timer) {
-        // Timer now only triggers UI updates - actual time is calculated continuously
-        // This ensures the UI updates every second even when laptop lid is closed
-        if hasActiveTasks {
-            objectWillChange.send()
-        }
-    }
-    
-    // Blink timer callback - toggles colon visibility every 0.5 seconds
-    @objc private func blinkTimerDidFire(_ timer: Timer) {
-        if hasActiveTasks {
-            showColons.toggle()
-        } else {
-            showColons = true
         }
     }
     
