@@ -26,6 +26,66 @@ struct ClipTimerApp: App {
     @StateObject private var store = TaskStore()
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
+    // Function to handle paste command based on active window
+    private func handlePasteCommand() {
+        // Check which window is currently active
+        guard let keyWindow = NSApp.keyWindow else {
+            // If no key window, default to main window behavior
+            store.replaceTasksFromClipboard()
+            return
+        }
+        
+        // Check if the active window is the task editor
+        if keyWindow.identifier?.rawValue == "task-editor" {
+            // For task editor window, we need to send the paste event to the focused text editor
+            // This will be handled by the TextEditor's native paste functionality
+            keyWindow.firstResponder?.tryToPerform(#selector(NSText.paste(_:)), with: nil)
+        } else {
+            // For main window or other windows, use the normal behavior
+            store.replaceTasksFromClipboard()
+        }
+    }
+    
+    // Function to handle copy command based on active window
+    private func handleCopyCommand() {
+        // Check which window is currently active
+        guard let keyWindow = NSApp.keyWindow else {
+            // If no key window, default to main window behavior
+            store.copySummaryToClipboard()
+            return
+        }
+        
+        // Check if the active window is the task editor
+        if keyWindow.identifier?.rawValue == "task-editor" {
+            // For task editor window, we need to send the copy event to the focused text editor
+            // This will be handled by the TextEditor's native copy functionality
+            keyWindow.firstResponder?.tryToPerform(#selector(NSText.copy(_:)), with: nil)
+        } else {
+            // For main window or other windows, use the normal behavior
+            store.copySummaryToClipboard()
+        }
+    }
+    
+    // Function to handle cut command based on active window
+    private func handleCutCommand() {
+        // Check which window is currently active
+        guard let keyWindow = NSApp.keyWindow else {
+            // If no key window, default to main window behavior
+            store.cutAllTasks()
+            return
+        }
+        
+        // Check if the active window is the task editor
+        if keyWindow.identifier?.rawValue == "task-editor" {
+            // For task editor window, we need to send the cut event to the focused text editor
+            // This will be handled by the TextEditor's native cut functionality
+            keyWindow.firstResponder?.tryToPerform(#selector(NSText.cut(_:)), with: nil)
+        } else {
+            // For main window or other windows, use the normal behavior
+            store.cutAllTasks()
+        }
+    }
 
     var body: some Scene {
         Window("ClipTimer", id: "main") {
@@ -51,12 +111,12 @@ struct ClipTimerApp: App {
             }
             CommandGroup(replacing: .pasteboard) {
                 Button("Cut all tasks") {
-                    store.cutAllTasks()
+                    handleCutCommand()
                 }
                 .keyboardShortcut("x")
                 
                 Button("Paste tasks (replace)") {
-                    store.replaceTasksFromClipboard()
+                    handlePasteCommand()
                 }
                 .keyboardShortcut("v")
 
@@ -68,7 +128,7 @@ struct ClipTimerApp: App {
                 Divider()
 
                 Button("Copy tasks with times") {
-                    store.copySummaryToClipboard()
+                    handleCopyCommand()
                 }
                 .keyboardShortcut("c")                     
             }
