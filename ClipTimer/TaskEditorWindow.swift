@@ -131,9 +131,6 @@ private extension TaskEditorWindow {
             store.addTasks(from: trimmedText)
         }
         
-        // Restart the previously paused task after updating
-        store.restartLastPausedTask()
-        
         dismiss()
     }
 }

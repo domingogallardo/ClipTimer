@@ -121,20 +121,16 @@
         }
       }
     },
-    "Add tasks (⇧⌘⏎)" : {
-      "comment" : "Button to add new tasks to existing ones",
-      "extractionState" : "stale",
+    "Add tasks (⌘⏎)" : {
+      "comment" : "Button to add new tasks",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir tareas (⇧⌘⏎)"
+            "value" : "Añadir tareas (⌘⏎)"
           }
         }
       }
-    },
-    "Add tasks (⌘⏎)" : {
-      "comment" : "Button to add new tasks"
     },
     "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task." : {
       "localizations" : {
@@ -409,18 +405,6 @@
         }
       }
     },
-    "Replace tasks (⌘⏎)" : {
-      "comment" : "Button to replace all tasks with new ones",
-      "extractionState" : "stale",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reemplazar tareas (⌘⏎)"
-          }
-        }
-      }
-    },
     "Restart last paused task" : {
       "localizations" : {
         "es" : {
@@ -564,7 +548,15 @@
       }
     },
     "Update tasks (⌘⏎)" : {
-      "comment" : "Button to update existing tasks"
+      "comment" : "Button to update existing tasks",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar tareas (⌘⏎)"
+          }
+        }
+      }
     },
     "Working time" : {
       "comment" : "Label for working time",
