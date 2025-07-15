@@ -32,8 +32,7 @@ struct TaskEditorWindow: View {
             minHeight: Self.editorHeight, idealHeight: Self.editorHeight, maxHeight: Self.editorHeight
         )
         .onAppear {
-            // Clear text every time the window opens
-            tasksText = ""
+            loadExistingTasks()
             // Focus the text editor so it can receive key events
             isTextEditorFocused = true
         }
@@ -56,8 +55,8 @@ private extension TaskEditorWindow {
                 .focusable()
                 .focused($isTextEditorFocused)
             
-            // Placeholder text
-            if tasksText.isEmpty {
+            // Placeholder text - only show when no tasks exist and text is empty
+            if tasksText.isEmpty && store.tasks.isEmpty {
                 Text("- Task 1\n- Task 2: 1:30:00")
                     .font(.system(.body, design: .monospaced))
                     .foregroundColor(.secondary.opacity(0.6))
@@ -70,27 +69,50 @@ private extension TaskEditorWindow {
     @ViewBuilder
     var actionButtons: some View {
         HStack {
-            Button {
-                commitTasks(replacing: false)
-            } label: {
-                Text("Add tasks (⇧⌘⏎)", comment: "Button to add new tasks to existing ones")
+            if store.tasks.isEmpty {
+                // When no tasks exist, only show add button
+                Button {
+                    commitTasks(replacing: false)
+                } label: {
+                    Text("Add tasks (⌘⏎)", comment: "Button to add new tasks")
+                }
+                .buttonStyle(.borderedProminent)
+                .keyboardShortcut(.return, modifiers: .command)
+                .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            } else {
+                // When tasks exist - single update button
+                Button {
+                    commitTasks(replacing: true)
+                } label: {
+                    Text("Update tasks (⌘⏎)", comment: "Button to update existing tasks")
+                }
+                .buttonStyle(.borderedProminent)
+                .keyboardShortcut(.return, modifiers: .command)
+                .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
-            .buttonStyle(.borderedProminent)
-            .keyboardShortcut(.return, modifiers: [.command, .shift])
-            .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            
-            Button {
-                commitTasks(replacing: true)
-            } label: {
-                Text("Replace tasks (⌘⏎)", comment: "Button to replace all tasks with new ones")
-            }
-            .buttonStyle(.borderedProminent)
-            .keyboardShortcut(.return, modifiers: .command)
-            .disabled(tasksText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
         }
     }
     
     // MARK: - Helper Methods
+    
+    /// Load existing tasks into the editor when window opens
+    private func loadExistingTasks() {
+        if !store.tasks.isEmpty {
+            // Load existing tasks with their current times
+            tasksText = generateTasksText()
+        } else {
+            // Clear text when no tasks exist
+            tasksText = ""
+        }
+    }
+    
+    /// Generate formatted text representation of current tasks
+    private func generateTasksText() -> String {
+        return store.tasks.map { task in
+            let currentElapsed = task.currentElapsed(activeTaskID: store.activeTaskID, startTime: store.activeTaskStartTime)
+            return "\(store.itemSymbol)\(task.name): \(currentElapsed.hms)"
+        }.joined(separator: "\n")
+    }
 
     /// Adds or replaces tasks based on `replacing` parameter.
     private func commitTasks(replacing: Bool) {
@@ -105,8 +127,6 @@ private extension TaskEditorWindow {
         
         dismiss()
     }
-    
-
 }
 
 #if DEBUG
