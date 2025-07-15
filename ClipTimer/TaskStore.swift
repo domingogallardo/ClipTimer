@@ -148,7 +148,21 @@ final class TaskStore: ObservableObject {
             detectAndSetItemSymbol(from: lines, forceDetection: true)
 
             let newTasks = lines.compactMap { parseTaskLine($0) }
-            tasks = newTasks
+            
+            // Preserve UUIDs of existing tasks to maintain references
+            var updatedTasks: [Task] = []
+            for newTask in newTasks {
+                if let existingTask = tasks.first(where: { $0.name == newTask.name }) {
+                    // Preserve the UUID of the existing task
+                    let preservedTask = Task(id: existingTask.id, name: newTask.name, elapsed: newTask.elapsed)
+                    updatedTasks.append(preservedTask)
+                } else {
+                    // New task, keep its generated UUID
+                    updatedTasks.append(newTask)
+                }
+            }
+            
+            tasks = updatedTasks
         }
     }
 
@@ -174,7 +188,8 @@ final class TaskStore: ObservableObject {
                 let existingTask = tasks[existingIndex]
                 
                 // Special case: if the existing task is currently active, pause it first
-                if activeTaskID == existingTask.id {
+                // BUT only if we're not already in a paused state (i.e., not in task editor context)
+                if activeTaskID == existingTask.id && lastPausedTaskID == nil {
                     pauseCurrentActiveTask()
                 }
                 
@@ -334,7 +349,9 @@ final class TaskStore: ObservableObject {
     
     func restartLastPausedTask() {
         guard let pausedID = lastPausedTaskID,
-              let _ = tasks.firstIndex(where: { $0.id == pausedID }) else { return }
+              let _ = tasks.firstIndex(where: { $0.id == pausedID }) else { 
+            return 
+        }
         
         // First pause any currently active task
         pauseCurrentActiveTask()
@@ -342,6 +359,9 @@ final class TaskStore: ObservableObject {
         // Restart the paused task
         activeTaskID = pausedID
         activeTaskStartTime = Date()
+        
+        // Clear the last paused ID to prevent re-triggering
+        lastPausedTaskID = nil
     }
     
     // MARK: - App Lifecycle Methods

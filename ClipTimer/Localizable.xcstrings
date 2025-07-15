@@ -121,13 +121,13 @@
         }
       }
     },
-    "Add tasks (⇧⌘⏎)" : {
-      "comment" : "Button to add new tasks to existing ones",
+    "Add tasks (⌘⏎)" : {
+      "comment" : "Button to add new tasks",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Añadir tareas (⇧⌘⏎)"
+            "value" : "Añadir tareas (⌘⏎)"
           }
         }
       }
@@ -405,17 +405,6 @@
         }
       }
     },
-    "Replace tasks (⌘⏎)" : {
-      "comment" : "Button to replace all tasks with new ones",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reemplazar tareas (⌘⏎)"
-          }
-        }
-      }
-    },
     "Restart last paused task" : {
       "localizations" : {
         "es" : {
@@ -554,6 +543,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Deshacer / Rehacer"
+          }
+        }
+      }
+    },
+    "Update tasks (⌘⏎)" : {
+      "comment" : "Button to update existing tasks",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar tareas (⌘⏎)"
           }
         }
       }
