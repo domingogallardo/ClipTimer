@@ -35,6 +35,12 @@ struct TaskEditorWindow: View {
             loadExistingTasks()
             // Focus the text editor so it can receive key events
             isTextEditorFocused = true
+            // Pause active task when editor opens
+            store.pauseActiveTask()
+        }
+        .onDisappear {
+            // Restart paused task when editor closes
+            store.restartLastPausedTask()
         }
     }
 }
@@ -124,6 +130,9 @@ private extension TaskEditorWindow {
         } else {
             store.addTasks(from: trimmedText)
         }
+        
+        // Restart the previously paused task after updating
+        store.restartLastPausedTask()
         
         dismiss()
     }

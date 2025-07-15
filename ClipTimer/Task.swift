@@ -19,6 +19,13 @@ struct Task: Identifiable, Codable {
         self.elapsed = elapsed
     }
     
+    // Custom initializer with specific UUID (for preserving existing task IDs)
+    init(id: UUID, name: String, elapsed: TimeInterval) {
+        self.id = id
+        self.name = name
+        self.elapsed = elapsed
+    }
+    
     // Calculate current elapsed time including active time if running
     func currentElapsed(activeTaskID: UUID?, startTime: Date?) -> TimeInterval {
         var elapsed = self.elapsed

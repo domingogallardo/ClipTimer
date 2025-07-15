@@ -123,6 +123,7 @@
     },
     "Add tasks (⇧⌘⏎)" : {
       "comment" : "Button to add new tasks to existing ones",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -131,6 +132,9 @@
           }
         }
       }
+    },
+    "Add tasks (⌘⏎)" : {
+      "comment" : "Button to add new tasks"
     },
     "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task." : {
       "localizations" : {
@@ -407,6 +411,7 @@
     },
     "Replace tasks (⌘⏎)" : {
       "comment" : "Button to replace all tasks with new ones",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -557,6 +562,9 @@
           }
         }
       }
+    },
+    "Update tasks (⌘⏎)" : {
+      "comment" : "Button to update existing tasks"
     },
     "Working time" : {
       "comment" : "Label for working time",
