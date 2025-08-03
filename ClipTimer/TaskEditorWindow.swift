@@ -36,7 +36,14 @@ struct TaskEditorWindow: View {
             // Focus the text editor so it can receive key events
             isTextEditorFocused = true
             // Pause active task when editor opens
-            store.pauseActiveTask()
+            if store.activeTaskID != nil {
+                // There's an active task, pause it normally
+                store.pauseActiveTask()
+            } else {
+                // No active task, clear any leftover lastPausedTaskID to prevent 
+                // reactivating a task the user manually stopped
+                store.clearLastPausedTask()
+            }
         }
         .onDisappear {
             // Restart paused task when editor closes
