@@ -364,6 +364,12 @@ final class TaskStore: ObservableObject {
         lastPausedTaskID = nil
     }
     
+    /// Clear the last paused task ID without affecting the currently active task
+    /// This is used when we want to "forget" about a previously paused task
+    func clearLastPausedTask() {
+        lastPausedTaskID = nil
+    }
+    
     // MARK: - App Lifecycle Methods
     
     /// Pause active task and save state when app is about to terminate

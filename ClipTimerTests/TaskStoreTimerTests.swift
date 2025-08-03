@@ -223,4 +223,48 @@ final class TaskStoreTimerTests: XCTestCase {
         XCTAssertEqual(finalTask.elapsed, 600.0) // Updated time is preserved
         XCTAssertEqual(finalTask.id, originalTaskID) // Same task ID
     }
+    
+    // MARK: - Bug Reproduction Tests
+    
+    func testTaskEditorBugWithPreviouslyPausedTask() {
+        // This test reproduces the bug where a previously paused task 
+        // gets reactivated when opening/closing the task editor
+        
+        let task = Task(name: "Bug Task", elapsed: 100)
+        taskStore.tasks = [task]
+        
+        // Step 1: Activate the task
+        taskStore.toggle(task)
+        XCTAssertEqual(taskStore.activeTaskID, task.id)
+        XCTAssertNotNil(taskStore.activeTaskStartTime)
+        
+        // Step 2: User manually pauses the task using "Pause active task" (⌘P)
+        taskStore.pauseActiveTask()
+        XCTAssertNil(taskStore.activeTaskID, "Task should be paused")
+        XCTAssertNil(taskStore.activeTaskStartTime, "No active start time")
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task.id, "Task ID should be stored as last paused")
+        
+        // Step 3: Task is now stopped - user expects it to stay stopped
+        // But now user opens the task editor...
+        
+        // Simulate TaskEditorWindow.onAppear - NEW LOGIC: 
+        // If no task is active, clear lastPausedTaskID instead of calling pauseActiveTask()
+        if taskStore.activeTaskID != nil {
+            taskStore.pauseActiveTask()
+        } else {
+            taskStore.clearLastPausedTask()
+        }
+        XCTAssertNil(taskStore.activeTaskID, "Still no active task")
+        XCTAssertNil(taskStore.getLastPausedTaskID(), "lastPausedTaskID should be cleared when no task is active")
+        
+        // Step 4: User closes the task editor without making changes
+        // Simulate TaskEditorWindow.onDisappear - calls restartLastPausedTask()
+        // FIXED: This should be a no-op now since lastPausedTaskID was cleared
+        taskStore.restartLastPausedTask()
+        
+        // EXPECTED BEHAVIOR: Task should remain stopped
+        // ACTUAL BEHAVIOR (BUG): Task becomes active again
+        XCTAssertNil(taskStore.activeTaskID, "Task should remain stopped - user manually paused it")
+        XCTAssertNil(taskStore.activeTaskStartTime, "No task should be running")
+    }
 } 
