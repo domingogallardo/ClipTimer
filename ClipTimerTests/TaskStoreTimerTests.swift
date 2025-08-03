@@ -267,4 +267,29 @@ final class TaskStoreTimerTests: XCTestCase {
         XCTAssertNil(taskStore.activeTaskID, "Task should remain stopped - user manually paused it")
         XCTAssertNil(taskStore.activeTaskStartTime, "No task should be running")
     }
+    
+    func testRestartShortcutAfterStoppingTaskFromList() {
+        // Reproduce bug: Start task → Stop from list → Press ⌘R should restart, but doesn't
+        let task = Task(name: "Test Task", elapsed: 100)
+        taskStore.tasks = [task]
+        
+        // Step 1: Start the task (like clicking on it in the list)
+        taskStore.toggle(task)
+        XCTAssertEqual(taskStore.activeTaskID, task.id, "Task should be active after starting")
+        XCTAssertNotNil(taskStore.activeTaskStartTime, "Task should have a start time")
+        
+        // Step 2: Stop the task by clicking on it again in the list
+        taskStore.toggle(task)
+        XCTAssertNil(taskStore.activeTaskID, "Task should be stopped after clicking again")
+        XCTAssertNil(taskStore.activeTaskStartTime, "Task should not have a start time")
+        
+        // Step 3: Try to restart using ⌘R shortcut (restartLastPausedTask)
+        // BUG: This should restart the task but currently does nothing
+        taskStore.restartLastPausedTask()
+        
+        // EXPECTED: Task should be active again
+        XCTAssertEqual(taskStore.activeTaskID, task.id, "Task should be restarted after ⌘R shortcut")
+        XCTAssertNotNil(taskStore.activeTaskStartTime, "Restarted task should have a start time")
+        XCTAssertNil(taskStore.getLastPausedTaskID(), "lastPausedTaskID should be cleared after restart")
+    }
 } 
