@@ -247,27 +247,41 @@ final class TaskStoreTimerTests: XCTestCase {
         // Step 3: Task is now stopped - user expects it to stay stopped
         // But now user opens the task editor...
         
-        // Simulate TaskEditorWindow.onAppear - NEW LOGIC: 
-        // If no task is active, clear lastPausedTaskID instead of calling pauseActiveTask()
-        if taskStore.activeTaskID != nil {
-            taskStore.pauseActiveTask()
-        } else {
-            taskStore.clearLastPausedTask()
-        }
+        // Simulate TaskEditorWindow.onAppear when no task is active
+        // Editor should leave lastPausedTaskID untouched and NOT pause anything
         XCTAssertNil(taskStore.activeTaskID, "Still no active task")
-        XCTAssertNil(taskStore.getLastPausedTaskID(), "lastPausedTaskID should be cleared when no task is active")
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task.id, "lastPausedTaskID should remain intact")
         
         // Step 4: User closes the task editor without making changes
-        // Simulate TaskEditorWindow.onDisappear - calls restartLastPausedTask()
-        // FIXED: This should be a no-op now since lastPausedTaskID was cleared
-        taskStore.restartLastPausedTask()
-        
-        // EXPECTED BEHAVIOR: Task should remain stopped
-        // ACTUAL BEHAVIOR (BUG): Task becomes active again
+        // Editor should NOT restart because it did not pause the task
+        // Verify task remains paused
         XCTAssertNil(taskStore.activeTaskID, "Task should remain stopped - user manually paused it")
         XCTAssertNil(taskStore.activeTaskStartTime, "No task should be running")
     }
     
+    // Editor should NOT restart a task that was already paused before opening
+    func testEditorDoesNotRestartPreviouslyPausedTask() {
+        let task = Task(name: "Editor Task", elapsed: 120)
+        taskStore.tasks = [task]
+        
+        // Start and immediately pause the task via ⌘P (or toggle+pause)
+        taskStore.toggle(task)               // start
+        taskStore.pauseActiveTask()          // pause -> lastPausedTaskID set
+        XCTAssertNil(taskStore.activeTaskID)
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task.id)
+        
+        // Simulate TaskEditorWindow.onAppear when no task is active (editor does nothing special)
+        // Editor should NOT clear lastPausedTaskID and should NOT pause anything (already paused)
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task.id)
+        
+        // Simulate TaskEditorWindow.onDisappear – editor should NOT restart because it didn't pause
+        // (no call to restartLastPausedTask())
+        
+        // Verify task remains paused and lastPausedTaskID is intact
+        XCTAssertNil(taskStore.activeTaskID, "Task should remain paused after closing editor")
+        XCTAssertEqual(taskStore.getLastPausedTaskID(), task.id, "lastPausedTaskID should remain for manual restart")
+    }
+
     func testRestartShortcutAfterStoppingTaskFromList() {
         // Reproduce bug: Start task → Stop from list → Press ⌘R should restart, but doesn't
         let task = Task(name: "Test Task", elapsed: 100)

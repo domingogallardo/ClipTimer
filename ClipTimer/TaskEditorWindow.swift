@@ -11,6 +11,8 @@ import AppKit
 struct TaskEditorWindow: View {
     @EnvironmentObject private var store: TaskStore
     @State private var tasksText: String = ""
+    // Tracks whether the editor itself paused a task when it opened
+    @State private var didEditorPauseTask: Bool = false
     @Environment(\.dismiss) private var dismiss
     @FocusState private var isTextEditorFocused: Bool
 
@@ -37,17 +39,19 @@ struct TaskEditorWindow: View {
             isTextEditorFocused = true
             // Pause active task when editor opens
             if store.activeTaskID != nil {
-                // There's an active task, pause it normally
+                // There's an active task, pause it and remember that we did so
                 store.pauseActiveTask()
+                didEditorPauseTask = true
             } else {
-                // No active task, clear any leftover lastPausedTaskID to prevent 
-                // reactivating a task the user manually stopped
-                store.clearLastPausedTask()
+                // Editor did not pause anything
+                didEditorPauseTask = false
             }
         }
         .onDisappear {
-            // Restart paused task when editor closes
-            store.restartLastPausedTask()
+            // Restart only if the editor itself paused a task
+            if didEditorPauseTask {
+                store.restartLastPausedTask()
+            }
         }
     }
 }
