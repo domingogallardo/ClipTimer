@@ -113,6 +113,7 @@ final class TaskStore: ObservableObject {
     func toggle(_ task: Task) {
         if activeTaskID == task.id {
             // Task is active, deactivate it (pause and save elapsed time)
+            lastPausedTaskID = task.id  // Remember this task for potential restart via ⌘R
             pauseCurrentActiveTask()
         } else {
             // First pause any currently active task
@@ -361,6 +362,12 @@ final class TaskStore: ObservableObject {
         activeTaskStartTime = Date()
         
         // Clear the last paused ID to prevent re-triggering
+        lastPausedTaskID = nil
+    }
+    
+    /// Clear the last paused task ID without affecting the currently active task
+    /// This is used when we want to "forget" about a previously paused task
+    func clearLastPausedTask() {
         lastPausedTaskID = nil
     }
     
