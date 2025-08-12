@@ -127,7 +127,8 @@ private extension TaskEditorWindow {
     private func generateTasksText() -> String {
         return store.tasks.map { task in
             let currentElapsed = task.currentElapsed(activeTaskID: store.activeTaskID, startTime: store.activeTaskStartTime)
-            return "\(store.itemSymbol)\(task.name): \(currentElapsed.hms)"
+            let name = task.isCompleted ? "~~\(task.name)~~" : task.name
+            return "\(store.itemSymbol)\(name): \(currentElapsed.hms)"
         }.joined(separator: "\n")
     }
 

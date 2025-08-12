@@ -59,9 +59,24 @@ final class TaskStore: ObservableObject {
     private func mutateTasks(actionName: String, mutation: (inout [Task]) -> Void) {
         let before = tasks
         mutation(&tasks)
+        moveCompletedTasksToEnd(&tasks)
         resetItemSymbolIfNoTasks()
         registerUndo(previousTasks: before, actionName: actionName)
         saveTasksLocally()
+    }
+
+    /// Ensure all completed tasks appear after incomplete ones while preserving relative order
+    private func moveCompletedTasksToEnd(_ tasks: inout [Task]) {
+        var incomplete: [Task] = []
+        var complete: [Task] = []
+        for task in tasks {
+            if task.isCompleted {
+                complete.append(task)
+            } else {
+                incomplete.append(task)
+            }
+        }
+        tasks = incomplete + complete
     }
     
     init() { 
@@ -136,7 +151,9 @@ final class TaskStore: ObservableObject {
         }
         mutateTasks(actionName: "Finish task") { tasks in
             if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-                tasks[index].isCompleted = true
+                var finished = tasks.remove(at: index)
+                finished.isCompleted = true
+                tasks.append(finished)
             }
         }
     }
@@ -170,8 +187,8 @@ final class TaskStore: ObservableObject {
             var updatedTasks: [Task] = []
             for newTask in newTasks {
                 if let existingTask = tasks.first(where: { $0.name == newTask.name }) {
-                    // Preserve the UUID and completion state of the existing task
-                    let preservedTask = Task(id: existingTask.id, name: newTask.name, elapsed: newTask.elapsed, isCompleted: existingTask.isCompleted)
+                    // Preserve the UUID of the existing task but adopt new completion state
+                    let preservedTask = Task(id: existingTask.id, name: newTask.name, elapsed: newTask.elapsed, isCompleted: newTask.isCompleted)
                     updatedTasks.append(preservedTask)
                 } else {
                     // New task, keep its generated UUID
@@ -210,8 +227,9 @@ final class TaskStore: ObservableObject {
                     pauseCurrentActiveTask()
                 }
                 
-                // Update the task's elapsed time
+                // Update the task's elapsed time and completion state
                 tasks[existingIndex].elapsed = newTask.elapsed
+                tasks[existingIndex].isCompleted = newTask.isCompleted
             } else {
                 // New task - add it to the list
                 tasks.append(newTask)
@@ -229,26 +247,30 @@ final class TaskStore: ObservableObject {
     
     // Parse task line with optional time format (e.g., "Task name: 1:30:45" or "Task name")
     func parseTaskLine(_ rawLine: String) -> Task? {
-        var trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
 
+        // Remove any item symbol so completion markers can be detected properly
+        let (_, textWithoutSymbol) = parseItemSymbolAndText(from: trimmed)
+        var content = textWithoutSymbol
+
         let isCompleted: Bool
-        if trimmed.hasPrefix("~~"), trimmed.hasSuffix("~~") {
+        if content.hasPrefix("~~"), content.hasSuffix("~~") {
             isCompleted = true
-            trimmed = String(trimmed.dropFirst(2).dropLast(2))
+            content = String(content.dropFirst(2).dropLast(2))
         } else {
             isCompleted = false
         }
 
-        let range = NSRange(trimmed.startIndex..., in: trimmed)
-        if let match = Self.timeParsingRegex.firstMatch(in: trimmed, range: range) {
-            let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
-            let first  = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
-            let second = match.range(at: 3).location != NSNotFound ? Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0 : nil
-            let third  = match.range(at: 4).location != NSNotFound ? Int(trimmed[Range(match.range(at: 4), in: trimmed)!]) ?? 0 : nil
+        let range = NSRange(content.startIndex..., in: content)
+        if let match = Self.timeParsingRegex.firstMatch(in: content, range: range) {
+            let taskName = String(content[Range(match.range(at: 1), in: content)!])
+            let first  = Int(content[Range(match.range(at: 2), in: content)!]) ?? 0
+            let second = match.range(at: 3).location != NSNotFound ? Int(content[Range(match.range(at: 3), in: content)!]) ?? 0 : nil
+            let third  = match.range(at: 4).location != NSNotFound ? Int(content[Range(match.range(at: 4), in: content)!]) ?? 0 : nil
 
             let (hours, minutes, seconds): (Int, Int, Int)
-            if let third = third { // H:MM:SS (all three numbers present)
+            if let third = third { // H:MM:SS
                 hours = first
                 minutes = second ?? 0
                 seconds = third
@@ -256,7 +278,7 @@ final class TaskStore: ObservableObject {
                 hours = 0
                 minutes = first
                 seconds = second
-            } else { // Only one number after colon → treat as seconds
+            } else { // Only seconds
                 hours = 0
                 minutes = 0
                 seconds = first
@@ -267,7 +289,7 @@ final class TaskStore: ObservableObject {
         }
 
         // No time found, treat entire line as task name
-        return createTask(from: trimmed, elapsed: 0, isCompleted: isCompleted)
+        return createTask(from: content, elapsed: 0, isCompleted: isCompleted)
     }
 
     // Helper method to create task with cleaned name
@@ -448,6 +470,7 @@ final class TaskStore: ObservableObject {
         do {
             let savedTasks = try JSONDecoder().decode([Task].self, from: data)
             tasks = savedTasks
+            moveCompletedTasksToEnd(&tasks)
 #if DEBUG
             print("📥 Loaded \(savedTasks.count) tasks from local storage")
 #endif

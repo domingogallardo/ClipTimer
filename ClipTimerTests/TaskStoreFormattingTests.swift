@@ -108,6 +108,34 @@ final class TaskStoreFormattingTests: XCTestCase {
             "Open Task: 0:00:45"
         ], in: summaryText)
     }
+
+    func testFinishingTaskMovesItToEnd() {
+        clearTasks()
+
+        taskStore.tasks = [
+            Task(name: "First", elapsed: 0),
+            Task(name: "Second", elapsed: 0),
+            Task(name: "Third", elapsed: 0)
+        ]
+
+        let firstTask = taskStore.tasks[0]
+        taskStore.finish(firstTask)
+
+        XCTAssertEqual(taskStore.tasks.map { $0.name }, ["Second", "Third", "First"])
+        XCTAssertTrue(taskStore.tasks.last?.isCompleted ?? false)
+    }
+
+    func testReplaceTasksTogglesCompletionState() {
+        clearTasks()
+
+        taskStore.tasks = [Task(name: "Sample", elapsed: 0, isCompleted: true)]
+
+        taskStore.replaceTasks(from: "Sample: 0:00:00")
+        XCTAssertFalse(taskStore.tasks[0].isCompleted)
+
+        taskStore.replaceTasks(from: "~~Sample~~: 0:00:00")
+        XCTAssertTrue(taskStore.tasks[0].isCompleted)
+    }
     
     func testTaskFormattingPreservesSymbolsInTaskNames() {
         clearTasks()
