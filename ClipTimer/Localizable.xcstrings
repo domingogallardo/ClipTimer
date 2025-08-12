@@ -516,17 +516,6 @@
         }
       }
     },
-    "Total" : {
-      "comment" : "Label for total time",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Total"
-          }
-        }
-      }
-    },
     "Undo" : {
       "localizations" : {
         "es" : {
