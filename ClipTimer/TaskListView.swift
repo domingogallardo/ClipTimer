@@ -16,7 +16,13 @@ struct TaskListView: View {
             ForEach(store.tasks) { task in
                 TaskRow(task: task) { store.toggle(task) }
                     .contextMenu {
-                        if !task.isCompleted {
+                        if task.isCompleted {
+                            Button {
+                                store.restart(task)
+                            } label: {
+                                Label("Restart", systemImage: "arrow.clockwise")
+                            }
+                        } else {
                             Button {
                                 store.finish(task)
                             } label: {

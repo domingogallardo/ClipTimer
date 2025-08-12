@@ -140,6 +140,17 @@ final class TaskStore: ObservableObject {
             }
         }
     }
+
+    func restart(_ task: Task) {
+        pauseCurrentActiveTask()
+        mutateTasks(actionName: "Restart task") { tasks in
+            if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+                tasks[index].isCompleted = false
+            }
+        }
+        activeTaskID = task.id
+        activeTaskStartTime = Date()
+    }
     
     func replaceTasksFromClipboard() {
         if let tasksString = NSPasteboard.general.string(forType: .string) {
