@@ -109,7 +109,7 @@ final class TaskStoreFormattingTests: XCTestCase {
         ], in: summaryText)
     }
 
-    func testFinishingTaskMovesItToEnd() {
+    func testFinishingTaskDoesNotChangeOrder() {
         clearTasks()
 
         taskStore.tasks = [
@@ -121,8 +121,8 @@ final class TaskStoreFormattingTests: XCTestCase {
         let firstTask = taskStore.tasks[0]
         taskStore.finish(firstTask)
 
-        XCTAssertEqual(taskStore.tasks.map { $0.name }, ["Second", "Third", "First"])
-        XCTAssertTrue(taskStore.tasks.last?.isCompleted ?? false)
+        XCTAssertEqual(taskStore.tasks.map { $0.name }, ["First", "Second", "Third"])
+        XCTAssertTrue(taskStore.tasks.first?.isCompleted ?? false)
     }
 
     func testReplaceTasksTogglesCompletionState() {

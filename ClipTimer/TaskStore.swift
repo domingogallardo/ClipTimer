@@ -59,24 +59,9 @@ final class TaskStore: ObservableObject {
     private func mutateTasks(actionName: String, mutation: (inout [Task]) -> Void) {
         let before = tasks
         mutation(&tasks)
-        moveCompletedTasksToEnd(&tasks)
         resetItemSymbolIfNoTasks()
         registerUndo(previousTasks: before, actionName: actionName)
         saveTasksLocally()
-    }
-
-    /// Ensure all completed tasks appear after incomplete ones while preserving relative order
-    private func moveCompletedTasksToEnd(_ tasks: inout [Task]) {
-        var incomplete: [Task] = []
-        var complete: [Task] = []
-        for task in tasks {
-            if task.isCompleted {
-                complete.append(task)
-            } else {
-                incomplete.append(task)
-            }
-        }
-        tasks = incomplete + complete
     }
     
     init() { 
@@ -151,9 +136,7 @@ final class TaskStore: ObservableObject {
         }
         mutateTasks(actionName: "Finish task") { tasks in
             if let index = tasks.firstIndex(where: { $0.id == task.id }) {
-                var finished = tasks.remove(at: index)
-                finished.isCompleted = true
-                tasks.append(finished)
+                tasks[index].isCompleted = true
             }
         }
     }
@@ -476,7 +459,6 @@ final class TaskStore: ObservableObject {
         do {
             let savedTasks = try JSONDecoder().decode([Task].self, from: data)
             tasks = savedTasks
-            moveCompletedTasksToEnd(&tasks)
 #if DEBUG
             print("📥 Loaded \(savedTasks.count) tasks from local storage")
 #endif
