@@ -29,7 +29,13 @@ struct TaskRow: View {
             Spacer()
             Text(currentElapsed.hms)
                 .monospacedDigit()
-            if !task.isCompleted {
+            if task.isCompleted {
+                Image(systemName: "power.circle")
+                    .resizable()
+                    .frame(width: 22, height: 22)
+                    .padding(4)
+                    .hidden()
+            } else {
                 Button {
                     toggle()
                 } label: {
