@@ -25,26 +25,35 @@ struct TaskRow: View {
     var body: some View {
         HStack {
             Text(task.name)
+                .strikethrough(task.isCompleted)
             Spacer()
             Text(currentElapsed.hms)
                 .monospacedDigit()
-            Button {
-                toggle()
-            } label: {
-                Image(systemName: isActive ? "power.circle.fill" : "power.circle")
+            if task.isCompleted {
+                Image(systemName: "power.circle")
                     .resizable()
                     .frame(width: 22, height: 22)
-                    .foregroundColor(isActive ? .green : .secondary)
-                    .scaleEffect(isAnimating ? 1.25 : 1.0)
-                    .animation(isActive
-                        ? .easeInOut(duration: 1).repeatForever(autoreverses: true)
-                        : .default,
-                        value: isAnimating)
                     .padding(4)
+                    .hidden()
+            } else {
+                Button {
+                    toggle()
+                } label: {
+                    Image(systemName: isActive ? "power.circle.fill" : "power.circle")
+                        .resizable()
+                        .frame(width: 22, height: 22)
+                        .foregroundColor(isActive ? .green : .secondary)
+                        .scaleEffect(isAnimating ? 1.25 : 1.0)
+                        .animation(isActive
+                            ? .easeInOut(duration: 1).repeatForever(autoreverses: true)
+                            : .default,
+                            value: isAnimating)
+                        .padding(4)
+                }
+                .buttonStyle(.plain)
+                .onAppear { isAnimating = isActive }
+                .onChange(of: isActive) { _, newValue in isAnimating = newValue }
             }
-            .buttonStyle(.plain)
-            .onAppear { isAnimating = isActive }
-            .onChange(of: isActive) { _, newValue in isAnimating = newValue }
         }
         .padding(.vertical, 4)
     }

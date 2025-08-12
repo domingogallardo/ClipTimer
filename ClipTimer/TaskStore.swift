@@ -100,7 +100,11 @@ final class TaskStore: ObservableObject {
     
     // MARK: - Helper to build summary lines
     private func taskLines() -> [String] {
-        tasks.map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
+        tasks.map {
+            let time = getCurrentElapsed(for: $0).hms
+            let name = $0.isCompleted ? "~~\($0.name)~~" : $0.name
+            return "\(itemSymbol)\(name): \(time)"
+        }
     }
     
     var summaryText: String {
@@ -111,6 +115,7 @@ final class TaskStore: ObservableObject {
     
     // Toggle task activation - only one task can be active at a time
     func toggle(_ task: Task) {
+        guard !task.isCompleted else { return }
         if activeTaskID == task.id {
             // Task is active, deactivate it (pause and save elapsed time)
             lastPausedTaskID = task.id  // Remember this task for potential restart via ⌘R
@@ -118,11 +123,33 @@ final class TaskStore: ObservableObject {
         } else {
             // First pause any currently active task
             pauseCurrentActiveTask()
-            
+
             // Activate this task (set start time)
             activeTaskID = task.id
             activeTaskStartTime = Date()
         }
+    }
+
+    func finish(_ task: Task) {
+        if activeTaskID == task.id {
+            pauseCurrentActiveTask()
+        }
+        mutateTasks(actionName: "Finish task") { tasks in
+            if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+                tasks[index].isCompleted = true
+            }
+        }
+    }
+
+    func restart(_ task: Task) {
+        pauseCurrentActiveTask()
+        mutateTasks(actionName: "Restart task") { tasks in
+            if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+                tasks[index].isCompleted = false
+            }
+        }
+        activeTaskID = task.id
+        activeTaskStartTime = Date()
     }
     
     func replaceTasksFromClipboard() {
@@ -154,8 +181,8 @@ final class TaskStore: ObservableObject {
             var updatedTasks: [Task] = []
             for newTask in newTasks {
                 if let existingTask = tasks.first(where: { $0.name == newTask.name }) {
-                    // Preserve the UUID of the existing task
-                    let preservedTask = Task(id: existingTask.id, name: newTask.name, elapsed: newTask.elapsed)
+                    // Preserve the UUID of the existing task but adopt new completion state
+                    let preservedTask = Task(id: existingTask.id, name: newTask.name, elapsed: newTask.elapsed, isCompleted: newTask.isCompleted)
                     updatedTasks.append(preservedTask)
                 } else {
                     // New task, keep its generated UUID
@@ -194,8 +221,9 @@ final class TaskStore: ObservableObject {
                     pauseCurrentActiveTask()
                 }
                 
-                // Update the task's elapsed time
+                // Update the task's elapsed time and completion state
                 tasks[existingIndex].elapsed = newTask.elapsed
+                tasks[existingIndex].isCompleted = newTask.isCompleted
             } else {
                 // New task - add it to the list
                 tasks.append(newTask)
@@ -216,15 +244,27 @@ final class TaskStore: ObservableObject {
         let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
 
-        let range = NSRange(trimmed.startIndex..., in: trimmed)
-        if let match = Self.timeParsingRegex.firstMatch(in: trimmed, range: range) {
-            let taskName = String(trimmed[Range(match.range(at: 1), in: trimmed)!])
-            let first  = Int(trimmed[Range(match.range(at: 2), in: trimmed)!]) ?? 0
-            let second = match.range(at: 3).location != NSNotFound ? Int(trimmed[Range(match.range(at: 3), in: trimmed)!]) ?? 0 : nil
-            let third  = match.range(at: 4).location != NSNotFound ? Int(trimmed[Range(match.range(at: 4), in: trimmed)!]) ?? 0 : nil
+        // Remove any item symbol so completion markers can be detected properly
+        let (_, textWithoutSymbol) = parseItemSymbolAndText(from: trimmed)
+        let content = textWithoutSymbol
+
+        // Attempt to parse "Task name: time" format
+        let range = NSRange(content.startIndex..., in: content)
+        if let match = Self.timeParsingRegex.firstMatch(in: content, range: range) {
+            // Extract task name and detect strikethrough markers just around the name
+            var taskName = String(content[Range(match.range(at: 1), in: content)!])
+            var isCompleted = false
+            if taskName.hasPrefix("~~"), taskName.hasSuffix("~~") {
+                isCompleted = true
+                taskName = String(taskName.dropFirst(2).dropLast(2))
+            }
+
+            let first  = Int(content[Range(match.range(at: 2), in: content)!]) ?? 0
+            let second = match.range(at: 3).location != NSNotFound ? Int(content[Range(match.range(at: 3), in: content)!]) ?? 0 : nil
+            let third  = match.range(at: 4).location != NSNotFound ? Int(content[Range(match.range(at: 4), in: content)!]) ?? 0 : nil
 
             let (hours, minutes, seconds): (Int, Int, Int)
-            if let third = third { // H:MM:SS (all three numbers present)
+            if let third = third { // H:MM:SS
                 hours = first
                 minutes = second ?? 0
                 seconds = third
@@ -232,24 +272,30 @@ final class TaskStore: ObservableObject {
                 hours = 0
                 minutes = first
                 seconds = second
-            } else { // Only one number after colon → treat as seconds
+            } else { // Only seconds
                 hours = 0
                 minutes = 0
                 seconds = first
             }
 
             let elapsed = Double(hours * 3600 + minutes * 60 + seconds)
-            return createTask(from: taskName, elapsed: elapsed)
+            return createTask(from: taskName, elapsed: elapsed, isCompleted: isCompleted)
         }
 
-        // No time found, treat entire line as task name
-        return createTask(from: trimmed, elapsed: 0)
+        // No time found, treat entire line as task name, detecting strikethrough
+        var nameOnly = content
+        var isCompleted = false
+        if nameOnly.hasPrefix("~~"), nameOnly.hasSuffix("~~") {
+            isCompleted = true
+            nameOnly = String(nameOnly.dropFirst(2).dropLast(2))
+        }
+        return createTask(from: nameOnly, elapsed: 0, isCompleted: isCompleted)
     }
-    
+
     // Helper method to create task with cleaned name
-    private func createTask(from rawText: String, elapsed: TimeInterval) -> Task {
+    private func createTask(from rawText: String, elapsed: TimeInterval, isCompleted: Bool) -> Task {
         let cleanName = removeItemSymbolFromStart(rawText)
-        return Task(name: cleanName, elapsed: elapsed)
+        return Task(name: cleanName, elapsed: elapsed, isCompleted: isCompleted)
     }
     
     // Parse item symbol and clean text from a task line
