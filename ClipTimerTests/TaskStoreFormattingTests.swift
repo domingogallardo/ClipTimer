@@ -104,7 +104,7 @@ final class TaskStoreFormattingTests: XCTestCase {
 
         let summaryText = taskStore.summaryText
         assertTasksInSummary([
-            "~~Done Task: 0:00:30~~",
+            "~~Done Task~~: 0:00:30",
             "Open Task: 0:00:45"
         ], in: summaryText)
     }

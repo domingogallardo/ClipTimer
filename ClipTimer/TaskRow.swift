@@ -25,6 +25,7 @@ struct TaskRow: View {
     var body: some View {
         HStack {
             Text(task.name)
+                .strikethrough(task.isCompleted)
             Spacer()
             Text(currentElapsed.hms)
                 .monospacedDigit()
@@ -49,7 +50,6 @@ struct TaskRow: View {
             }
         }
         .padding(.vertical, 4)
-        .strikethrough(task.isCompleted)
     }
 }
 

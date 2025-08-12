@@ -101,8 +101,9 @@ final class TaskStore: ObservableObject {
     // MARK: - Helper to build summary lines
     private func taskLines() -> [String] {
         tasks.map {
-            let line = "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)"
-            return $0.isCompleted ? "~~\(line)~~" : line
+            let time = getCurrentElapsed(for: $0).hms
+            let name = $0.isCompleted ? "~~\($0.name)~~" : $0.name
+            return "\(itemSymbol)\(name): \(time)"
         }
     }
     
