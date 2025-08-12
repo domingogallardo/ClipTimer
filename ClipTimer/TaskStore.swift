@@ -100,7 +100,10 @@ final class TaskStore: ObservableObject {
     
     // MARK: - Helper to build summary lines
     private func taskLines() -> [String] {
-        tasks.map { "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)" }
+        tasks.map {
+            let line = "\(itemSymbol)\($0.name): \(getCurrentElapsed(for: $0).hms)"
+            return $0.isCompleted ? "~~\(line)~~" : line
+        }
     }
     
     var summaryText: String {
@@ -111,6 +114,7 @@ final class TaskStore: ObservableObject {
     
     // Toggle task activation - only one task can be active at a time
     func toggle(_ task: Task) {
+        guard !task.isCompleted else { return }
         if activeTaskID == task.id {
             // Task is active, deactivate it (pause and save elapsed time)
             lastPausedTaskID = task.id  // Remember this task for potential restart via ⌘R
@@ -118,10 +122,21 @@ final class TaskStore: ObservableObject {
         } else {
             // First pause any currently active task
             pauseCurrentActiveTask()
-            
+
             // Activate this task (set start time)
             activeTaskID = task.id
             activeTaskStartTime = Date()
+        }
+    }
+
+    func finish(_ task: Task) {
+        if activeTaskID == task.id {
+            pauseCurrentActiveTask()
+        }
+        mutateTasks(actionName: "Finish task") { tasks in
+            if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+                tasks[index].isCompleted = true
+            }
         }
     }
     
@@ -154,8 +169,8 @@ final class TaskStore: ObservableObject {
             var updatedTasks: [Task] = []
             for newTask in newTasks {
                 if let existingTask = tasks.first(where: { $0.name == newTask.name }) {
-                    // Preserve the UUID of the existing task
-                    let preservedTask = Task(id: existingTask.id, name: newTask.name, elapsed: newTask.elapsed)
+                    // Preserve the UUID and completion state of the existing task
+                    let preservedTask = Task(id: existingTask.id, name: newTask.name, elapsed: newTask.elapsed, isCompleted: existingTask.isCompleted)
                     updatedTasks.append(preservedTask)
                 } else {
                     // New task, keep its generated UUID
@@ -213,8 +228,16 @@ final class TaskStore: ObservableObject {
     
     // Parse task line with optional time format (e.g., "Task name: 1:30:45" or "Task name")
     func parseTaskLine(_ rawLine: String) -> Task? {
-        let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        var trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
+
+        let isCompleted: Bool
+        if trimmed.hasPrefix("~~"), trimmed.hasSuffix("~~") {
+            isCompleted = true
+            trimmed = String(trimmed.dropFirst(2).dropLast(2))
+        } else {
+            isCompleted = false
+        }
 
         let range = NSRange(trimmed.startIndex..., in: trimmed)
         if let match = Self.timeParsingRegex.firstMatch(in: trimmed, range: range) {
@@ -239,17 +262,17 @@ final class TaskStore: ObservableObject {
             }
 
             let elapsed = Double(hours * 3600 + minutes * 60 + seconds)
-            return createTask(from: taskName, elapsed: elapsed)
+            return createTask(from: taskName, elapsed: elapsed, isCompleted: isCompleted)
         }
 
         // No time found, treat entire line as task name
-        return createTask(from: trimmed, elapsed: 0)
+        return createTask(from: trimmed, elapsed: 0, isCompleted: isCompleted)
     }
-    
+
     // Helper method to create task with cleaned name
-    private func createTask(from rawText: String, elapsed: TimeInterval) -> Task {
+    private func createTask(from rawText: String, elapsed: TimeInterval, isCompleted: Bool) -> Task {
         let cleanName = removeItemSymbolFromStart(rawText)
-        return Task(name: cleanName, elapsed: elapsed)
+        return Task(name: cleanName, elapsed: elapsed, isCompleted: isCompleted)
     }
     
     // Parse item symbol and clean text from a task line

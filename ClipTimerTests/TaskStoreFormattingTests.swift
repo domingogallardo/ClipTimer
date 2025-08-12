@@ -84,13 +84,28 @@ final class TaskStoreFormattingTests: XCTestCase {
     
     func testTaskFormattingWithTabSymbols() {
         clearTasks()
-        
+
         taskStore.addTasks(from: tabSymbolTasksContent())
         
         let summaryText = taskStore.summaryText
         assertTasksInSummary([
             "•\tTab Task One: 0:00:00",
             "•\tTab Task Two: 0:00:00"
+        ], in: summaryText)
+    }
+
+    func testCompletedTasksAreStrikethrough() {
+        clearTasks()
+
+        taskStore.tasks = [
+            Task(name: "Done Task", elapsed: 30, isCompleted: true),
+            Task(name: "Open Task", elapsed: 45)
+        ]
+
+        let summaryText = taskStore.summaryText
+        assertTasksInSummary([
+            "~~Done Task: 0:00:30~~",
+            "Open Task: 0:00:45"
         ], in: summaryText)
     }
     
