@@ -252,19 +252,19 @@ final class TaskStore: ObservableObject {
 
         // Remove any item symbol so completion markers can be detected properly
         let (_, textWithoutSymbol) = parseItemSymbolAndText(from: trimmed)
-        var content = textWithoutSymbol
+        let content = textWithoutSymbol
 
-        let isCompleted: Bool
-        if content.hasPrefix("~~"), content.hasSuffix("~~") {
-            isCompleted = true
-            content = String(content.dropFirst(2).dropLast(2))
-        } else {
-            isCompleted = false
-        }
-
+        // Attempt to parse "Task name: time" format
         let range = NSRange(content.startIndex..., in: content)
         if let match = Self.timeParsingRegex.firstMatch(in: content, range: range) {
-            let taskName = String(content[Range(match.range(at: 1), in: content)!])
+            // Extract task name and detect strikethrough markers just around the name
+            var taskName = String(content[Range(match.range(at: 1), in: content)!])
+            var isCompleted = false
+            if taskName.hasPrefix("~~"), taskName.hasSuffix("~~") {
+                isCompleted = true
+                taskName = String(taskName.dropFirst(2).dropLast(2))
+            }
+
             let first  = Int(content[Range(match.range(at: 2), in: content)!]) ?? 0
             let second = match.range(at: 3).location != NSNotFound ? Int(content[Range(match.range(at: 3), in: content)!]) ?? 0 : nil
             let third  = match.range(at: 4).location != NSNotFound ? Int(content[Range(match.range(at: 4), in: content)!]) ?? 0 : nil
@@ -288,8 +288,14 @@ final class TaskStore: ObservableObject {
             return createTask(from: taskName, elapsed: elapsed, isCompleted: isCompleted)
         }
 
-        // No time found, treat entire line as task name
-        return createTask(from: content, elapsed: 0, isCompleted: isCompleted)
+        // No time found, treat entire line as task name, detecting strikethrough
+        var nameOnly = content
+        var isCompleted = false
+        if nameOnly.hasPrefix("~~"), nameOnly.hasSuffix("~~") {
+            isCompleted = true
+            nameOnly = String(nameOnly.dropFirst(2).dropLast(2))
+        }
+        return createTask(from: nameOnly, elapsed: 0, isCompleted: isCompleted)
     }
 
     // Helper method to create task with cleaned name
