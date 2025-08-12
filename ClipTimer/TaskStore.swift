@@ -330,7 +330,7 @@ final class TaskStore: ObservableObject {
         let total = totalElapsed
         let summaryWithTotal = taskSummary.isEmpty
             ? NSLocalizedString("No tasks yet", comment: "Message shown when there are no tasks")
-            : "\(taskSummary)\n\n\(NSLocalizedString("Total", comment: "Label for total time")): \(total.hms)"
+            : "\(taskSummary)\n\n\(NSLocalizedString("Working time", comment: "Label for working time")): \(total.hms)"
         let pb = NSPasteboard.general
         pb.clearContents()
         pb.setString(summaryWithTotal, forType: .string)
