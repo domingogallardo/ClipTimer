@@ -14,6 +14,7 @@
 		A99C9ACD2E16CB3C00B0B126 /* TaskStoreTimerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99C9AC82E16CB3C00B0B126 /* TaskStoreTimerTests.swift */; };
 		A99C9ACE2E16CB3C00B0B126 /* TaskStoreUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99C9AC92E16CB3C00B0B126 /* TaskStoreUITests.swift */; };
 		A9CTESTS12345678901234567 /* TaskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9CTESTS12345678901234568 /* TaskTests.swift */; };
+		A9DF703C2E4B217B00465749 /* TaskStoreClipboardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DF703B2E4B217B00465749 /* TaskStoreClipboardTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		A99C9AC92E16CB3C00B0B126 /* TaskStoreUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStoreUITests.swift; sourceTree = "<group>"; };
 		A9CTESTS12345678901234568 /* TaskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTests.swift; sourceTree = "<group>"; };
 		A9CTESTS12345678901234572 /* ClipTimerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ClipTimerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9DF703B2E4B217B00465749 /* TaskStoreClipboardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskStoreClipboardTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -100,6 +102,7 @@
 		A9CTESTS12345678901234574 /* ClipTimerTests */ = {
 			isa = PBXGroup;
 			children = (
+				A9DF703B2E4B217B00465749 /* TaskStoreClipboardTests.swift */,
 				A99C9AC52E16CB3C00B0B126 /* TaskStoreBasicTests.swift */,
 				A99C9AC62E16CB3C00B0B126 /* TaskStoreFormattingTests.swift */,
 				A99C9AC72E16CB3C00B0B126 /* TaskStorePersistenceTests.swift */,
@@ -226,6 +229,7 @@
 				A9CTESTS12345678901234567 /* TaskTests.swift in Sources */,
 				A99C9ACA2E16CB3C00B0B126 /* TaskStoreFormattingTests.swift in Sources */,
 				A99C9ACB2E16CB3C00B0B126 /* TaskStoreBasicTests.swift in Sources */,
+				A9DF703C2E4B217B00465749 /* TaskStoreClipboardTests.swift in Sources */,
 				A99C9ACC2E16CB3C00B0B126 /* TaskStorePersistenceTests.swift in Sources */,
 				A99C9ACD2E16CB3C00B0B126 /* TaskStoreTimerTests.swift in Sources */,
 				A99C9ACE2E16CB3C00B0B126 /* TaskStoreUITests.swift in Sources */,
