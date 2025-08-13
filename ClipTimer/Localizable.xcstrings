@@ -282,6 +282,36 @@
         }
       }
     },
+    "Finish" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminar"
+          }
+        }
+      }
+    },
+    "Finish active task" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminar tarea activa"
+          }
+        }
+      }
+    },
+    "Finish completed tasks" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminar tareas completadas"
+          }
+        }
+      }
+    },
     "Follow the steps below to start timing your tasks in seconds. ClipTimer is designed around the clipboard, so you can move fast without manual typing." : {
       "localizations" : {
         "es" : {
@@ -405,16 +435,6 @@
         }
       }
     },
-    "Finish" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminar"
-          }
-        }
-      }
-    },
     "Redo" : {
       "localizations" : {
         "es" : {
@@ -445,16 +465,6 @@
         }
       }
     },
-    "Finish active task" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminar tarea activa"
-          }
-        }
-      }
-    },
     "Right-click" : {
       "localizations" : {
         "es" : {
@@ -471,6 +481,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Haz clic derecho en una tarea y elige 'Eliminar' (o presiona ⌘Z / ⇧⌘Z para deshacer/rehacer). Siempre puedes pegar una nueva lista para reemplazar todas las tareas."
+          }
+        }
+      }
+    },
+    "Right-click a task and choose `Finish` to mark it as completed. Finished tasks show a strikethrough and won't start unless you `Restart` them from the context menu." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haz clic con el botón derecho en una tarea y elige `Terminar` para marcarla como completada.\nLas tareas finalizadas muestran un tachado y no se iniciarán a menos que pulses `Reiniciar` desde el menú contextual."
           }
         }
       }
