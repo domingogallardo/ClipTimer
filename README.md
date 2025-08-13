@@ -70,6 +70,7 @@ ClipTimer automatically parses various time formats when pasting tasks:
 ### Keyboard Shortcuts
 - `⌘+V`: Paste tasks from clipboard
 - `⌘+C`: Copy task summary back to clipboard
+- `⌘+F`: Finish active task
 - `⌘+?`: Show help overlay
 - `⌘E`: Open Task Editor window
 - `⇧⌘⏎`: Add tasks from editor

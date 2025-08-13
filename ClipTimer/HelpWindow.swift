@@ -47,7 +47,7 @@ struct HelpWindow: View {
                                   details: """
                                            Click the power icon next to a task to start \
                                            timing it. Only one task runs at a time. \
-                                           Press ⌘P to pause, ⌘R to restart the last paused task.
+                                           Press ⌘P to pause, ⌘R to restart the last paused task, ⌘F to finish.
                                            """)
                              
                              step(number: 4,

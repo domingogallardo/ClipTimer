@@ -396,8 +396,8 @@ final class TaskStore: ObservableObject {
     
     func restartLastPausedTask() {
         guard let pausedID = lastPausedTaskID,
-              let _ = tasks.firstIndex(where: { $0.id == pausedID }) else { 
-            return 
+              let _ = tasks.firstIndex(where: { $0.id == pausedID }) else {
+            return
         }
         
         // First pause any currently active task
@@ -410,7 +410,12 @@ final class TaskStore: ObservableObject {
         // Clear the last paused ID to prevent re-triggering
         lastPausedTaskID = nil
     }
-    
+
+    func finishActiveTask() {
+        guard let task = activeTask else { return }
+        finish(task)
+    }
+
     /// Clear the last paused task ID without affecting the currently active task
     /// This is used when we want to "forget" about a previously paused task
     func clearLastPausedTask() {
