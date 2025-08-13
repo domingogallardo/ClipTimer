@@ -102,6 +102,17 @@ final class TaskStoreTimerTests: XCTestCase {
         XCTAssertEqual(taskStore.activeTaskID, task1.id)
         XCTAssertNotEqual(taskStore.activeTaskID, task2.id)
     }
+
+    func testFinishActiveTask() {
+        let task = Task(name: "Task", elapsed: 100)
+        taskStore.tasks = [task]
+
+        taskStore.toggle(task)
+        taskStore.finishActiveTask()
+
+        XCTAssertTrue(taskStore.tasks[0].isCompleted)
+        XCTAssertNil(taskStore.activeTaskID)
+    }
     
     func testTaskEditorPauseResumeWorkflow() {
         let task1 = Task(name: "Task 1", elapsed: 100)

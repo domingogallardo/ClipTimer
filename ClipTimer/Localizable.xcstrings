@@ -71,6 +71,16 @@
         }
       }
     },
+    "⌘F" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "⌘F"
+          }
+        }
+      }
+    },
     "⌘P" : {
       "localizations" : {
         "es" : {
@@ -132,12 +142,12 @@
         }
       }
     },
-    "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task." : {
+    "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task, ⌘F to finish." : {
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Haz clic en el icono de encendido junto a una tarea para comenzar a cronometrarla. Solo una tarea se ejecuta a la vez. Presiona ⌘P para pausar, ⌘R para reiniciar la última tarea pausada."
+            "value" : "Haz clic en el icono de encendido junto a una tarea para comenzar a cronometrarla. Solo una tarea se ejecuta a la vez. Presiona ⌘P para pausar, ⌘R para reiniciar la última tarea pausada, ⌘F para terminar."
           }
         }
       }
@@ -431,6 +441,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reiniciar última tarea pausada"
+          }
+        }
+      }
+    },
+    "Finish active task" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminar tarea activa"
           }
         }
       }
