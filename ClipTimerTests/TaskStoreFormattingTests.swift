@@ -84,7 +84,7 @@ final class TaskStoreFormattingTests: XCTestCase {
     
     func testTaskFormattingWithTabSymbols() {
         clearTasks()
-        
+
         taskStore.addTasks(from: tabSymbolTasksContent())
         
         let summaryText = taskStore.summaryText
@@ -92,6 +92,61 @@ final class TaskStoreFormattingTests: XCTestCase {
             "•\tTab Task One: 0:00:00",
             "•\tTab Task Two: 0:00:00"
         ], in: summaryText)
+    }
+
+    func testCompletedTasksAreStrikethrough() {
+        clearTasks()
+
+        taskStore.tasks = [
+            Task(name: "Done Task", elapsed: 30, isCompleted: true),
+            Task(name: "Open Task", elapsed: 45)
+        ]
+
+        let summaryText = taskStore.summaryText
+        assertTasksInSummary([
+            "~~Done Task~~: 0:00:30",
+            "Open Task: 0:00:45"
+        ], in: summaryText)
+    }
+
+    func testFinishingTaskDoesNotChangeOrder() {
+        clearTasks()
+
+        taskStore.tasks = [
+            Task(name: "First", elapsed: 0),
+            Task(name: "Second", elapsed: 0),
+            Task(name: "Third", elapsed: 0)
+        ]
+
+        let firstTask = taskStore.tasks[0]
+        taskStore.finish(firstTask)
+
+        XCTAssertEqual(taskStore.tasks.map { $0.name }, ["First", "Second", "Third"])
+        XCTAssertTrue(taskStore.tasks.first?.isCompleted ?? false)
+    }
+
+    func testReplaceTasksTogglesCompletionState() {
+        clearTasks()
+
+        taskStore.tasks = [Task(name: "Sample", elapsed: 0, isCompleted: true)]
+
+        taskStore.replaceTasks(from: "Sample: 0:00:00")
+        XCTAssertFalse(taskStore.tasks[0].isCompleted)
+
+        taskStore.replaceTasks(from: "~~Sample~~: 0:00:00")
+        XCTAssertTrue(taskStore.tasks[0].isCompleted)
+    }
+
+    func testRestartTaskClearsCompletionAndActivates() {
+        clearTasks()
+
+        taskStore.tasks = [Task(name: "Task", elapsed: 0, isCompleted: true)]
+        let task = taskStore.tasks[0]
+
+        taskStore.restart(task)
+
+        XCTAssertFalse(taskStore.tasks[0].isCompleted)
+        XCTAssertEqual(taskStore.activeTaskID, task.id)
     }
     
     func testTaskFormattingPreservesSymbolsInTaskNames() {

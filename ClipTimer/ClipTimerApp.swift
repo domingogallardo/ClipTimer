@@ -153,6 +153,10 @@ struct ClipTimerApp: App {
                     store.restartLastPausedTask()
                 }
                 .keyboardShortcut("r")
+                Button("Finish active task") {
+                    store.finishActiveTask()
+                }
+                .keyboardShortcut("f")
             }
             
 

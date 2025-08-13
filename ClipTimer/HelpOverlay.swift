@@ -60,6 +60,13 @@ struct HelpOverlay: View {
                 Text("Restart last paused task")
             }
             .padding(.leading, 12)
+            HStack {
+                Text("⌘F")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                Spacer(minLength: 16)
+                Text("Finish active task")
+            }
+            .padding(.leading, 12)
 
             Text("Export Tasks")
                 .font(.headline)

@@ -11,19 +11,22 @@ struct Task: Identifiable, Codable {
     let id: UUID
     var name: String
     var elapsed: TimeInterval
+    var isCompleted: Bool = false
     
     // Custom initializer to generate UUID
-    init(name: String, elapsed: TimeInterval) {
+    init(name: String, elapsed: TimeInterval, isCompleted: Bool = false) {
         self.id = UUID()
         self.name = name
         self.elapsed = elapsed
+        self.isCompleted = isCompleted
     }
-    
+
     // Custom initializer with specific UUID (for preserving existing task IDs)
-    init(id: UUID, name: String, elapsed: TimeInterval) {
+    init(id: UUID, name: String, elapsed: TimeInterval, isCompleted: Bool = false) {
         self.id = id
         self.name = name
         self.elapsed = elapsed
+        self.isCompleted = isCompleted
     }
     
     // Calculate current elapsed time including active time if running

@@ -47,7 +47,7 @@ struct HelpWindow: View {
                                   details: """
                                            Click the power icon next to a task to start \
                                            timing it. Only one task runs at a time. \
-                                           Press ⌘P to pause, ⌘R to restart the last paused task.
+                                           Press ⌘P to pause, ⌘R to restart the last paused task, ⌘F to finish.
                                            """)
                              
                              step(number: 4,
@@ -57,8 +57,17 @@ struct HelpWindow: View {
                                            (or press ⌘Z / ⇧⌘Z to undo/redo). \
                                            You can always paste a fresh list to replace all tasks.
                                            """)
-                             
+
                              step(number: 5,
+                                  title: "Finish completed tasks",
+                                  details: """
+                                           Right-click a task and choose `Finish` to mark it as \
+                                           completed. Finished tasks show a strikethrough and \
+                                           won't start unless you `Restart` them from the \
+                                           context menu.
+                                           """)
+
+                             step(number: 6,
                                   title: "Export your work",
                                   details: """
                                            Press ⌘C to copy a neatly formatted summary, \
