@@ -167,7 +167,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ClipTimer • Inicio Rápido"
+            "value" : "ClipTimer • Inicio rápido"
           }
         }
       }
@@ -197,7 +197,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Copia la lista de tareas (con/sin tiempos)\n al portapapeles y pégalas aquí."
+            "value" : "Copia la lista de tareas (con/sin tiempos)\n al portapapeles y pégala aquí."
           }
         }
       }
@@ -267,7 +267,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Exportar Tareas"
+            "value" : "Exportar tareas"
           }
         }
       }
@@ -378,7 +378,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Abrir Editor de tareas"
+            "value" : "Abrir editor de tareas"
           }
         }
       }
@@ -460,7 +460,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reiniciar última tarea pausada"
+            "value" : "Reiniciar la última tarea pausada"
           }
         }
       }
@@ -480,7 +480,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Haz clic derecho en una tarea y elige 'Eliminar' (o presiona ⌘Z / ⇧⌘Z para deshacer/rehacer). Siempre puedes pegar una nueva lista para reemplazar todas las tareas."
+            "value" : "Haz clic derecho en una tarea y elige `Eliminar` (o presiona ⌘Z / ⇧⌘Z para deshacer/rehacer). Siempre puedes pegar una nueva lista para reemplazar todas las tareas."
           }
         }
       }
