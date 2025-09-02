@@ -1,623 +1,989 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "- Task 1\n- Task 2: 1:30:00" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "- Tarea 1\n- Tarea 2: 1:30:00"
+  "sourceLanguage": "en",
+  "strings": {
+    "- Task 1\n- Task 2: 1:30:00": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "- Tarea 1\n- Tarea 2: 1:30:00"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "- 任务 1\n- 任务 2: 1:30:00"
           }
         }
       }
     },
-    "%lld." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld."
+    "%lld.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld."
           }
         }
       }
     },
-    "• Email support: domingo.gallardo@gmail.com" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Correo de soporte: domingo.gallardo@gmail.com"
+    "• Email support: domingo.gallardo@gmail.com": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Correo de soporte: domingo.gallardo@gmail.com"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• 电子邮件支持: domingo.gallardo@gmail.com"
           }
         }
       }
     },
-    "• Project page: https://domingogallardo.com/cliptimer-support-en.html" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Página del proyecto: https://domingogallardo.com/cliptimer-support-es.html"
+    "• Project page: https://domingogallardo.com/cliptimer-support-en.html": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Página del proyecto: https://domingogallardo.com/cliptimer-support-es.html"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• 项目页面: https://domingogallardo.com/cliptimer-support-en.html"
           }
         }
       }
     },
-    "⇧⌘V" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⇧⌘V"
+    "⇧⌘V": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘V"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘V"
           }
         }
       }
     },
-    "⇧⌘Z" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⇧⌘Z"
+    "⇧⌘Z": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘Z"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧⌘Z"
           }
         }
       }
     },
-    "⌘C" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘C"
+    "⌘C": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘C"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘C"
           }
         }
       }
     },
-    "⌘F" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘F"
+    "⌘F": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘F"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘F"
           }
         }
       }
     },
-    "⌘P" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘P"
+    "⌘P": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘P"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘P"
           }
         }
       }
     },
-    "⌘R" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘R"
+    "⌘R": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘R"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘R"
           }
         }
       }
     },
-    "⌘V" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘V"
+    "⌘V": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘V"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘V"
           }
         }
       }
     },
-    "⌘X" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘X"
+    "⌘X": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘X"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘X"
           }
         }
       }
     },
-    "⌘Z" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘Z"
+    "⌘Z": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘Z"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘Z"
           }
         }
       }
     },
-    "Add tasks (⌘⏎)" : {
-      "comment" : "Button to add new tasks",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Añadir tareas (⌘⏎)"
+    "Add tasks (⌘⏎)": {
+      "comment": "Button to add new tasks",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir tareas (⌘⏎)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加任务 (⌘⏎)"
           }
         }
       }
     },
-    "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task, ⌘F to finish." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz clic en el icono de encendido junto a una tarea para comenzar a cronometrarla. Solo una tarea se ejecuta a la vez. Presiona ⌘P para pausar, ⌘R para reiniciar la última tarea pausada, ⌘F para terminar."
+    "Click the power icon next to a task to start timing it. Only one task runs at a time. Press ⌘P to pause, ⌘R to restart the last paused task, ⌘F to finish.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haz clic en el icono de encendido junto a una tarea para comenzar a cronometrarla. Solo una tarea se ejecuta a la vez. Presiona ⌘P para pausar, ⌘R para reiniciar la última tarea pausada, ⌘F para terminar."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点击任务旁的电源图标开始计时。一次只能运行一个任务。按 ⌘P 暂停，按 ⌘R 重新开始上次暂停的任务，按 ⌘F 完成。"
           }
         }
       }
     },
-    "ClipTimer" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ClipTimer"
+    "ClipTimer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ClipTimer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ClipTimer"
           }
         }
       }
     },
-    "ClipTimer • Quick Start" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ClipTimer • Inicio rápido"
+    "ClipTimer • Quick Start": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ClipTimer • Inicio rápido"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ClipTimer • 快速开始"
           }
         }
       }
     },
-    "ClipTimer Help" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ayuda de ClipTimer"
+    "ClipTimer Help": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayuda de ClipTimer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ClipTimer 帮助"
           }
         }
       }
     },
-    "Copy tasks with times" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copiar tareas con tiempos"
+    "Copy tasks with times": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar tareas con tiempos"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制带时间的任务"
           }
         }
       }
     },
-    "Copy the list of tasks (with/without times)\n to the clipboard and paste them here." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copia la lista de tareas (con/sin tiempos)\n al portapapeles y pégala aquí."
+    "Copy the list of tasks (with/without times)\n to the clipboard and paste them here.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia la lista de tareas (con/sin tiempos)\n al portapapeles y pégala aquí."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将任务列表（包含/不含时间）\n复制到剪贴板并在此处粘贴。"
           }
         }
       }
     },
-    "Copy your task list" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copia tu lista de tareas"
+    "Copy your task list": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia tu lista de tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "复制你的任务列表"
           }
         }
       }
     },
-    "Cut all tasks" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cortar todas las tareas"
+    "Cut all tasks": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cortar todas las tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剪切所有任务"
           }
         }
       }
     },
-    "Cut tasks with times" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cortar tareas con tiempos"
+    "Cut tasks with times": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cortar tareas con tiempos"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剪切带时间的任务"
           }
         }
       }
     },
-    "Delete" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar"
+    "Delete": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除"
           }
         }
       }
     },
-    "Delete task" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eliminar tarea"
+    "Delete task": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar tarea"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "删除任务"
           }
         }
       }
     },
-    "Edit or delete tasks" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edita o elimina tareas"
+    "Edit or delete tasks": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edita o elimina tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "编辑或删除任务"
           }
         }
       }
     },
-    "Export Tasks" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exportar tareas"
+    "Export Tasks": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportar tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出任务"
           }
         }
       }
     },
-    "Export your work" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Exporta tu trabajo"
+    "Export your work": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exporta tu trabajo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导出你的工作"
           }
         }
       }
     },
-    "Finish" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminar"
+    "Finish": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminar"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
           }
         }
       }
     },
-    "Finish active task" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminar tarea activa"
+    "Finish active task": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminar tarea activa"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成活动任务"
           }
         }
       }
     },
-    "Finish completed tasks" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Terminar tareas completadas"
+    "Finish completed tasks": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminar tareas completadas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束已完成的任务"
           }
         }
       }
     },
-    "Follow the steps below to start timing your tasks in seconds. ClipTimer is designed around the clipboard, so you can move fast without manual typing." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sigue los siguientes pasos para comenzar a cronometrar tus tareas. ClipTimer está diseñado para trabajar con el portapapeles, por lo que puedes moverte rápidamente sin escribir manualmente."
+    "Follow the steps below to start timing your tasks in seconds. ClipTimer is designed around the clipboard, so you can move fast without manual typing.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sigue los siguientes pasos para comenzar a cronometrar tus tareas. ClipTimer está diseñado para trabajar con el portapapeles, por lo que puedes moverte rápidamente sin escribir manualmente."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按照以下步骤，在几秒内开始为任务计时。ClipTimer 围绕剪贴板设计，让你无需手动输入即可快速操作。"
           }
         }
       }
     },
-    "In ClipTimer, press ⌘V (or ⇧⌘V to append). Each line becomes an individual task. Any timecodes are parsed automatically." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En ClipTimer, presiona ⌘V (o ⇧⌘V para añadir). Cada línea se convierte en una tarea individual. Los códigos de tiempo se analizan automáticamente."
+    "In ClipTimer, press ⌘V (or ⇧⌘V to append). Each line becomes an individual task. Any timecodes are parsed automatically.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En ClipTimer, presiona ⌘V (o ⇧⌘V para añadir). Cada línea se convierte en una tarea individual. Los códigos de tiempo se analizan automáticamente."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 ClipTimer 中，按 ⌘V（或按 ⇧⌘V 追加）。每一行都会成为一个独立的任务，任何时间码都会被自动解析。"
           }
         }
       }
     },
-    "Keyboard Shortcuts" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atajos de teclado"
+    "Keyboard Shortcuts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atajos de teclado"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "键盘快捷键"
           }
         }
       }
     },
-    "Need more help?" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Necesitas más ayuda?"
+    "Need more help?": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Necesitas más ayuda?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要更多帮助吗？"
           }
         }
       }
     },
-    "No tasks yet" : {
-      "comment" : "Message shown when there are no tasks",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún no hay tareas"
+    "No tasks yet": {
+      "comment": "Message shown when there are no tasks",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no hay tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有任务"
           }
         }
       }
     },
-    "Open main window" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir ventana principal"
+    "Open main window": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir ventana principal"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开主窗口"
           }
         }
       }
     },
-    "Open Task Editor" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir editor de tareas"
+    "Open Task Editor": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir editor de tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开任务编辑器"
           }
         }
       }
     },
-    "Paste into ClipTimer" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pega en ClipTimer"
+    "Paste into ClipTimer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pega en ClipTimer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粘贴到 ClipTimer"
           }
         }
       }
     },
-    "Paste tasks (append)" : {
-      "comment" : "Button to add new tasks to existing ones",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegar tareas (añadir)"
+    "Paste tasks (append)": {
+      "comment": "Button to add new tasks to existing ones",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pegar tareas (añadir)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粘贴任务（追加）"
           }
         }
       }
     },
-    "Paste tasks (replace)" : {
-      "comment" : "Button to replace all tasks with new ones",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pegar tareas (reemplazar)"
+    "Paste tasks (replace)": {
+      "comment": "Button to replace all tasks with new ones",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pegar tareas (reemplazar)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "粘贴任务（替换）"
           }
         }
       }
     },
-    "Pause active task" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pausar tarea activa"
+    "Pause active task": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausar tarea activa"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "暂停活动任务"
           }
         }
       }
     },
-    "Press ⌘C to copy a neatly formatted summary, including the total working time, back to the clipboard. Paste it anywhere you like—notes, email, timesheet…" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Presiona ⌘C para copiar un resumen formateado, incluyendo el tiempo total de trabajo, al portapapeles. Pégalo donde quieras—notas, correo, hoja de tiempos…"
+    "Press ⌘C to copy a neatly formatted summary, including the total working time, back to the clipboard. Paste it anywhere you like—notes, email, timesheet…": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Presiona ⌘C para copiar un resumen formateado, incluyendo el tiempo total de trabajo, al portapapeles. Pégalo donde quieras—notas, correo, hoja de tiempos…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按 ⌘C 将整洁格式的摘要（包括总工作时间）复制回剪贴板。可粘贴到任意位置——笔记、电子邮件、工时表……"
           }
         }
       }
     },
-    "Redo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rehacer"
+    "Redo": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rehacer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重做"
           }
         }
       }
     },
-    "Restart" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reiniciar"
+    "Restart": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reiniciar"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新开始"
           }
         }
       }
     },
-    "Restart last paused task" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reiniciar la última tarea pausada"
+    "Restart last paused task": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reiniciar la última tarea pausada"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重新开始上次暂停的任务"
           }
         }
       }
     },
-    "Right-click" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clic derecho"
+    "Right-click": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clic derecho"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右键单击"
           }
         }
       }
     },
-    "Right-click a task and choose `Delete` (or press ⌘Z / ⇧⌘Z to undo/redo). You can always paste a fresh list to replace all tasks." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz clic derecho en una tarea y elige `Eliminar` (o presiona ⌘Z / ⇧⌘Z para deshacer/rehacer). Siempre puedes pegar una nueva lista para reemplazar todas las tareas."
+    "Right-click a task and choose `Delete` (or press ⌘Z / ⇧⌘Z to undo/redo). You can always paste a fresh list to replace all tasks.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haz clic derecho en una tarea y elige `Eliminar` (o presiona ⌘Z / ⇧⌘Z para deshacer/rehacer). Siempre puedes pegar una nueva lista para reemplazar todas las tareas."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右键单击任务并选择“删除”（或按 ⌘Z / ⇧⌘Z 撤销/重做）。你随时可以粘贴新的列表以替换所有任务。"
           }
         }
       }
     },
-    "Right-click a task and choose `Finish` to mark it as completed. Finished tasks show a strikethrough and won't start unless you `Restart` them from the context menu." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Haz clic con el botón derecho en una tarea y elige `Terminar` para marcarla como completada.\nLas tareas finalizadas muestran un tachado y no se iniciarán a menos que pulses `Reiniciar` desde el menú contextual."
+    "Right-click a task and choose `Finish` to mark it as completed. Finished tasks show a strikethrough and won't start unless you `Restart` them from the context menu.": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haz clic con el botón derecho en una tarea y elige `Terminar` para marcarla como completada.\nLas tareas finalizadas muestran un tachado y no se iniciarán a menos que pulses `Reiniciar` desde el menú contextual."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右键单击任务并选择“完成”以将其标记为已完成。已完成的任务会显示删除线，除非从上下文菜单中选择“重新开始”，否则不会启动。"
           }
         }
       }
     },
-    "Select any plain-text list of tasks (it may include existing times such as “Design 1:30:45”). Copy it to the clipboard (⌘C)." : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selecciona cualquier lista de texto plano de tareas (puede incluir tiempos existentes como \"Diseño 1:30:45\"). Cópiala al portapapeles (⌘C)."
+    "Select any plain-text list of tasks (it may include existing times such as “Design 1:30:45”). Copy it to the clipboard (⌘C).": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selecciona cualquier lista de texto plano de tareas (puede incluir tiempos existentes como \"Diseño 1:30:45\"). Cópiala al portapapeles (⌘C)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择任意纯文本任务列表（可包含现有时间，例如“设计 1:30:45”）。将其复制到剪贴板（⌘C）。"
           }
         }
       }
     },
-    "Show keyboard shortcuts" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar atajos de teclado"
+    "Show keyboard shortcuts": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar atajos de teclado"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示键盘快捷键"
           }
         }
       }
     },
-    "Start or pause a task" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inicia o pausa una tarea"
+    "Start or pause a task": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicia o pausa una tarea"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始或暂停任务"
           }
         }
       }
     },
-    "Task Editor" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Editor de tareas"
+    "Task Editor": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editor de tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任务编辑器"
           }
         }
       }
     },
-    "Tasks" : {
-      "comment" : "Label for tasks text area",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tareas"
+    "Tasks": {
+      "comment": "Label for tasks text area",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任务"
           }
         }
       }
     },
-    "Tasks Management" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gestión de tareas"
+    "Tasks Management": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gestión de tareas"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "任务管理"
           }
         }
       }
     },
-    "Timer" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Temporizador"
+    "Timer": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temporizador"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计时器"
           }
         }
       }
     },
-    "Timer Controls" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Controles del temporizador"
+    "Timer Controls": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controles del temporizador"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "计时器控制"
           }
         }
       }
     },
-    "Undo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deshacer"
+    "Undo": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deshacer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "撤销"
           }
         }
       }
     },
-    "Undo / Redo" : {
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deshacer / Rehacer"
+    "Undo / Redo": {
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deshacer / Rehacer"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "撤销 / 重做"
           }
         }
       }
     },
-    "Update tasks (⌘⏎)" : {
-      "comment" : "Button to update existing tasks",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Actualizar tareas (⌘⏎)"
+    "Update tasks (⌘⏎)": {
+      "comment": "Button to update existing tasks",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actualizar tareas (⌘⏎)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新任务 (⌘⏎)"
           }
         }
       }
     },
-    "Working time" : {
-      "comment" : "Label for working time",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tiempo de trabajo"
+    "Working time": {
+      "comment": "Label for working time",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiempo de trabajo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "工作时间"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }
