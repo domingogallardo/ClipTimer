@@ -336,7 +336,38 @@ final class TaskStoreFormattingTests: XCTestCase {
         XCTAssertEqual(task?.name, "Short task")
         XCTAssertEqual(task?.elapsed, 330) // 5*60 + 30
     }
-    
+
+    func testParseTaskLineWithSubtractionExpression() {
+        let task = taskStore.parseTaskLine("Newsletter: 4:29:32 - 2:09:00")
+        XCTAssertEqual(task?.name, "Newsletter")
+        XCTAssertEqual(task?.elapsed, 8432)
+    }
+
+    func testParseTaskLineWithAdditionExpression() {
+        let task = taskStore.parseTaskLine("Updates: 0:45:00 + 0:15:00")
+        XCTAssertEqual(task?.name, "Updates")
+        XCTAssertEqual(task?.elapsed, 3600)
+    }
+
+    func testParseTaskLineWithExpressionAndCompletion() {
+        let task = taskStore.parseTaskLine("~~Review~~: 1:00:00 - 0:15:00")
+        XCTAssertEqual(task?.name, "Review")
+        XCTAssertEqual(task?.elapsed, 2700)
+        XCTAssertTrue(task?.isCompleted ?? false)
+    }
+
+    func testParseTaskLineWithInvalidExpressionFallsBackToName() {
+        let task = taskStore.parseTaskLine("Task: 1:00 0:30")
+        XCTAssertEqual(task?.name, "Task: 1:00 0:30")
+        XCTAssertEqual(task?.elapsed, 0)
+    }
+
+    func testParseTaskLineWithNegativeExpressionClampsToZero() {
+        let task = taskStore.parseTaskLine("Overlogged: 0:10 - 0:20")
+        XCTAssertEqual(task?.name, "Overlogged")
+        XCTAssertEqual(task?.elapsed, 0)
+    }
+
     func testParseTaskLineWithBulletPoints() {
         let task = taskStore.parseTaskLine("• Bullet task: 2:15")
         XCTAssertEqual(task?.name, "Bullet task")
