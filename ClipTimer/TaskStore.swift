@@ -30,16 +30,6 @@ final class TaskStore: ObservableObject {
     /// Supported item symbols for task formatting
     private static let supportedSymbols = ["• ", "- ", "* ", "→ ", "✓ ", "☐ ", "•\t"]
     
-    /// Static regex for parsing task lines with time format
-    private static let timeParsingRegex: NSRegularExpression = {
-        // Pattern matches "Task name: H:MM:SS" or "Task name: MM:SS" or "Task name: SS"
-        // 1- Task name (lazily up to colon)
-        // 2- First numeric block (hours or minutes)
-        // 3- Second numeric block optional (minutes or seconds)
-        // 4- Third numeric block optional (seconds)
-        let pattern = #"^(.*?):\s*(\d{1,2})(?::(\d{2}))?(?::(\d{2}))?\s*$"#
-        return try! NSRegularExpression(pattern: pattern)
-    }()
 
     // Register undo/redo operations for task modifications
     private func registerUndo(previousTasks: [Task], actionName: String) {
@@ -239,7 +229,7 @@ final class TaskStore: ObservableObject {
         }
     }
     
-    // Parse task line with optional time format (e.g., "Task name: 1:30:45" or "Task name")
+    // Parse task line with optional time format or arithmetic (e.g., "Task: 1:30:45 - 0:15:00")
     func parseTaskLine(_ rawLine: String) -> Task? {
         let trimmed = rawLine.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
@@ -248,38 +238,19 @@ final class TaskStore: ObservableObject {
         let (_, textWithoutSymbol) = parseItemSymbolAndText(from: trimmed)
         let content = textWithoutSymbol
 
-        // Attempt to parse "Task name: time" format
-        let range = NSRange(content.startIndex..., in: content)
-        if let match = Self.timeParsingRegex.firstMatch(in: content, range: range) {
-            // Extract task name and detect strikethrough markers just around the name
-            var taskName = String(content[Range(match.range(at: 1), in: content)!])
-            var isCompleted = false
-            if taskName.hasPrefix("~~"), taskName.hasSuffix("~~") {
-                isCompleted = true
-                taskName = String(taskName.dropFirst(2).dropLast(2))
+        if let colonIndex = content.firstIndex(of: ":") {
+            let namePart = content[..<colonIndex].trimmingCharacters(in: .whitespaces)
+            let expressionPart = content[content.index(after: colonIndex)...].trimmingCharacters(in: .whitespaces)
+
+            if let elapsed = Self.parseTimeExpression(expressionPart) {
+                var taskName = String(namePart)
+                var isCompleted = false
+                if taskName.hasPrefix("~~"), taskName.hasSuffix("~~") {
+                    isCompleted = true
+                    taskName = String(taskName.dropFirst(2).dropLast(2))
+                }
+                return createTask(from: taskName, elapsed: elapsed, isCompleted: isCompleted)
             }
-
-            let first  = Int(content[Range(match.range(at: 2), in: content)!]) ?? 0
-            let second = match.range(at: 3).location != NSNotFound ? Int(content[Range(match.range(at: 3), in: content)!]) ?? 0 : nil
-            let third  = match.range(at: 4).location != NSNotFound ? Int(content[Range(match.range(at: 4), in: content)!]) ?? 0 : nil
-
-            let (hours, minutes, seconds): (Int, Int, Int)
-            if let third = third { // H:MM:SS
-                hours = first
-                minutes = second ?? 0
-                seconds = third
-            } else if let second = second { // MM:SS
-                hours = 0
-                minutes = first
-                seconds = second
-            } else { // Only seconds
-                hours = 0
-                minutes = 0
-                seconds = first
-            }
-
-            let elapsed = Double(hours * 3600 + minutes * 60 + seconds)
-            return createTask(from: taskName, elapsed: elapsed, isCompleted: isCompleted)
         }
 
         // No time found, treat entire line as task name, detecting strikethrough
@@ -290,6 +261,87 @@ final class TaskStore: ObservableObject {
             nameOnly = String(nameOnly.dropFirst(2).dropLast(2))
         }
         return createTask(from: nameOnly, elapsed: 0, isCompleted: isCompleted)
+    }
+
+    /// Evaluate a time expression such as "1:00:00 - 0:30:00 + 45". Returns `nil` for invalid input.
+    private static func parseTimeExpression(_ rawExpression: String) -> TimeInterval? {
+        let expression = rawExpression.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !expression.isEmpty else { return nil }
+
+        var totalSeconds = 0
+        var index = expression.startIndex
+        var sign = 1
+        var consumedValue = false
+
+        while index < expression.endIndex {
+            // Skip whitespace between tokens
+            while index < expression.endIndex, expression[index].isWhitespace {
+                index = expression.index(after: index)
+            }
+
+            guard index < expression.endIndex else { break }
+
+            let character = expression[index]
+
+            if character == "+" || character == "-" {
+                sign = (character == "+") ? 1 : -1
+                consumedValue = false
+                index = expression.index(after: index)
+                continue
+            }
+
+            guard character.isNumber else { return nil }
+            guard !consumedValue else { return nil }
+
+            let valueStart = index
+            while index < expression.endIndex {
+                let current = expression[index]
+                if current.isNumber || current == ":" {
+                    index = expression.index(after: index)
+                } else {
+                    break
+                }
+            }
+
+            let token = expression[valueStart..<index]
+            guard let tokenSeconds = parseTimeToken(token) else { return nil }
+
+            totalSeconds += sign * tokenSeconds
+            consumedValue = true
+            sign = 1
+        }
+
+        guard consumedValue else { return nil }
+
+        return TimeInterval(max(0, totalSeconds))
+    }
+
+    /// Parse a single time token into seconds. Tokens support "SS", "MM:SS", or "HH:MM:SS".
+    private static func parseTimeToken(_ token: Substring) -> Int? {
+        let components = token.split(separator: ":")
+        guard !components.isEmpty, components.count <= 3 else { return nil }
+
+        var values: [Int] = []
+        for (index, part) in components.enumerated() {
+            guard !part.isEmpty, part.allSatisfy({ $0.isNumber }) else { return nil }
+
+            if index > 0, part.count != 2 { return nil }
+            if index == 0, part.count > 2 { return nil }
+
+            guard let value = Int(part) else { return nil }
+            values.append(value)
+        }
+
+        switch values.count {
+        case 1:
+            return values[0]
+        case 2:
+            return values[0] * 60 + values[1]
+        case 3:
+            return values[0] * 3600 + values[1] * 60 + values[2]
+        default:
+            return nil
+        }
     }
 
     // Helper method to create task with cleaned name

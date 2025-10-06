@@ -14,7 +14,7 @@ A clipboard-driven time tracking app for macOS that helps you monitor time spent
 - **Time Tracking**: Accurate time measurement with live updates
 - **Auto-Pause**: Automatically pauses active tasks when you quit the app
 - **Data Persistence**: Your tasks and elapsed times are automatically saved
-- **Task Editor Window**: Write or edit multiple tasks in a dedicated window (⌘E)
+- **Task Editor Window**: Write or edit multiple tasks in a dedicated window (⌘E), including arithmetic expressions such as `Newsletter: 4:29:32 - 2:09:00`
 - **Task Completion**: Mark tasks as finished and restart them later if needed
 
 ### 🔄 Smart Workflow
@@ -63,10 +63,11 @@ A clipboard-driven time tracking app for macOS that helps you monitor time spent
 5. **Export Summary**: Copy all tasks with elapsed times back to clipboard
 
 ### Supported Clipboard Formats
-ClipTimer automatically parses various time formats when pasting tasks:
+ClipTimer automatically parses various time formats when pasting tasks or editing them in the Task Editor:
 - `Task name: 1:30:45` (H:MM:SS)
 - `Task name: 90:30` (MM:SS)
 - `Task name` (starts at 0:00:00)
+- `Task name: 4:29:32 - 2:09:00 + 45` (add or subtract multiple time fragments)
 - Multi-line task lists (one task per line)
 
 ### Keyboard Shortcuts
@@ -135,6 +136,7 @@ ClipTimer/
 - ✅ Enhanced data persistence (v1.1.0)
 - ✅ Improved reliability and performance (v1.1.0)
 - ✅ Task Editor window (v1.2.0)
+- ✅ Arithmetic expressions when updating task times (v1.3.0)
 
 ### Code Style
 - Follow Swift API Design Guidelines
