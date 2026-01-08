@@ -396,14 +396,16 @@ final class TaskStore: ObservableObject {
     }
     
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
             guard let self, self.hasActiveTasks else { return }
             self.objectWillChange.send()
         }
+        RunLoop.main.add(timer, forMode: .common)
+        self.timer = timer
     }
     
     private func startBlinkTimer() {
-        blinkTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+        let timer = Timer(timeInterval: 0.5, repeats: true) { [weak self] _ in
             guard let self else { return }
             if self.hasActiveTasks {
                 self.showColons.toggle()
@@ -411,6 +413,8 @@ final class TaskStore: ObservableObject {
                 self.showColons = true
             }
         }
+        RunLoop.main.add(timer, forMode: .common)
+        blinkTimer = timer
     }
     
     func delete(_ task: Task) {

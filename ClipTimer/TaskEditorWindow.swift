@@ -35,6 +35,7 @@ struct TaskEditorWindow: View {
         )
         .onAppear {
             loadExistingTasks()
+            positionWindowNextToMainWindow()
             // Focus the text editor so it can receive key events
             isTextEditorFocused = true
             // Pause active task when editor opens
@@ -57,6 +58,44 @@ struct TaskEditorWindow: View {
 }
 
 private extension TaskEditorWindow {
+    func positionWindowNextToMainWindow() {
+        DispatchQueue.main.async {
+            guard let window = NSApp.windows.first(where: { $0.identifier?.rawValue == "task-editor" }) else { return }
+            let mainWindow = NSApp.windows.first(where: { $0.identifier?.rawValue == "main" })
+            let screen = mainWindow?.screen ?? window.screen ?? NSScreen.main
+            guard let screen else { return }
+
+            let visible = screen.visibleFrame
+            let frame = window.frame
+            let gap: CGFloat = 12
+
+            if let mainWindow {
+                let mainFrame = mainWindow.frame
+                var origin = NSPoint(
+                    x: mainFrame.maxX + gap,
+                    y: mainFrame.maxY - frame.height
+                )
+
+                // If it doesn't fit to the right, place to the left of main window.
+                if origin.x + frame.width > visible.maxX {
+                    origin.x = mainFrame.minX - frame.width - gap
+                }
+
+                // Clamp within visible area.
+                origin.x = min(max(origin.x, visible.minX), visible.maxX - frame.width)
+                origin.y = min(max(origin.y, visible.minY), visible.maxY - frame.height)
+
+                window.setFrameOrigin(origin)
+            } else {
+                let centered = NSPoint(
+                    x: visible.midX - (frame.width / 2),
+                    y: visible.midY - (frame.height / 2)
+                )
+                window.setFrameOrigin(centered)
+            }
+        }
+    }
+
     @ViewBuilder
     var textEditor: some View {
         ZStack(alignment: .topLeading) {
