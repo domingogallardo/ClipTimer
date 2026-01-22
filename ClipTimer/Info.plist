@@ -8,5 +8,7 @@
 <string>es</string>
 <string>zh-Hans</string>
 </array>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>ClipTimer uses Bluetooth to detect beacon presence.</string>
 </dict>
 </plist>

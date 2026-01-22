@@ -24,6 +24,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct ClipTimerApp: App {
     @StateObject private var store = TaskStore()
+    @StateObject private var beaconPresence = BeaconPresenceManager()
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
@@ -91,6 +92,7 @@ struct ClipTimerApp: App {
         Window("ClipTimer", id: "main") {
             ContentView()
                 .environmentObject(store)
+                .environmentObject(beaconPresence)
                 .frame(
                     minWidth: 380, idealWidth: 380,
                     minHeight: 540, idealHeight: 540
@@ -207,5 +209,6 @@ struct ClipTimerApp: App {
 #Preview {
     ContentView()
         .environmentObject(TaskStore())
+        .environmentObject(BeaconPresenceManager(initialState: .searching, startScanning: false))
         .frame(width: 380, height: 540)
 }

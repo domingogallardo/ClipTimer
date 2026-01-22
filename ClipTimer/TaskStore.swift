@@ -403,7 +403,7 @@ final class TaskStore: ObservableObject {
         RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
     }
-    
+
     private func startBlinkTimer() {
         let timer = Timer(timeInterval: 0.5, repeats: true) { [weak self] _ in
             guard let self else { return }

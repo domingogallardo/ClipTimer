@@ -10,14 +10,31 @@ import AppKit
 
 struct ContentView: View {
     @EnvironmentObject private var store: TaskStore
+    @EnvironmentObject private var beaconPresence: BeaconPresenceManager
     @Environment(\.undoManager) private var undoManager
     @Environment(\.openWindow) private var openWindow
     @State private var showHelp = false
+    @State private var showAwayAlert = false
 
     var body: some View {
         VStack(spacing: 0) {
 
             header
+
+            if beaconPresence.needsBluetoothPermission {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                    Text("Bluetooth permission required. Enable it in System Settings > Privacy & Security > Bluetooth.")
+                }
+                .font(.footnote)
+                .foregroundStyle(.red)
+                .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.red.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+            }
 
             Divider()
 
@@ -38,6 +55,24 @@ struct ContentView: View {
             footer
         }
         .onAppear { store.undoManager = undoManager }
+        .onChange(of: beaconPresence.state) { _, newState in
+            if newState == .away {
+                if store.activeTaskID != nil {
+                    store.pauseActiveTask()
+                    showAwayAlert = true
+                }
+            }
+        }
+        .alert(NSLocalizedString("Task paused due to absence",
+                                 comment: "Alert title when task paused due to beacon absence"),
+               isPresented: $showAwayAlert) {
+            Button("OK", role: .cancel) {
+                beaconPresence.restartDetection()
+            }
+        } message: {
+            Text(NSLocalizedString("The active task was paused because the beacon was not detected.",
+                                   comment: "Alert message when task paused due to beacon absence"))
+        }
         .overlay(helpOverlay)
     }
 }
@@ -51,6 +86,16 @@ private extension ContentView {
                 .font(.system(size: 24, weight: .bold))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
+
+            Circle()
+                .fill(beaconPresence.isPresent ? Color.green : Color.red)
+                .frame(width: 12, height: 12)
+                .shadow(color: (beaconPresence.isPresent ? Color.green : Color.red).opacity(0.5),
+                        radius: 3, x: 0, y: 0)
+                .help(beaconPresence.awaitingConfirmation
+                      ? "Beacon detection paused."
+                      : (beaconPresence.isPresent ? "Beacon present" : "Beacon not detected"))
+            .padding(.horizontal, 8)
 
             Button {
                 openWindow(id: "task-editor")
@@ -111,23 +156,28 @@ private extension ContentView {
 
 #if DEBUG
 
-#Preview {
-    ContentView()
-        .environmentObject(TaskStore())
-        .frame(width: 380, height: 600)
-}
-
-#Preview {
+@MainActor
+private func makePreviewStore() -> TaskStore {
     let store = TaskStore()
     store.tasks = [
         Task(name: "Write Report", elapsed: 432),
         Task(name: "Email Review", elapsed: 1230)
     ]
-    // Make first task active
     store.activeTaskID = store.tasks[0].id
-    
-    return ContentView()
-        .environmentObject(store)
+    return store
+}
+
+#Preview {
+    ContentView()
+        .environmentObject(TaskStore())
+        .environmentObject(BeaconPresenceManager(initialState: .present, startScanning: false))
+        .frame(width: 380, height: 600)
+}
+
+#Preview {
+    ContentView()
+        .environmentObject(makePreviewStore())
+        .environmentObject(BeaconPresenceManager(initialState: .searching, startScanning: false))
         .frame(width: 380, height: 600)
 }
 
