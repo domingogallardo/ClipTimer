@@ -87,14 +87,19 @@ private extension ContentView {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
 
-            Circle()
-                .fill(beaconPresence.isPresent ? Color.green : Color.red)
-                .frame(width: 12, height: 12)
-                .shadow(color: (beaconPresence.isPresent ? Color.green : Color.red).opacity(0.5),
-                        radius: 3, x: 0, y: 0)
-                .help(beaconPresence.awaitingConfirmation
-                      ? "Beacon detection paused."
-                      : (beaconPresence.isPresent ? "Beacon present" : "Beacon not detected"))
+            Button {
+                if canResumeBeaconDetection {
+                    beaconPresence.restartDetection()
+                }
+            } label: {
+                Circle()
+                    .fill(beaconPresence.isPresent ? Color.green : Color.red)
+                    .frame(width: 12, height: 12)
+                    .shadow(color: (beaconPresence.isPresent ? Color.green : Color.red).opacity(0.5),
+                            radius: 3, x: 0, y: 0)
+            }
+            .buttonStyle(.plain)
+            .help(presenceIndicatorHelp)
             .padding(.horizontal, 8)
 
             Button {
@@ -151,6 +156,25 @@ private extension ContentView {
             withAnimation { showHelp = false }
         }
         .animation(.easeInOut(duration: 0.5), value: showHelp)
+    }
+
+    var canResumeBeaconDetection: Bool {
+        beaconPresence.awaitingConfirmation && store.activeTaskID == nil
+    }
+
+    var presenceIndicatorHelp: Text {
+        if beaconPresence.awaitingConfirmation {
+            if store.activeTaskID == nil {
+                return Text("Beacon detection paused. Click to resume.")
+            }
+            return Text("Beacon detection paused.")
+        }
+
+        if beaconPresence.isPresent {
+            return Text("Beacon present")
+        }
+
+        return Text("Beacon not detected")
     }
 }
 
