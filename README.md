@@ -111,6 +111,10 @@ xcodebuild test -scheme ClipTimer -destination 'platform=macOS'
 
 ## 🛠️ Development
 
+### Branches
+- `main`: App Store release branch.
+- `local`: Internal branch that includes beacon-based presence features.
+
 ### Project Structure
 ```
 ClipTimer/
