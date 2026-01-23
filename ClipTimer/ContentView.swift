@@ -15,6 +15,8 @@ struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @State private var showHelp = false
     @State private var showAwayAlert = false
+    @State private var awayAlertTitle = ""
+    @State private var awayAlertMessage = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -57,21 +59,44 @@ struct ContentView: View {
         .onAppear { store.undoManager = undoManager }
         .onChange(of: beaconPresence.state) { _, newState in
             if newState == .away {
-                if store.activeTaskID != nil {
+                let hadActiveTask = store.activeTaskID != nil
+                if hadActiveTask {
                     store.pauseActiveTask()
-                    showAwayAlert = true
                 }
+
+                if hadActiveTask {
+                    awayAlertTitle = NSLocalizedString(
+                        "Task paused due to absence",
+                        comment: "Alert title when task paused due to beacon absence"
+                    )
+                    awayAlertMessage = NSLocalizedString(
+                        "The active task was paused because the beacon was not detected.",
+                        comment: "Alert message when task paused due to beacon absence"
+                    )
+                } else {
+                    awayAlertTitle = NSLocalizedString(
+                        "Beacon not detected",
+                        comment: "Alert title when beacon presence is lost"
+                    )
+                    awayAlertMessage = NSLocalizedString(
+                        "The beacon was not detected. Detection is paused until you confirm you are back.",
+                        comment: "Alert message when beacon presence is lost without active task"
+                    )
+                }
+
+                if let details = beaconPresence.lastAbsenceDetails?.formattedDescription {
+                    awayAlertMessage += "\n\n" + details
+                }
+
+                showAwayAlert = true
             }
         }
-        .alert(NSLocalizedString("Task paused due to absence",
-                                 comment: "Alert title when task paused due to beacon absence"),
-               isPresented: $showAwayAlert) {
+        .alert(Text(awayAlertTitle), isPresented: $showAwayAlert) {
             Button("OK", role: .cancel) {
                 beaconPresence.restartDetection()
             }
         } message: {
-            Text(NSLocalizedString("The active task was paused because the beacon was not detected.",
-                                   comment: "Alert message when task paused due to beacon absence"))
+            Text(awayAlertMessage)
         }
         .overlay(helpOverlay)
     }
@@ -87,20 +112,13 @@ private extension ContentView {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
 
-            Button {
-                if canResumeBeaconDetection {
-                    beaconPresence.restartDetection()
-                }
-            } label: {
-                Circle()
-                    .fill(beaconPresence.isPresent ? Color.green : Color.red)
-                    .frame(width: 12, height: 12)
-                    .shadow(color: (beaconPresence.isPresent ? Color.green : Color.red).opacity(0.5),
-                            radius: 3, x: 0, y: 0)
-            }
-            .buttonStyle(.plain)
-            .help(presenceIndicatorHelp)
-            .padding(.horizontal, 8)
+            Circle()
+                .fill(beaconPresence.isPresent ? Color.green : Color.red)
+                .frame(width: 12, height: 12)
+                .shadow(color: (beaconPresence.isPresent ? Color.green : Color.red).opacity(0.5),
+                        radius: 3, x: 0, y: 0)
+                .help(presenceIndicatorHelp)
+                .padding(.horizontal, 8)
 
             Button {
                 openWindow(id: "task-editor")
@@ -158,15 +176,8 @@ private extension ContentView {
         .animation(.easeInOut(duration: 0.5), value: showHelp)
     }
 
-    var canResumeBeaconDetection: Bool {
-        beaconPresence.awaitingConfirmation && store.activeTaskID == nil
-    }
-
     var presenceIndicatorHelp: Text {
         if beaconPresence.awaitingConfirmation {
-            if store.activeTaskID == nil {
-                return Text("Beacon detection paused. Click to resume.")
-            }
             return Text("Beacon detection paused.")
         }
 

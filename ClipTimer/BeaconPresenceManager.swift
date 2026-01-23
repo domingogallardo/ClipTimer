@@ -50,9 +50,41 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
         case away
     }
 
+    struct AbsenceDetails: Equatable {
+        let reason: String
+        let rssi: Int?
+        let rssiAverage: Double?
+        let ageSeconds: Int?
+        let weakDuration: TimeInterval?
+        let minValidRssiThreshold: Int
+        let weakSeconds: TimeInterval
+        let weakPrimeSeconds: TimeInterval
+        let awayTimeout: TimeInterval
+
+        var formattedDescription: String {
+            let rssiLabel = rssi.map { String($0) } ?? "NA"
+            let rssiAvgLabel = rssiAverage.map { String(format: "%.1f", $0) } ?? "NA"
+            let ageLabel = ageSeconds.map { String($0) } ?? "NA"
+            let weakAge = weakDuration.map { String(format: "%.0f", $0) } ?? "NA"
+            let weakSecondsLabel = String(format: "%.0f", weakSeconds)
+            let weakPrimeLabel = String(format: "%.0f", weakPrimeSeconds)
+            let awayTimeoutLabel = String(format: "%.0f", awayTimeout)
+
+            return """
+Reason: \(reason)
+RSSI: \(rssiLabel)
+RSSI avg: \(rssiAvgLabel)
+Age: \(ageLabel)s
+Weak duration: \(weakAge)s (threshold \(minValidRssiThreshold), weak \(weakSecondsLabel)s, prime \(weakPrimeLabel)s)
+Away timeout: \(awayTimeoutLabel)s
+"""
+        }
+    }
+
     @Published private(set) var state: PresenceState
     @Published private(set) var bluetoothState: CBManagerState = .unknown
     @Published private(set) var awaitingConfirmation = false
+    @Published private(set) var lastAbsenceDetails: AbsenceDetails?
 
     var isPresent: Bool {
         state == .present
@@ -258,6 +290,17 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
         }
 
         if newState == .away && lastState != .away {
+            lastAbsenceDetails = AbsenceDetails(
+                reason: reason,
+                rssi: lastRssi,
+                rssiAverage: rssiFiltered,
+                ageSeconds: ageSeconds,
+                weakDuration: weakDuration,
+                minValidRssiThreshold: config.minValidRssiThreshold,
+                weakSeconds: config.weakSeconds,
+                weakPrimeSeconds: config.weakPrimeSeconds,
+                awayTimeout: config.awayTimeout
+            )
             if state != .away {
                 state = .away
             }
@@ -325,6 +368,7 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
         lastLoggedMinute = nil
         weakSince = nil
         awaitingConfirmation = false
+        lastAbsenceDetails = nil
         if state != .searching {
             state = .searching
         }
