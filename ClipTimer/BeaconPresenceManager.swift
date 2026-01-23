@@ -26,6 +26,7 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
         let target: BeaconKey
         let minValidRssiThreshold: Int
         let weakSeconds: TimeInterval
+        let weakPrimeSeconds: TimeInterval
         let awayTimeout: TimeInterval
         let emaAlpha: Double
 
@@ -35,8 +36,9 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
                 major: 10011,
                 minor: 19641
             ),
-            minValidRssiThreshold: -75,
-            weakSeconds: 60.0,
+            minValidRssiThreshold: -70,
+            weakSeconds: 30.0,
+            weakPrimeSeconds: 20.0,
             awayTimeout: 90.0,
             emaAlpha: 0.3
         )
@@ -206,6 +208,7 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
         }
 
         let weakTimedOut = weakDuration.map { $0 >= config.weakSeconds } ?? false
+        let weakPrimed = weakDuration.map { $0 >= config.weakPrimeSeconds } ?? false
 
         let newState: PresenceState
         let reason: String
@@ -217,15 +220,22 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
             firstPresenceConfirmed = true
             newState = .present
             reason = "assumed"
-        } else if weakTimedOut {
-            newState = .away
-            reason = "weak-rssi"
-        } else if let ageSeconds = ageSeconds, Double(ageSeconds) > config.awayTimeout {
-            newState = .away
-            reason = "timeout"
         } else {
-            newState = .present
-            reason = "hold"
+            if weakTimedOut {
+                newState = .away
+                reason = "weak-rssi"
+            } else if let ageSeconds = ageSeconds, Double(ageSeconds) > config.awayTimeout {
+                if weakPrimed {
+                    newState = .away
+                    reason = "timeout"
+                } else {
+                    newState = .present
+                    reason = "stale-hold"
+                }
+            } else {
+                newState = .present
+                reason = "hold"
+            }
         }
 
         let rssiLabel = lastRssi.map { String($0) } ?? "NA"
@@ -233,7 +243,7 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
         let ageLabel = ageSeconds.map { String($0) } ?? "NA"
         let awayTimeoutLabel = String(format: "%.0f", config.awayTimeout)
         let weakAge = weakDuration.map { String(format: "%.0f", $0) } ?? "NA"
-        let weakLabel = "weak=\(weakAge)s/\(Int(config.weakSeconds))s@\(config.minValidRssiThreshold)"
+        let weakLabel = "weak=\(weakAge)s/\(Int(config.weakSeconds))s@\(config.minValidRssiThreshold) prime=\(Int(config.weakPrimeSeconds))s"
         let detailed = "[BLE] presence \(newState.rawValue) (reason=\(reason), rssi=\(rssiLabel), rssiAvg=\(rssiAvgLabel), age=\(ageLabel)s, valid>=\(config.minValidRssiThreshold), \(weakLabel), awayTimeout=\(awayTimeoutLabel)s)"
 
         let stateChanged = newState == .searching || lastState == nil || lastState != newState
@@ -242,7 +252,7 @@ final class BeaconPresenceManager: NSObject, ObservableObject, CBCentralManagerD
         } else if firstPresenceConfirmed {
             let minuteIndex = Int(now.timeIntervalSince(startTime) / 60) + 1
             if lastLoggedMinute != minuteIndex {
-                print("[BLE] minute \(minuteIndex): \(newState.rawValue) (reason=\(reason), age=\(ageLabel)s, rssiAvg=\(rssiAvgLabel))")
+                print("[BLE] minute \(minuteIndex): \(newState.rawValue) (reason=\(reason), age=\(ageLabel)s, rssiAvg=\(rssiAvgLabel), \(weakLabel))")
                 lastLoggedMinute = minuteIndex
             }
         }
