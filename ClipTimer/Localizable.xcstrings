@@ -996,6 +996,23 @@
         }
       }
     },
+    "Alert time: %@" : {
+      "comment" : "Alert time label for beacon absence alerts",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora de la alerta: %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "警报时间：%@"
+          }
+        }
+      }
+    },
     "Timer" : {
       "localizations" : {
         "es" : {

@@ -17,6 +17,12 @@ struct ContentView: View {
     @State private var showAwayAlert = false
     @State private var awayAlertTitle = ""
     @State private var awayAlertMessage = ""
+    private static let alertTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        return formatter
+    }()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -83,6 +89,16 @@ struct ContentView: View {
                         comment: "Alert message when beacon presence is lost without active task"
                     )
                 }
+
+                let alertTime = Self.alertTimeFormatter.string(from: Date())
+                let timeLabel = String(
+                    format: NSLocalizedString(
+                        "Alert time: %@",
+                        comment: "Alert time label for beacon absence alerts"
+                    ),
+                    alertTime
+                )
+                awayAlertMessage += "\n\n" + timeLabel
 
                 if let details = beaconPresence.lastAbsenceDetails?.formattedDescription {
                     awayAlertMessage += "\n\n" + details
