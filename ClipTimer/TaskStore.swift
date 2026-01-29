@@ -24,6 +24,7 @@ final class TaskStore: ObservableObject {
     // MARK: - Local Persistence
     private let userDefaults = UserDefaults.standard
     private let localStorageKey = "saved_tasks"
+    private let itemSymbolStorageKey = "saved_item_symbol"
     
     // MARK: - Constants
     
@@ -511,6 +512,11 @@ final class TaskStore: ObservableObject {
         do {
             let data = try JSONEncoder().encode(tasks)
             userDefaults.set(data, forKey: localStorageKey)
+            if itemSymbol.isEmpty {
+                userDefaults.removeObject(forKey: itemSymbolStorageKey)
+            } else {
+                userDefaults.set(itemSymbol, forKey: itemSymbolStorageKey)
+            }
 #if DEBUG
             print("💾 Saved \(tasks.count) tasks locally")
 #endif
@@ -531,6 +537,7 @@ final class TaskStore: ObservableObject {
         do {
             let savedTasks = try JSONDecoder().decode([Task].self, from: data)
             tasks = savedTasks
+            itemSymbol = userDefaults.string(forKey: itemSymbolStorageKey) ?? ""
 #if DEBUG
             print("📥 Loaded \(savedTasks.count) tasks from local storage")
 #endif
@@ -560,6 +567,9 @@ extension TaskStore {
     /// Clear all persisted data - for testing only
     func clearPersistedData() {
         userDefaults.removeObject(forKey: localStorageKey)
+        userDefaults.removeObject(forKey: itemSymbolStorageKey)
+        tasks = []
+        itemSymbol = ""
         print("🧪 Cleared persisted data for testing")
     }
     
