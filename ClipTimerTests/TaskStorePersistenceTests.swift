@@ -63,6 +63,16 @@ final class TaskStorePersistenceTests: XCTestCase {
         XCTAssertEqual(newTaskStore.tasks[1].name, "Persistence Task 2")
         XCTAssertEqual(newTaskStore.tasks[1].elapsed, 300.75, accuracy: 0.01)
     }
+
+    func testItemSymbolPersistenceRoundTrip() {
+        taskStore.replaceTasks(from: "- Task 1\n- Task 2")
+        XCTAssertEqual(taskStore.itemSymbol, "- ")
+
+        let newTaskStore = TaskStore()
+
+        XCTAssertEqual(newTaskStore.tasks.count, 2)
+        XCTAssertEqual(newTaskStore.itemSymbol, "- ")
+    }
     
     // MARK: - Auto-Save Tests
     
