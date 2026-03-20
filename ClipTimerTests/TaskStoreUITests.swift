@@ -43,6 +43,12 @@ final class TaskStoreUITests: XCTestCase {
         XCTAssertTrue(summary.contains("Task 2: 0:02:00"))
         XCTAssertTrue(summary.contains("\(NSLocalizedString("Working time", comment: "Label for working time")): 0:03:00"))
     }
+
+    func testMenuBarDisplayTextUsesStableClockFormatting() {
+        taskStore.tasks = [Task(name: "Task 1", elapsed: 3661)]
+
+        XCTAssertEqual(taskStore.menuBarDisplayText, "1:01:01")
+    }
     
     // MARK: - UI Text Tests
     
