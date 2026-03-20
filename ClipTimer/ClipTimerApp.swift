@@ -26,6 +26,10 @@ struct ClipTimerApp: App {
     @StateObject private var store = TaskStore()
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    private func window(withIdentifier identifier: String) -> NSWindow? {
+        NSApp.windows.first { $0.identifier?.rawValue == identifier }
+    }
     
     // Function to handle paste command based on active window
     private func handlePasteCommand() {
@@ -96,7 +100,7 @@ struct ClipTimerApp: App {
                     minHeight: 540, idealHeight: 540
                 ).onAppear {
                     // Center window on screen when app launches
-                    NSApp.windows.first?.center()
+                    window(withIdentifier: "main")?.center()
                     // Connect TaskStore to AppDelegate for termination handling
                     appDelegate.taskStore = store
                 }
@@ -184,7 +188,7 @@ struct ClipTimerApp: App {
             Divider()
             Button("Open main window") {
                 // Find and restore main window or create new one
-                if let win = NSApp.windows.first(where: { $0.identifier?.rawValue == "main" }) {
+                if let win = window(withIdentifier: "main") {
                     if win.isMiniaturized {
                         win.deminiaturize(nil)
                     }
@@ -196,11 +200,11 @@ struct ClipTimerApp: App {
                 }
             }
         } label: {
-            Text(store.totalElapsed.hms(showSecondsColon: store.showColons))
-                .monospacedDigit()
-                .font(.system(size: 12, weight: .semibold))
+            Text(store.menuBarDisplayText)
+                .font(.system(size: 12, weight: .semibold, design: .monospaced))
                 .padding(.horizontal, 6)
         }
+        .menuBarExtraStyle(.menu)
     }
 }
 

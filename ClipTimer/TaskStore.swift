@@ -12,14 +12,12 @@ import AppKit
 @MainActor
 final class TaskStore: ObservableObject {
     @Published var tasks: [Task] = []
-    @Published var showColons: Bool = true
     @Published var activeTaskID: UUID?
     @Published var activeTaskStartTime: Date? = nil  // Single Source of Truth for start time
     @Published var itemSymbol: String = ""  // Item symbol for all tasks
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
     private var timer: Timer?
-    private var blinkTimer: Timer?
 
     // MARK: - Local Persistence
     private let userDefaults = UserDefaults.standard
@@ -57,13 +55,11 @@ final class TaskStore: ObservableObject {
     
     init() { 
         startTimer() 
-        startBlinkTimer()
         loadTasksLocally()  // 🆕 Load tasks on app start
     }
     
     deinit {
         timer?.invalidate()
-        blinkTimer?.invalidate()
     }
     
     var totalElapsed: TimeInterval {
@@ -102,6 +98,11 @@ final class TaskStore: ObservableObject {
         if tasks.isEmpty { return NSLocalizedString("No tasks yet", comment: "Message shown when there are no tasks") }
         return taskLines().joined(separator: "\n") +
         "\n\n\(NSLocalizedString("Working time", comment: "Label for working time")): \(totalElapsed.hms)"
+    }
+
+    /// Keep menu bar text stable to avoid triggering extra layout churn in the status item.
+    var menuBarDisplayText: String {
+        totalElapsed.hms
     }
     
     // Toggle task activation - only one task can be active at a time
@@ -403,19 +404,6 @@ final class TaskStore: ObservableObject {
         }
         RunLoop.main.add(timer, forMode: .common)
         self.timer = timer
-    }
-    
-    private func startBlinkTimer() {
-        let timer = Timer(timeInterval: 0.5, repeats: true) { [weak self] _ in
-            guard let self else { return }
-            if self.hasActiveTasks {
-                self.showColons.toggle()
-            } else {
-                self.showColons = true
-            }
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        blinkTimer = timer
     }
     
     func delete(_ task: Task) {
