@@ -113,7 +113,22 @@ xcodebuild test -scheme ClipTimer -destination 'platform=macOS'
 
 ### Branches
 - `main`: App Store release branch.
-- `local`: Internal branch that includes beacon-based presence features.
+- `beacon`: Private-feature branch built on top of `main`. It can live on GitHub, but it must never be used for App Store submissions.
+
+### Branch Workflow
+1. Start shared or App Store-safe changes from `main` and merge them back into `main`.
+2. Start beacon-only work from `beacon` and merge it back into `beacon`.
+3. Keep the private branch current with `main` by merging `main` into `beacon` regularly:
+   ```bash
+   git switch main
+   git pull
+
+   git switch beacon
+   git merge main
+   git push
+   ```
+4. Do not use `beacon` for App Store releases. Public release builds and App Store submissions must always come from `main`.
+5. Prefer `merge main -> beacon` for ongoing maintenance. Reserve `cherry-pick` for exceptional cases where only a single fix should move between branches.
 
 ### Project Structure
 ```
