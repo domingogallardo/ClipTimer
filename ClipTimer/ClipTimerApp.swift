@@ -152,11 +152,11 @@ struct ClipTimerApp: App {
 
             CommandMenu("Timer") {
                 Button("Pause active task") {
-                    store.pauseActiveTask()
+                    store.pauseActiveTask(trigger: "Timer menu or Cmd-P")
                 }
                 .keyboardShortcut("p")
                 Button("Restart last paused task") {
-                    store.restartLastPausedTask()
+                    store.restartLastPausedTask(trigger: "Timer menu or Cmd-R")
                 }
                 .keyboardShortcut("r")
                 Button("Finish active task") {

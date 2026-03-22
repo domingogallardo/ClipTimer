@@ -7,6 +7,12 @@
 
 import SwiftUI
 import AppKit
+import os
+
+private let taskEditorLogger = Logger(
+    subsystem: Bundle.main.bundleIdentifier ?? "ClipTimer",
+    category: "TaskEditor"
+)
 
 struct TaskEditorWindow: View {
     @EnvironmentObject private var store: TaskStore
@@ -38,12 +44,15 @@ struct TaskEditorWindow: View {
         })
         .onAppear {
             loadExistingTasks()
+            taskEditorLogger.notice(
+                "TaskEditorWindow.onAppear activeTaskID=\(store.activeTaskID?.uuidString ?? "nil", privacy: .public)"
+            )
             // Focus the text editor so it can receive key events
             isTextEditorFocused = true
             // Pause active task when editor opens
             if store.activeTaskID != nil {
                 // There's an active task, pause it and remember that we did so
-                store.pauseActiveTask()
+                store.pauseActiveTask(trigger: "TaskEditorWindow.onAppear")
                 didEditorPauseTask = true
             } else {
                 // Editor did not pause anything
@@ -51,9 +60,12 @@ struct TaskEditorWindow: View {
             }
         }
         .onDisappear {
+            taskEditorLogger.notice(
+                "TaskEditorWindow.onDisappear didEditorPauseTask=\(didEditorPauseTask, privacy: .public) activeTaskID=\(store.activeTaskID?.uuidString ?? "nil", privacy: .public)"
+            )
             // Restart only if the editor itself paused a task
             if didEditorPauseTask {
-                store.restartLastPausedTask()
+                store.restartLastPausedTask(trigger: "TaskEditorWindow.onDisappear")
             }
         }
     }
@@ -90,6 +102,9 @@ private extension TaskEditorWindow {
             origin.y = min(max(origin.y, visible.minY), visible.maxY - frame.height)
 
             guard window.frame.origin != origin else { return }
+            taskEditorLogger.debug(
+                "Positioning task editor next to main window targetX=\(origin.x, format: .fixed(precision: 1)) targetY=\(origin.y, format: .fixed(precision: 1)) windowNumber=\(window.windowNumber, privacy: .public)"
+            )
             window.setFrameOrigin(origin)
         } else {
             let centered = NSPoint(
@@ -98,6 +113,9 @@ private extension TaskEditorWindow {
             )
 
             guard window.frame.origin != centered else { return }
+            taskEditorLogger.debug(
+                "Centering task editor targetX=\(centered.x, format: .fixed(precision: 1)) targetY=\(centered.y, format: .fixed(precision: 1)) windowNumber=\(window.windowNumber, privacy: .public)"
+            )
             window.setFrameOrigin(centered)
         }
     }
@@ -228,6 +246,9 @@ private struct WindowAccessor: NSViewRepresentable {
                 }
 
                 self.resolvedWindow = window
+                taskEditorLogger.notice(
+                    "WindowAccessor resolved window id=\(window.identifier?.rawValue ?? "nil", privacy: .public) number=\(window.windowNumber, privacy: .public)"
+                )
                 self.onResolve(window)
             }
         }
