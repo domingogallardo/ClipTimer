@@ -30,12 +30,12 @@ struct Task: Identifiable, Codable {
     }
     
     // Calculate current elapsed time including active time if running
-    func currentElapsed(activeTaskID: UUID?, startTime: Date?) -> TimeInterval {
+    func currentElapsed(activeTaskID: UUID?, startTime: Date?, now: Date = Date()) -> TimeInterval {
         var elapsed = self.elapsed
         
         // If this task is currently active, add the time since it started
         if activeTaskID == self.id, let startTime = startTime {
-            elapsed += Date().timeIntervalSince(startTime)
+            elapsed += now.timeIntervalSince(startTime)
         }
         
         return elapsed

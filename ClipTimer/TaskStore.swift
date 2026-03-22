@@ -23,7 +23,6 @@ final class TaskStore: ObservableObject {
     @Published var itemSymbol: String = ""  // Item symbol for all tasks
     weak var undoManager: UndoManager?
     private var lastPausedTaskID: UUID? = nil
-    private var timer: Timer?
 
     // MARK: - Local Persistence
     private let userDefaults = UserDefaults.standard
@@ -60,21 +59,20 @@ final class TaskStore: ObservableObject {
     }
     
     init() { 
-        startTimer() 
         loadTasksLocally()  // 🆕 Load tasks on app start
     }
-    
-    deinit {
-        timer?.invalidate()
-    }
-    
+
     var totalElapsed: TimeInterval {
-        tasks.reduce(0) { $0 + getCurrentElapsed(for: $1) }
+        totalElapsed(at: Date())
     }
     
     // Get current elapsed time for a task (including active time if running)
-    private func getCurrentElapsed(for task: Task) -> TimeInterval {
-        return task.currentElapsed(activeTaskID: activeTaskID, startTime: activeTaskStartTime)
+    func currentElapsed(for task: Task, at now: Date = Date()) -> TimeInterval {
+        task.currentElapsed(activeTaskID: activeTaskID, startTime: activeTaskStartTime, now: now)
+    }
+
+    func totalElapsed(at now: Date) -> TimeInterval {
+        tasks.reduce(0) { $0 + currentElapsed(for: $1, at: now) }
     }
     
     // Pause the currently active task (save elapsed time and clear active state)
@@ -103,7 +101,7 @@ final class TaskStore: ObservableObject {
     // MARK: - Helper to build summary lines
     private func taskLines() -> [String] {
         tasks.map {
-            let time = getCurrentElapsed(for: $0).hms
+            let time = currentElapsed(for: $0).hms
             let name = $0.isCompleted ? "~~\($0.name)~~" : $0.name
             return "\(itemSymbol)\(name): \(time)"
         }
@@ -113,11 +111,6 @@ final class TaskStore: ObservableObject {
         if tasks.isEmpty { return NSLocalizedString("No tasks yet", comment: "Message shown when there are no tasks") }
         return taskLines().joined(separator: "\n") +
         "\n\n\(NSLocalizedString("Working time", comment: "Label for working time")): \(totalElapsed.hms)"
-    }
-
-    /// Keep menu bar text stable to avoid triggering extra layout churn in the status item.
-    var menuBarDisplayText: String {
-        totalElapsed.hms
     }
     
     // Toggle task activation - only one task can be active at a time
@@ -412,15 +405,6 @@ final class TaskStore: ObservableObject {
         }
     }
     
-    private func startTimer() {
-        let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self, self.hasActiveTasks else { return }
-            self.objectWillChange.send()
-        }
-        RunLoop.main.add(timer, forMode: .common)
-        self.timer = timer
-    }
-    
     func delete(_ task: Task) {
         mutateTasks(actionName: "Delete task") { tasks in
             tasks.removeAll { $0.id == task.id }
@@ -429,6 +413,11 @@ final class TaskStore: ObservableObject {
     
     var hasActiveTasks: Bool {
         activeTaskID != nil
+    }
+
+    /// Reflect timer state in the menu bar without updating the title every second.
+    var menuBarIconName: String {
+        hasActiveTasks ? "power.circle.fill" : "power.circle"
     }
     
     func copySummaryToClipboard() {

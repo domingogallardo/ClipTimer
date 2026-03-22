@@ -79,11 +79,24 @@ private extension ContentView {
             Text("Working time")
                 .font(.headline)
             Spacer()
+            totalElapsedText
+        }
+        .padding()
+    }
+
+    @ViewBuilder
+    var totalElapsedText: some View {
+        if store.hasActiveTasks {
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                Text(store.totalElapsed(at: context.date).hms)
+                    .font(.headline)
+                    .monospacedDigit()
+            }
+        } else {
             Text(store.totalElapsed.hms)
                 .font(.headline)
                 .monospacedDigit()
         }
-        .padding()
     }
 
     // Sliding help overlay with tap-to-dismiss functionality

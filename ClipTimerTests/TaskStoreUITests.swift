@@ -44,12 +44,19 @@ final class TaskStoreUITests: XCTestCase {
         XCTAssertTrue(summary.contains("\(NSLocalizedString("Working time", comment: "Label for working time")): 0:03:00"))
     }
 
-    func testMenuBarDisplayTextUsesStableClockFormatting() {
-        taskStore.tasks = [Task(name: "Task 1", elapsed: 3661)]
+    func testMenuBarIconReflectsActiveTaskState() {
+        taskStore.tasks = [Task(name: "Task 1", elapsed: 0)]
 
-        XCTAssertEqual(taskStore.menuBarDisplayText, "1:01:01")
+        XCTAssertEqual(taskStore.menuBarIconName, "power.circle")
+
+        let task = taskStore.tasks[0]
+        taskStore.toggle(task)
+        XCTAssertEqual(taskStore.menuBarIconName, "power.circle.fill")
+
+        taskStore.pauseActiveTask()
+        XCTAssertEqual(taskStore.menuBarIconName, "power.circle")
     }
-    
+
     // MARK: - UI Text Tests
     
     func testEmptyTasksPlaceholderText() {
