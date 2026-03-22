@@ -8,6 +8,12 @@
 
 import SwiftUI
 import AppKit
+import os
+
+private let taskStoreLogger = Logger(
+    subsystem: Bundle.main.bundleIdentifier ?? "ClipTimer",
+    category: "TaskStore"
+)
 
 @MainActor
 final class TaskStore: ObservableObject {
@@ -75,9 +81,18 @@ final class TaskStore: ObservableObject {
     private func pauseCurrentActiveTask() {
         guard let activeID = activeTaskID,
               let activeIndex = tasks.firstIndex(where: { $0.id == activeID }),
-              let startTime = activeTaskStartTime else { return }
+              let startTime = activeTaskStartTime else {
+            taskStoreLogger.debug("pauseCurrentActiveTask ignored because there is no active task")
+            return
+        }
+
+        let taskName = tasks[activeIndex].name
+        let elapsedToAdd = Date().timeIntervalSince(startTime)
+        taskStoreLogger.notice(
+            "Pausing task name=\(taskName, privacy: .public) id=\(activeID.uuidString, privacy: .public) addedSeconds=\(elapsedToAdd, format: .fixed(precision: 2))"
+        )
         
-        tasks[activeIndex].elapsed += Date().timeIntervalSince(startTime)
+        tasks[activeIndex].elapsed += elapsedToAdd
         activeTaskID = nil
         activeTaskStartTime = nil
         
@@ -432,18 +447,35 @@ final class TaskStore: ObservableObject {
         return tasks.first(where: { $0.id == activeID })
     }
     
-    func pauseActiveTask() {
-        guard let activeID = activeTaskID else { return }
+    func pauseActiveTask(trigger: String = "unknown") {
+        guard let activeID = activeTaskID else {
+            taskStoreLogger.debug("pauseActiveTask ignored trigger=\(trigger, privacy: .public) because there is no active task")
+            return
+        }
+
+        let taskName = activeTask?.name ?? "Unknown"
+        taskStoreLogger.notice(
+            "pauseActiveTask trigger=\(trigger, privacy: .public) name=\(taskName, privacy: .public) id=\(activeID.uuidString, privacy: .public)"
+        )
         
         lastPausedTaskID = activeID
         pauseCurrentActiveTask()
     }
     
-    func restartLastPausedTask() {
+    func restartLastPausedTask(trigger: String = "unknown") {
         guard let pausedID = lastPausedTaskID,
               let _ = tasks.firstIndex(where: { $0.id == pausedID }) else {
+            let activeTaskIDDescription = self.activeTaskID?.uuidString ?? "nil"
+            taskStoreLogger.debug(
+                "restartLastPausedTask ignored trigger=\(trigger, privacy: .public) lastPausedTaskID=nil-or-missing activeTaskID=\(activeTaskIDDescription, privacy: .public)"
+            )
             return
         }
+
+        let pausedTaskName = tasks.first(where: { $0.id == pausedID })?.name ?? "Unknown"
+        taskStoreLogger.notice(
+            "restartLastPausedTask trigger=\(trigger, privacy: .public) name=\(pausedTaskName, privacy: .public) id=\(pausedID.uuidString, privacy: .public)"
+        )
         
         // First pause any currently active task
         pauseCurrentActiveTask()
@@ -472,11 +504,17 @@ final class TaskStore: ObservableObject {
     /// Pause active task and save state when app is about to terminate
     func pauseActiveTaskAndSave() {
         guard let activeID = activeTaskID else {
+            taskStoreLogger.debug("pauseActiveTaskAndSave ignored because there is no active task")
 #if DEBUG
             print("🚪 No active task to pause on app termination")
 #endif
             return
         }
+
+        let taskName = activeTask?.name ?? "Unknown"
+        taskStoreLogger.notice(
+            "pauseActiveTaskAndSave name=\(taskName, privacy: .public) id=\(activeID.uuidString, privacy: .public)"
+        )
         
 #if DEBUG
         print("🚪 Auto-pausing active task on app termination: \(activeTask?.name ?? "Unknown")")
