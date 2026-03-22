@@ -17,18 +17,13 @@ struct TaskRow: View {
     private var isActive: Bool {
         store.activeTaskID == task.id
     }
-    
-    private var currentElapsed: TimeInterval {
-        return task.currentElapsed(activeTaskID: store.activeTaskID, startTime: store.activeTaskStartTime)
-    }
 
     var body: some View {
         HStack {
             Text(task.name)
                 .strikethrough(task.isCompleted)
             Spacer()
-            Text(currentElapsed.hms)
-                .monospacedDigit()
+            elapsedText
             if task.isCompleted {
                 Image(systemName: "power.circle")
                     .resizable()
@@ -56,6 +51,19 @@ struct TaskRow: View {
             }
         }
         .padding(.vertical, 4)
+    }
+
+    @ViewBuilder
+    var elapsedText: some View {
+        if isActive {
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                Text(store.currentElapsed(for: task, at: context.date).hms)
+                    .monospacedDigit()
+            }
+        } else {
+            Text(store.currentElapsed(for: task).hms)
+                .monospacedDigit()
+        }
     }
 }
 

@@ -202,8 +202,8 @@ struct ClipTimerApp: App {
                 }
             }
         } label: {
-            Text(store.menuBarDisplayText)
-                .font(.system(size: 12, weight: .semibold, design: .monospaced))
+            Image(systemName: store.menuBarIconName)
+                .font(.system(size: 13, weight: .semibold))
                 .padding(.horizontal, 6)
         }
         .menuBarExtraStyle(.menu)
