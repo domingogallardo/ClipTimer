@@ -67,7 +67,7 @@ struct ContentView: View {
             if newState == .away {
                 let hadActiveTask = store.activeTaskID != nil
                 if hadActiveTask {
-                    store.pauseActiveTask()
+                    store.pauseActiveTask(trigger: "BeaconPresenceManager.away")
                 }
 
                 if hadActiveTask {
