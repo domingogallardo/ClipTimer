@@ -46,6 +46,8 @@ A clipboard-driven time tracking app for macOS that helps you monitor time spent
    cd ClipTimer
    ```
 
+   The default public workflow uses `main`. If you need the private beacon presence functionality for personal use, switch to `beacon` and build it locally only; never use `beacon` for App Store submissions.
+
 2. Open the project in Xcode:
    ```bash
    open ClipTimer.xcodeproj
